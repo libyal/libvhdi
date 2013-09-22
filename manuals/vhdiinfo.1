@@ -1,0 +1,62 @@
+.Dd May 12, 2013
+.Dt vhdiinfo
+.Os libvhdi
+.Sh NAME
+.Nm vhdiinfo
+.Nd determines information about a Virtual Hard Disk (VHD) image file
+.Sh SYNOPSIS
+.Nm vhdiinfo
+.Op Fl hvV
+.Va Ar source
+.Sh DESCRIPTION
+.Nm vhdiinfo
+is a utility to determine information about a Virtual Hard Disk (VHD) image file
+.Pp
+.Nm vhdiinfo
+is part of the
+.Nm libvhdi
+package.
+.Nm libvhdi
+is a library to access the Virtual Hard Disk (VHD) image format
+.Pp
+.Ar source
+is the source file.
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl h
+shows this help
+.It Fl v
+verbose output to stderr
+.It Fl V
+print version
+.El
+.Sh ENVIRONMENT
+None
+.Sh FILES
+None
+.Sh EXAMPLES
+.Bd -literal
+# vhdiinfo differential.vhd
+vhdiinfo 20130512
+
+Virtual Hard Disk (VHD) image information:
+	Format:			1.0
+	Disk type:		Differential
+	Media size:		536870912 bytes
+	Identifier:		5577d188-a753-4a80-800a-c627f764c304
+	Parent identifier:	44421587-1b53-4972-9ceb-9a31e1618e5b
+	Parent filename: 	dynamic.vhd
+
+.Ed
+.Sh DIAGNOSTICS
+Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled.
+Verbose and debug output are only printed when enabled at compilation.
+.Sh BUGS
+Please report bugs of any kind to <joachim.metz@gmail.com> or on the project website:
+http://code.google.com/p/libvhdi/
+.Sh AUTHOR
+These man pages were written by Joachim Metz.
+.Sh COPYRIGHT
+Copyright 2012-2013, Joachim Metz <joachim.metz@gmail.com>.
+.Sh SEE ALSO

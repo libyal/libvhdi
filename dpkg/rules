@@ -1,0 +1,86 @@
+#!/usr/bin/make -f
+# debian/rules that uses debhelper >= 7.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+PYTHON_PACKAGE_DIR=$(shell python -c "import distutils.sysconfig;print distutils.sysconfig.get_python_lib(True) ")
+
+
+%:
+	dh  $@
+
+install_libvhdi:
+	# Set up libvhdi package directories and files
+	mkdir -p debian/libvhdi/usr/lib
+	install -p -m755 debian/tmp/usr/lib/lib*.so.*.*.* debian/libvhdi/usr/lib
+
+install_libvhdi_dev:
+	# Set up libvhdi-dev package directories and files
+	mkdir -p debian/libvhdi-dev/usr/include
+	mkdir -p debian/libvhdi-dev/usr/include/libvhdi
+	mkdir -p debian/libvhdi-dev/usr/lib
+	mkdir -p debian/libvhdi-dev/usr/lib/pkgconfig
+	mkdir -p debian/libvhdi-dev/usr/share/man/man3
+	install -p -m755 debian/tmp/usr/include/*.h debian/libvhdi-dev/usr/include
+	install -p -m755 debian/tmp/usr/include/libvhdi/*.h debian/libvhdi-dev/usr/include/libvhdi
+	install -p -m755 debian/tmp/usr/lib/*.la debian/libvhdi-dev/usr/lib
+	install -p -m755 debian/tmp/usr/lib/lib*.a debian/libvhdi-dev/usr/lib
+	install -p -m755 debian/tmp/usr/lib/lib*.so debian/libvhdi-dev/usr/lib
+	install -p -m755 debian/tmp/usr/lib/pkgconfig/* debian/libvhdi-dev/usr/lib/pkgconfig
+	install -p -m755 debian/tmp/usr/share/man/man3/* debian/libvhdi-dev/usr/share/man/man3
+
+install_libvhdi_tools:
+	# Set up libvhdi-tools package directories and files
+	mkdir -p debian/libvhdi-tools/usr/bin
+	mkdir -p debian/libvhdi-tools/usr/share/man/man1
+	install -p -m755 debian/tmp/usr/bin/* debian/libvhdi-tools/usr/bin
+	install -p -m755 debian/tmp/usr/share/man/man1/* debian/libvhdi-tools/usr/share/man/man1
+
+install_libvhdi_python:
+	# Set up libvhdi-python package directories and files
+	mkdir -p debian/libvhdi-python/$(PYTHON_PACKAGE_DIR)
+	install -p -m775 debian/tmp$(PYTHON_PACKAGE_DIR)/pyvhdi.* debian/libvhdi-python$(PYTHON_PACKAGE_DIR)
+
+override_dh_auto_configure:
+	dh_auto_configure -- --enable-python
+
+override_dh_auto_test:
+
+override_dh_installinit: install_libvhdi install_libvhdi_dev install_libvhdi_tools install_libvhdi_python
+
+override_dh_installmenu:
+
+override_dh_installmime:
+
+override_dh_installmodules:
+
+override_dh_installlogcheck:
+
+override_dh_installlogrotate:
+
+override_dh_installpam:
+
+override_dh_installppp:
+
+override_dh_installudev:
+
+override_dh_installwm:
+
+override_dh_installxfonts:
+
+override_dh_gconf:
+
+override_dh_icons:
+
+override_dh_perl:
+
+override_dh_shlibdeps:
+	dh_shlibdeps -Llibvhdi -l${PWD}/debian/tmp/usr/lib
+
+override_dh_makeshlibs:
+	dh_makeshlibs -Xlibvhdi-dev
+
