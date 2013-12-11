@@ -27,8 +27,10 @@
 #endif
 
 #include "pyvhdi.h"
+#include "pyvhdi_error.h"
 #include "pyvhdi_file.h"
 #include "pyvhdi_file_object_io_handle.h"
+#include "pyvhdi_integer.h"
 #include "pyvhdi_libbfio.h"
 #include "pyvhdi_libcerror.h"
 #include "pyvhdi_libclocale.h"
@@ -102,7 +104,7 @@ PyMethodDef pyvhdi_file_object_methods[] = {
 	{ "get_offset",
 	  (PyCFunction) pyvhdi_file_get_offset,
 	  METH_NOARGS,
-	  "get_offset() -> Long\n"
+	  "get_offset() -> Integer\n"
 	  "\n"
 	  "Retrieved the current offset within the data." },
 
@@ -125,7 +127,7 @@ PyMethodDef pyvhdi_file_object_methods[] = {
 	{ "tell",
 	  (PyCFunction) pyvhdi_file_get_offset,
 	  METH_NOARGS,
-	  "tell() -> Long\n"
+	  "tell() -> Integer\n"
 	  "\n"
 	  "Retrieves the current offset within the data." },
 
@@ -134,7 +136,7 @@ PyMethodDef pyvhdi_file_object_methods[] = {
 	{ "get_media_size",
 	  (PyCFunction) pyvhdi_file_get_media_size,
 	  METH_NOARGS,
-	  "get_media_size() -> Long\n"
+	  "get_media_size() -> Integer\n"
 	  "\n"
 	  "Retrieves the size of the data." },
 
@@ -344,8 +346,6 @@ PyObject *pyvhdi_file_new_open_file_object(
 int pyvhdi_file_init(
      pyvhdi_file_t *pyvhdi_file )
 {
-	char error_string[ PYVHDI_ERROR_STRING_SIZE ];
-
 	static char *function    = "pyvhdi_file_init";
 	libcerror_error_t *error = NULL;
 
@@ -366,24 +366,12 @@ int pyvhdi_file_init(
 	     &( pyvhdi_file->file ),
 	     &error ) != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYVHDI_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to initialize file.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to initialize file.\n%s",
-			 function,
-			 error_string );
-		}
+		pyvhdi_error_raise(
+		 PyExc_MemoryError,
+		 "%s: unable to initialize file.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -397,8 +385,6 @@ int pyvhdi_file_init(
 void pyvhdi_file_free(
       pyvhdi_file_t *pyvhdi_file )
 {
-	char error_string[ PYVHDI_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error = NULL;
 	static char *function    = "pyvhdi_file_free";
 	int result               = 0;
@@ -449,24 +435,12 @@ void pyvhdi_file_free(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYVHDI_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to free libvhdi file.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to free libvhdi file.\n%s",
-			 function,
-			 error_string );
-		}
+		pyvhdi_error_raise(
+		 PyExc_MemoryError,
+		 "%s: unable to free libvhdi file.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 	}
@@ -481,8 +455,6 @@ PyObject *pyvhdi_file_signal_abort(
            pyvhdi_file_t *pyvhdi_file,
            PyObject *arguments PYVHDI_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYVHDI_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error = NULL;
 	static char *function    = "pyvhdi_file_signal_abort";
 	int result               = 0;
@@ -508,24 +480,12 @@ PyObject *pyvhdi_file_signal_abort(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYVHDI_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to signal abort.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to signal abort.\n%s",
-			 function,
-			 error_string );
-		}
+		pyvhdi_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to signal abort.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -545,8 +505,6 @@ PyObject *pyvhdi_file_open(
            PyObject *arguments,
            PyObject *keywords )
 {
-	char error_string[ PYVHDI_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error    = NULL;
 	char *filename              = NULL;
 	char *mode                  = NULL;
@@ -596,24 +554,12 @@ PyObject *pyvhdi_file_open(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYVHDI_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to open file.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to open file.\n%s",
-			 function,
-			 error_string );
-		}
+		pyvhdi_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to open file.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -633,8 +579,6 @@ PyObject *pyvhdi_file_open_file_object(
            PyObject *arguments,
            PyObject *keywords )
 {
-	char error_string[ PYVHDI_ERROR_STRING_SIZE ];
-
 	PyObject *file_object            = NULL;
 	libbfio_handle_t *file_io_handle = NULL;
 	libcerror_error_t *error         = NULL;
@@ -678,24 +622,12 @@ PyObject *pyvhdi_file_open_file_object(
 	     file_object,
 	     &error ) != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYVHDI_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to initialize file IO handle.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to initialize file IO handle.\n%s",
-			 function,
-			 error_string );
-		}
+		pyvhdi_error_raise(
+		 PyExc_MemoryError,
+		 "%s: unable to initialize file IO handle.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -713,24 +645,12 @@ PyObject *pyvhdi_file_open_file_object(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYVHDI_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to open file.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to open file.\n%s",
-			 function,
-			 error_string );
-		}
+		pyvhdi_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to open file.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -758,8 +678,6 @@ PyObject *pyvhdi_file_close(
            pyvhdi_file_t *pyvhdi_file,
            PyObject *arguments PYVHDI_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYVHDI_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error = NULL;
 	static char *function    = "pyvhdi_file_close";
 	int result               = 0;
@@ -785,24 +703,12 @@ PyObject *pyvhdi_file_close(
 
 	if( result != 0 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYVHDI_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to close file.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to close file.\n%s",
-			 function,
-			 error_string );
-		}
+		pyvhdi_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to close file.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -822,8 +728,6 @@ PyObject *pyvhdi_file_read_buffer(
            PyObject *arguments,
            PyObject *keywords )
 {
-	char error_string[ PYVHDI_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error    = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyvhdi_file_read_buffer";
@@ -884,28 +788,30 @@ PyObject *pyvhdi_file_read_buffer(
 
 	Py_END_ALLOW_THREADS
 
-	if( read_count != (ssize_t) read_size )
+	if( read_count <= -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYVHDI_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to read data.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to read data.\n%s",
-			 function,
-			 error_string );
-		}
+		pyvhdi_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to read data.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
+
+		Py_DecRef(
+		 (PyObject *) result_data );
+
+		return( NULL );
+	}
+	/* Need to resize the string here in case read_size was not fully read.
+	 */
+	if( _PyString_Resize(
+	     &result_data,
+	     (Py_ssize_t) read_count ) != 0 )
+	{
+		Py_DecRef(
+		 (PyObject *) result_data );
 
 		return( NULL );
 	}
@@ -920,8 +826,6 @@ PyObject *pyvhdi_file_read_random(
            PyObject *arguments,
            PyObject *keywords )
 {
-	char error_string[ PYVHDI_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error    = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyvhdi_file_read_random";
@@ -998,26 +902,28 @@ PyObject *pyvhdi_file_read_random(
 
 	if( read_count != (ssize_t) read_size )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYVHDI_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to read data.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to read data.\n%s",
-			 function,
-			 error_string );
-		}
+		pyvhdi_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to read data.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
+
+		Py_DecRef(
+		 (PyObject *) result_data );
+
+		return( NULL );
+	}
+	/* Need to resize the string here in case read_size was not fully read.
+	 */
+	if( _PyString_Resize(
+	     &result_data,
+	     (Py_ssize_t) read_count ) != 0 )
+	{
+		Py_DecRef(
+		 (PyObject *) result_data );
 
 		return( NULL );
 	}
@@ -1032,8 +938,6 @@ PyObject *pyvhdi_file_seek_offset(
            PyObject *arguments,
            PyObject *keywords )
 {
-	char error_string[ PYVHDI_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error    = NULL;
 	static char *function       = "pyvhdi_file_seek_offset";
 	static char *keyword_list[] = { "offset", "whence", NULL };
@@ -1071,24 +975,12 @@ PyObject *pyvhdi_file_seek_offset(
 
  	if( offset == -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYVHDI_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to seek offset.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to seek offset.\n%s",
-			 function,
-			 error_string );
-		}
+		pyvhdi_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to seek offset.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -1107,9 +999,8 @@ PyObject *pyvhdi_file_get_offset(
            pyvhdi_file_t *pyvhdi_file,
            PyObject *arguments PYVHDI_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYVHDI_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
 	static char *function    = "pyvhdi_file_get_offset";
 	off64_t current_offset   = 0;
 	int result               = 0;
@@ -1136,54 +1027,21 @@ PyObject *pyvhdi_file_get_offset(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYVHDI_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve offset.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve offset.\n%s",
-			 function,
-			 error_string );
-		}
+		pyvhdi_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve offset.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
 		return( NULL );
 	}
-#if defined( HAVE_LONG_LONG )
-	if( current_offset > (off64_t) LLONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: offset value exceeds maximum.",
-		 function );
+	integer_object = pyvhdi_integer_signed_new_from_64bit(
+	                  (int64_t) current_offset );
 
-		return( NULL );
-	}
-	return( PyLong_FromLongLong(
-	         (long long) current_offset ) );
-#else
-	if( current_offset > (off64_t) LONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: offset value exceeds maximum.",
-		 function );
-
-		return( NULL );
-	}
-	return( PyLong_FromLong(
-	         (long) current_offset ) );
-#endif
+	return( integer_object );
 }
 
 /* Retrieves the media size
@@ -1193,9 +1051,8 @@ PyObject *pyvhdi_file_get_media_size(
            pyvhdi_file_t *pyvhdi_file,
            PyObject *arguments PYVHDI_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYVHDI_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
 	static char *function    = "pyvhdi_file_get_media_size";
 	size64_t media_size      = 0;
 	int result               = 0;
@@ -1222,53 +1079,20 @@ PyObject *pyvhdi_file_get_media_size(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYVHDI_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: failed to retrieve media size.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: failed to retrieve media size.\n%s",
-			 function,
-			 error_string );
-		}
+		pyvhdi_error_raise(
+		 PyExc_IOError,
+		 "%s: failed to retrieve media size.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
 		return( NULL );
 	}
-#if defined( HAVE_LONG_LONG )
-	if( media_size > (size64_t) LLONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: media size value exceeds maximum.",
-		 function );
+	integer_object = pyvhdi_integer_unsigned_new_from_64bit(
+	                  (uint64_t) media_size );
 
-		return( NULL );
-	}
-	return( PyLong_FromLongLong(
-	         (long long) media_size ) );
-#else
-	if( media_size > (size64_t) LONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: media size value exceeds maximum.",
-		 function );
-
-		return( NULL );
-	}
-	return( PyLong_FromLong(
-	         (long) media_size ) );
-#endif
+	return( integer_object );
 }
 

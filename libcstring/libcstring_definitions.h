@@ -40,11 +40,11 @@
 #define LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER           1
 #endif
 
-#define LIBCSTRING_VERSION				20130403
+#define LIBCSTRING_VERSION				20131015
 
 /* The libcstring version string
  */
-#define LIBCSTRING_VERSION_STRING			"20130403"
+#define LIBCSTRING_VERSION_STRING			"20131015"
 
 #if defined( WINAPI ) && ( defined( _UNICODE ) || defined( UNICODE ) )
 #define PRIc_LIBCSTRING_SYSTEM				"lc"

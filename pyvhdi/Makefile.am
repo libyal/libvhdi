@@ -16,8 +16,10 @@ pyexec_LTLIBRARIES = pyvhdi.la
 
 pyvhdi_la_SOURCES = \
 	pyvhdi.c pyvhdi.h \
+	pyvhdi_error.c pyvhdi_error.h \
 	pyvhdi_file.c pyvhdi_file.h \
 	pyvhdi_file_object_io_handle.c pyvhdi_file_object_io_handle.h \
+	pyvhdi_integer.c pyvhdi_integer.h \
 	pyvhdi_libbfio.h \
 	pyvhdi_libcerror.h \
 	pyvhdi_libclocale.h \
@@ -43,9 +45,14 @@ pyvhdi_la_LDFLAGS  = -module -avoid-version $(PYTHON_LDFLAGS)
 
 endif
 
+EXTRA_DIST = \
+	setup.py \
+	setup.py.in
+
 MAINTAINERCLEANFILES = \
 	Makefile.in
 
 distclean: clean
+	/bin/rm -f setup.py
 	/bin/rm -f Makefile
 

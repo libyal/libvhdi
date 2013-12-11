@@ -42,9 +42,9 @@ vhdi_test_open_close_SOURCES = \
 	vhdi_test_unused.h
 
 vhdi_test_open_close_LDADD = \
-	@LIBCSTRING_LIBADD@ \
+	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@ \
-	../libvhdi/libvhdi.la
+	@LIBCSTRING_LIBADD@
 
 vhdi_test_read_SOURCES = \
 	vhdi_test_libcerror.h \
@@ -54,9 +54,9 @@ vhdi_test_read_SOURCES = \
 	vhdi_test_unused.h
 
 vhdi_test_read_LDADD = \
-	@LIBCSTRING_LIBADD@ \
+	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@ \
-	../libvhdi/libvhdi.la
+	@LIBCSTRING_LIBADD@
 
 vhdi_test_seek_SOURCES = \
 	vhdi_test_libcerror.h \
@@ -66,9 +66,9 @@ vhdi_test_seek_SOURCES = \
 	vhdi_test_unused.h
 
 vhdi_test_seek_LDADD = \
-	@LIBCSTRING_LIBADD@ \
+	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@ \
-	../libvhdi/libvhdi.la
+	@LIBCSTRING_LIBADD@
 
 MAINTAINERCLEANFILES = \
 	Makefile.in

@@ -401,15 +401,16 @@ int mount_handle_open_input_parent_file(
 {
 	uint8_t guid[ 16 ];
 
-	libcstring_system_character_t *parent_filename = NULL;
-	libcstring_system_character_t *parent_path     = NULL;
-	libvhdi_file_t *parent_input_file              = NULL;
-	static char *function                          = "mount_handle_open_input_parent_file";
-	size_t parent_filename_size                    = 0;
-	size_t parent_path_size                        = 0;
-	uint32_t parent_content_identifier             = 0;
-	int entry_index                                = 0;
-	int result                                     = 0;
+	libcstring_system_character_t *parent_basename_end = NULL;
+	libcstring_system_character_t *parent_filename     = NULL;
+	libcstring_system_character_t *parent_path         = NULL;
+	libvhdi_file_t *parent_input_file                  = NULL;
+	static char *function                              = "mount_handle_open_input_parent_file";
+	size_t parent_basename_length                      = 0;
+	size_t parent_filename_size                        = 0;
+	size_t parent_path_size                            = 0;
+	int entry_index                                    = 0;
+	int result                                         = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -526,40 +527,52 @@ int mount_handle_open_input_parent_file(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libcpath_path_join_wide(
-	     &parent_path,
-	     &parent_path_size,
-	     mount_handle->basename,
-	     mount_handle->basename_size - 1,
-	     parent_filename,
-	     parent_filename_size - 1,
-	     error ) != 1 )
-#else
-	if( libcpath_path_join(
-	     &parent_path,
-	     &parent_path_size,
-	     mount_handle->basename,
-	     mount_handle->basename_size - 1,
-	     parent_filename,
-	     parent_filename_size - 1,
-	     error ) != 1 )
-#endif
+	parent_basename_end = libcstring_system_string_search_character_reverse(
+	                       parent_filename,
+	                       (libcstring_system_character_t) '\\',
+	                       parent_filename_size );
+
+	if( parent_basename_end != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create parent path.",
-		 function );
-
-		goto on_error;
+		parent_basename_length = (size_t) ( parent_basename_end - parent_filename ) + 1;
 	}
-	memory_free(
-	 parent_filename );
+	if( mount_handle->basename == NULL )
+	{
+		parent_path      = &( parent_filename[ parent_basename_length ] );
+		parent_path_size = parent_filename_size - ( parent_basename_length + 1 );
+	}
+	else
+	{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libcpath_path_join_wide(
+		     &parent_path,
+		     &parent_path_size,
+		     mount_handle->basename,
+		     mount_handle->basename_size - 1,
+		     &( parent_filename[ parent_basename_length ] ),
+		     parent_filename_size - ( parent_basename_length + 1 ),
+		     error ) != 1 )
+#else
+		if( libcpath_path_join(
+		     &parent_path,
+		     &parent_path_size,
+		     mount_handle->basename,
+		     mount_handle->basename_size - 1,
+		     &( parent_filename[ parent_basename_length ] ),
+		     parent_filename_size - ( parent_basename_length + 1 ),
+		     error ) != 1 )
+#endif
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create parent path.",
+			 function );
 
-	parent_filename = NULL;
-
+			goto on_error;
+		}
+	}
 	if( libvhdi_file_initialize(
 	     &parent_input_file,
 	     error ) != 1 )
@@ -597,11 +610,22 @@ int mount_handle_open_input_parent_file(
 
 		goto on_error;
 	}
-	memory_free(
-	 parent_path );
+	if( parent_path != NULL )
+	{
+		if( mount_handle->basename != NULL )
+		{
+			memory_free(
+			 parent_path );
+		}
+		parent_path = NULL;
+	}
+	if( parent_filename != NULL )
+	{
+		memory_free(
+		 parent_filename );
 
-	parent_path = NULL;
-
+		parent_filename = NULL;
+	}
 	if( mount_handle_open_input_parent_file(
 	     mount_handle,
 	     parent_input_file,
@@ -654,7 +678,8 @@ on_error:
 		 &parent_input_file,
 		 NULL );
 	}
-	if( parent_path != NULL )
+	if( ( parent_path != NULL )
+	 && ( mount_handle->basename != NULL ) )
 	{
 		memory_free(
 		 parent_path );

@@ -1,5 +1,5 @@
 /*
- * Python bindings for libvhdi (pyvhdi)
+ * Error functions
  *
  * Copyright (c) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,34 +19,27 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _PYVHDI_H )
-#define _PYVHDI_H
+#if !defined( _PYVHDI_ERROR_H )
+#define _PYVHDI_ERROR_H
 
 #include <common.h>
 #include <types.h>
 
+#include "pyvhdi_libcerror.h"
 #include "pyvhdi_python.h"
+
+#define PYVHDI_ERROR_FORMAT_STRING_SIZE		128
+#define PYVHDI_ERROR_STRING_SIZE		512
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-PyObject *pyvhdi_get_version(
-           PyObject *self,
-           PyObject *arguments );
-
-PyObject *pyvhdi_check_file_signature(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords );
-
-PyObject *pyvhdi_check_file_signature_file_object(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords );
-
-PyMODINIT_FUNC initpyvhdi(
-                void );
+void pyvhdi_error_raise(
+      PyObject *exception_object,
+      const char *format_string,
+      const char *function,
+      libcerror_error_t *error );
 
 #if defined( __cplusplus )
 }

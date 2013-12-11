@@ -13,6 +13,19 @@ TODO
 
 Tools:
 
+20131210
+* updated dependencies
+* worked on Python bindings
+* fixed issue in mount handle
+  - for empty basename
+  - for vhd files with parent path instead of filename
+
+20131017
+* updated dependencies
+
+20131013
+* updated dependencies
+
 20130922
 * updated msvscpp files
 * removed libfvalue

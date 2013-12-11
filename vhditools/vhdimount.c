@@ -146,7 +146,7 @@ void vhdimount_signal_handler(
 static char *vhdimount_fuse_path_prefix         = "/vhdi";
 static size_t vhdimount_fuse_path_prefix_length = 5;
 
-/* Opens a file
+/* Opens a file or directory
  * Returns 0 if successful or a negative errno value otherwise
  */
 int vhdimount_fuse_open(

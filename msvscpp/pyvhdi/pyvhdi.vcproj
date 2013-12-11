@@ -189,11 +189,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyvhdi\pyvhdi_error.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyvhdi\pyvhdi_file.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\pyvhdi\pyvhdi_file_object_io_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyvhdi\pyvhdi_integer.c"
 				>
 			</File>
 		</Filter>
@@ -207,11 +215,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyvhdi\pyvhdi_error.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyvhdi\pyvhdi_file.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\pyvhdi\pyvhdi_file_object_io_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyvhdi\pyvhdi_integer.h"
 				>
 			</File>
 			<File

@@ -37,11 +37,11 @@
  * for local use of libvhdi
  */
 #else
-#define LIBVHDI_VERSION						20130922
+#define LIBVHDI_VERSION						20131210
 
 /* The version string
  */
-#define LIBVHDI_VERSION_STRING					"20130922"
+#define LIBVHDI_VERSION_STRING					"20131210"
 
 /* The access flags definitions
  * bit 1        set to 1 for read access

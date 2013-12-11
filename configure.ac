@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libvhdi],
- [20130922],
+ [20131210],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -215,6 +215,7 @@ AC_CONFIG_FILES([macosx/libvhdi.pmdoc/04share.xml])
 AC_CONFIG_FILES([macosx/libvhdi.pmdoc/05python.xml])
 AC_CONFIG_FILES([macosx/libvhdi.pmdoc/index.xml])
 AC_CONFIG_FILES([macosx/Introduction.rtf])
+AC_CONFIG_FILES([pyvhdi/setup.py])
 AC_CONFIG_FILES([libvhdi.pc])
 AC_CONFIG_FILES([libvhdi.spec])
 dnl Have configure write its configuration
