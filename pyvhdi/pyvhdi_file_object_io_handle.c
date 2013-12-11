@@ -686,7 +686,6 @@ ssize_t pyvhdi_file_object_write_buffer(
 	PyObject *method_result       = NULL;
 	char *error_string            = NULL;
 	static char *function         = "pyvhdi_file_object_write_buffer";
-	ssize_t write_count           = 0;
 
 	if( file_object == NULL )
 	{
@@ -710,7 +709,11 @@ ssize_t pyvhdi_file_object_write_buffer(
 
 		return( -1 );
 	}
+#if SIZEOF_SIZE_T > SIZEOF_INT
+	if( size > (size_t) INT_MAX )
+#else
 	if( size > (size_t) SSIZE_MAX )
+#endif
 	{
 		libcerror_error_set(
 		 error,
@@ -726,9 +729,9 @@ ssize_t pyvhdi_file_object_write_buffer(
 		method_name = PyString_FromString(
 			       "write" );
 
-/* TODO set up argument_string */
-
-		write_count = (ssize_t) size;
+		argument_string = PyString_FromStringAndSize(
+		                   (char *) buffer,
+		                   size );
 
 		PyErr_Clear();
 
@@ -784,7 +787,7 @@ ssize_t pyvhdi_file_object_write_buffer(
 		Py_DecRef(
 		 method_name );
 	}
-	return( write_count );
+	return( (ssize_t) size );
 
 on_error:
 	if( method_result != NULL )

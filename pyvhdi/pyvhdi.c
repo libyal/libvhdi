@@ -154,10 +154,10 @@ PyObject *pyvhdi_check_file_signature(
 	if( result == -1 )
 	{
 		pyvhdi_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to check file signature.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -203,10 +203,10 @@ PyObject *pyvhdi_check_file_signature_file_object(
 	     &error ) != 1 )
 	{
 		pyvhdi_error_raise(
+		 error,
 		 PyExc_MemoryError,
 		 "%s: unable to initialize file IO handle.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -224,10 +224,10 @@ PyObject *pyvhdi_check_file_signature_file_object(
 	if( result == -1 )
 	{
 		pyvhdi_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to check file signature.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -239,10 +239,10 @@ PyObject *pyvhdi_check_file_signature_file_object(
 	     &error ) != 1 )
 	{
 		pyvhdi_error_raise(
+		 error,
 		 PyExc_MemoryError,
 		 "%s: unable to free file IO handle.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
