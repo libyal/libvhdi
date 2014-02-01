@@ -2,7 +2,7 @@
  * Library for system independent implementation of functionality
  * for programs
  *
- * Copyright (c) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2012-2014, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *

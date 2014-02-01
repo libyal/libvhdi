@@ -1,7 +1,7 @@
 /*
  * Python object definition of the libvhdi file
  *
- * Copyright (c) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2012-2014, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #endif
 
-#include "pyvhdi.h"
 #include "pyvhdi_error.h"
 #include "pyvhdi_file.h"
 #include "pyvhdi_file_object_io_handle.h"

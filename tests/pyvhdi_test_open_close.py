@@ -2,7 +2,7 @@
 #
 # Python-bindings open close testing program
 #
-# Copyright (c) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (c) 2012-2014, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #

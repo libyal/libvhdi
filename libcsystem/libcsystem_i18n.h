@@ -1,7 +1,7 @@
 /*
  * Internationalization (i18n) functions
  *
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2008-2014, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,6 +26,10 @@
 
 #if defined( HAVE_LIBINTL_H )
 #include <libintl.h>
+#endif
+
+#if defined( __cplusplus )
+extern "C" {
 #endif
 
 /* TODO for now do nothing i18n like

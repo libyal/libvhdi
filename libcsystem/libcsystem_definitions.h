@@ -1,7 +1,7 @@
 /*
  * The internal definitions
  *
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2008-2014, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,11 +25,11 @@
 #include <common.h>
 #include <types.h>
 
-#define LIBCSYSTEM_VERSION			20130413
+#define LIBCSYSTEM_VERSION			20140105
 
 /* The libcsystem version string
  */
-#define LIBCSYSTEM_VERSION_STRING		"20130413"
+#define LIBCSYSTEM_VERSION_STRING		"20140105"
 
 #endif
 

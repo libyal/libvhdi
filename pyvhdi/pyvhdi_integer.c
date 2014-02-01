@@ -1,7 +1,7 @@
 /*
  * Integer functions
  *
- * Copyright (c) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2012-2014, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -22,7 +22,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "pyvhdi.h"
 #include "pyvhdi_libcerror.h"
 #include "pyvhdi_integer.h"
 #include "pyvhdi_python.h"
