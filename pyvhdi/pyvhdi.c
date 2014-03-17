@@ -27,6 +27,7 @@
 #endif
 
 #include "pyvhdi.h"
+#include "pyvhdi_disk_types.h"
 #include "pyvhdi_error.h"
 #include "pyvhdi_libcerror.h"
 #include "pyvhdi_libcstring.h"
@@ -276,9 +277,10 @@ on_error:
 PyMODINIT_FUNC initpyvhdi(
                 void )
 {
-	PyObject *module               = NULL;
-	PyTypeObject *file_type_object = NULL;
-	PyGILState_STATE gil_state     = 0;
+	PyObject *module                     = NULL;
+	PyTypeObject *disk_types_type_object = NULL;
+	PyTypeObject *file_type_object       = NULL;
+	PyGILState_STATE gil_state           = 0;
 
 	/* Create the module
 	 * This function must be called before grabbing the GIL
@@ -309,8 +311,32 @@ PyMODINIT_FUNC initpyvhdi(
 
 	PyModule_AddObject(
 	 module,
-	"file",
-	(PyObject *) file_type_object );
+	 "file",
+	 (PyObject *) file_type_object );
+
+	/* Setup the disk types type object
+	 */
+	pyvhdi_disk_types_type_object.tp_new = PyType_GenericNew;
+
+	if( pyvhdi_disk_types_init_type(
+             &pyvhdi_disk_types_type_object ) != 1 )
+	{
+		goto on_error;
+	}
+	if( PyType_Ready(
+	     &pyvhdi_disk_types_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyvhdi_disk_types_type_object );
+
+	disk_types_type_object = &pyvhdi_disk_types_type_object;
+
+	PyModule_AddObject(
+	 module,
+	 "disk_types",
+	 (PyObject *) disk_types_type_object );
 
 on_error:
 	PyGILState_Release(

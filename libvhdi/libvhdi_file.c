@@ -1089,6 +1089,7 @@ ssize_t libvhdi_file_read_buffer(
 	libvhdi_internal_file_t *internal_file = NULL;
 	static char *function                  = "libvhdi_file_read_buffer";
 	off64_t block_file_offset              = 0;
+	off64_t element_data_offset            = 0;
 	size_t buffer_offset                   = 0;
 	size_t read_size                       = 0;
 	uint64_t block_offset                  = 0;
@@ -1293,6 +1294,7 @@ ssize_t libvhdi_file_read_buffer(
 			     (intptr_t *) internal_file->file_io_handle,
 			     internal_file->data_block_cache,
 			     block_file_offset,
+			     &element_data_offset,
 			     (intptr_t **) &data_block,
 			     0,
 			     error ) != 1 )

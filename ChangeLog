@@ -13,6 +13,11 @@ TODO
 
 Tools:
 
+20140317
+* fix in synclibs.sh for missing libfguid
+* updated libfdata
+* worked on setup.py
+
 20140201
 * worked on Python bindings
 

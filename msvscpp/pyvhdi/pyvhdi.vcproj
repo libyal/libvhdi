@@ -189,6 +189,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyvhdi\pyvhdi_disk_type.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyvhdi\pyvhdi_error.c"
 				>
 			</File>
@@ -212,6 +216,10 @@
 			>
 			<File
 				RelativePath="..\..\pyvhdi\pyvhdi.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyvhdi\pyvhdi_disk_type.h"
 				>
 			</File>
 			<File

@@ -16,6 +16,7 @@ pyexec_LTLIBRARIES = pyvhdi.la
 
 pyvhdi_la_SOURCES = \
 	pyvhdi.c pyvhdi.h \
+	pyvhdi_disk_types.c pyvhdi_disk_types.h \
 	pyvhdi_error.c pyvhdi_error.h \
 	pyvhdi_file.c pyvhdi_file.h \
 	pyvhdi_file_object_io_handle.c pyvhdi_file_object_io_handle.h \
