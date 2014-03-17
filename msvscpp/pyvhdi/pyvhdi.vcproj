@@ -189,7 +189,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\pyvhdi\pyvhdi_disk_type.c"
+				RelativePath="..\..\pyvhdi\pyvhdi_disk_types.c"
 				>
 			</File>
 			<File
@@ -219,7 +219,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\pyvhdi\pyvhdi_disk_type.h"
+				RelativePath="..\..\pyvhdi\pyvhdi_disk_types.h"
 				>
 			</File>
 			<File
