@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "pyvhdi_libbfio.h"
 #include "pyvhdi_libvhdi.h"
 #include "pyvhdi_python.h"
 
@@ -43,6 +44,10 @@ struct pyvhdi_file
 	/* The libvhdi file
 	 */
 	libvhdi_file_t *file;
+
+	/* The libbfio file IO handle
+	 */
+	libbfio_handle_t *file_io_handle;
 };
 
 extern PyMethodDef pyvhdi_file_object_methods[];
@@ -90,7 +95,7 @@ PyObject *pyvhdi_file_read_buffer(
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject *pyvhdi_file_read_random(
+PyObject *pyvhdi_file_read_buffer_at_offset(
            pyvhdi_file_t *pyvhdi_file,
            PyObject *arguments,
            PyObject *keywords );

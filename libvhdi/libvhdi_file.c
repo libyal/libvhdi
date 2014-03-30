@@ -608,6 +608,7 @@ int libvhdi_file_open_file_io_handle(
 
 			goto on_error;
 		}
+		internal_file->file_io_handle_opened_in_library = 1;
 	}
 	if( libvhdi_file_open_read(
 	     internal_file,
@@ -623,18 +624,22 @@ int libvhdi_file_open_file_io_handle(
 
 		goto on_error;
 	}
-	internal_file->file_io_handle                   = file_io_handle;
-	internal_file->file_io_handle_opened_in_library = ( file_io_handle_is_open == 0 );
+	internal_file->file_io_handle = file_io_handle;
 
 	return( 1 );
 
 on_error:
-	if( file_io_handle_is_open == 0 )
+	if( ( file_io_handle_is_open == 0 )
+	 && ( internal_file->file_io_handle_opened_in_library != 0 ) )
 	{
 		libbfio_handle_close(
 		 file_io_handle,
 		 error );
+
+		internal_file->file_io_handle_opened_in_library = 0;
 	}
+	internal_file->file_io_handle = NULL;
+
 	return( -1 );
 }
 
@@ -673,6 +678,27 @@ int libvhdi_file_close(
 
 		return( -1 );
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		if( internal_file->file_io_handle_created_in_library != 0 )
+		{
+			if( libvhdi_debug_print_read_offsets(
+			     internal_file->file_io_handle,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print the read offsets.",
+				 function );
+
+				result = -1;
+			}
+		}
+	}
+#endif
 	if( internal_file->file_io_handle_opened_in_library != 0 )
 	{
 		if( libbfio_handle_close(
@@ -692,37 +718,6 @@ int libvhdi_file_close(
 	}
 	if( internal_file->file_io_handle_created_in_library != 0 )
 	{
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			if( libvhdi_debug_print_read_offsets(
-			     internal_file->file_io_handle,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-				 "%s: unable to print the read offsets.",
-				 function );
-
-				result = -1;
-			}
-		}
-#endif
-		if( libbfio_handle_close(
-		     internal_file->file_io_handle,
-		     error ) != 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close file IO handle.",
-			 function );
-
-			result = -1;
-		}
 		if( libbfio_handle_free(
 		     &( internal_file->file_io_handle ),
 		     error ) != 1 )
@@ -1388,6 +1383,54 @@ ssize_t libvhdi_file_read_buffer(
 /* Reads (media) data at a specific offset
  * Returns the number of bytes read or -1 on error
  */
+ssize_t libvhdi_file_read_buffer_at_offset(
+         libvhdi_file_t *file,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libcerror_error_t **error )
+{
+	static char *function = "libvhdi_file_read_buffer_at_offset";
+	ssize_t read_count    = 0;
+
+	if( libvhdi_file_seek_offset(
+	     file,
+	     offset,
+	     SEEK_SET,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset.",
+		 function );
+
+		return( -1 );
+	}
+	read_count = libvhdi_file_read_buffer(
+	              file,
+	              buffer,
+	              buffer_size,
+	              error );
+
+	if( read_count <= -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read buffer.",
+		 function );
+
+		return( -1 );
+	}
+	return( read_count );
+}
+
+/* Reads (media) data at a specific offset
+ * Returns the number of bytes read or -1 on error
+ */
 ssize_t libvhdi_file_read_random(
          libvhdi_file_t *file,
          void *buffer,
@@ -1505,14 +1548,14 @@ ssize_t libvhdi_file_write_buffer(
  * Will initialize write if necessary
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
  */
-ssize_t libvhdi_file_write_random(
+ssize_t libvhdi_file_write_buffer_at_offset(
          libvhdi_file_t *file,
          const void *buffer,
          size_t buffer_size,
          off64_t offset,
          libcerror_error_t **error )
 {
-	static char *function = "libvhdi_file_write_random";
+	static char *function = "libvhdi_file_write_buffer_at_offset";
 	ssize_t write_count   = 0;
 
 	if( libvhdi_file_seek_offset(

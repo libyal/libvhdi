@@ -1,4 +1,7 @@
 TODO
+* remove deprecated functions
+  - libvhdi_file_read_random
+  - pyvhdi file.read_random
 * complete differential images support
 * debug
   - print disk type
@@ -12,6 +15,10 @@ TODO
 * update man pages
 
 Tools:
+
+20140330
+* worked on Python bindings
+* worked on setup.py
 
 20140317
 * fix in synclibs.sh for missing libfguid

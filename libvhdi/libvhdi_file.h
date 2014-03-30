@@ -138,6 +138,14 @@ ssize_t libvhdi_file_read_buffer(
          libcerror_error_t **error );
 
 LIBVHDI_EXTERN \
+ssize_t libvhdi_file_read_buffer_at_offset(
+         libvhdi_file_t *file,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libcerror_error_t **error );
+
+LIBVHDI_EXTERN \
 ssize_t libvhdi_file_read_random(
          libvhdi_file_t *file,
          void *buffer,
@@ -155,7 +163,7 @@ ssize_t libvhdi_file_write_buffer(
          libcerror_error_t **error );
 
 LIBVHDI_EXTERN \
-ssize_t libvhdi_file_read_write(
+ssize_t libvhdi_file_write_buffer_at_offset(
          libvhdi_file_t *file,
          void *buffer,
          size_t buffer_size,

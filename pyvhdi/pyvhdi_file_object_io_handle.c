@@ -211,7 +211,8 @@ int pyvhdi_file_object_io_handle_free(
      pyvhdi_file_object_io_handle_t **file_object_io_handle,
      libcerror_error_t **error )
 {
-	static char *function = "pyvhdi_file_object_io_handle_free";
+	PyGILState_STATE gil_state = 0;
+	static char *function      = "pyvhdi_file_object_io_handle_free";
 
 	if( file_object_io_handle == NULL )
 	{
@@ -226,8 +227,13 @@ int pyvhdi_file_object_io_handle_free(
 	}
 	if( *file_object_io_handle != NULL )
 	{
+		gil_state = PyGILState_Ensure();
+
 		Py_DecRef(
 		 ( *file_object_io_handle )->file_object );
+
+		PyGILState_Release(
+		 gil_state );
 
 		PyMem_Free(
 		 *file_object_io_handle );

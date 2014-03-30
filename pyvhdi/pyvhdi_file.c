@@ -86,8 +86,15 @@ PyMethodDef pyvhdi_file_object_methods[] = {
 	  "\n"
 	  "Reads a buffer of data." },
 
+	{ "read_buffer_at_offset",
+	  (PyCFunction) pyvhdi_file_read_buffer_at_offset,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "read_buffer_at_offset(size, offset) -> String\n"
+	  "\n"
+	  "Reads a buffer of data at a specific offset." },
+
 	{ "read_random",
-	  (PyCFunction) pyvhdi_file_read_random,
+	  (PyCFunction) pyvhdi_file_read_buffer_at_offset,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "read_random(size, offset) -> String\n"
 	  "\n"
@@ -357,9 +364,8 @@ int pyvhdi_file_init(
 
 		return( -1 );
 	}
-	/* Make sure libvhdi file is set to NULL
-	 */
-	pyvhdi_file->file = NULL;
+	pyvhdi_file->file           = NULL;
+	pyvhdi_file->file_io_handle = NULL;
 
 	if( libvhdi_file_initialize(
 	     &( pyvhdi_file->file ),
@@ -578,13 +584,12 @@ PyObject *pyvhdi_file_open_file_object(
            PyObject *arguments,
            PyObject *keywords )
 {
-	PyObject *file_object            = NULL;
-	libbfio_handle_t *file_io_handle = NULL;
-	libcerror_error_t *error         = NULL;
-	char *mode                       = NULL;
-	static char *keyword_list[]      = { "file_object", "mode", NULL };
-	static char *function            = "pyvhdi_file_open_file_object";
-	int result                       = 0;
+	PyObject *file_object       = NULL;
+	libcerror_error_t *error    = NULL;
+	char *mode                  = NULL;
+	static char *keyword_list[] = { "file_object", "mode", NULL };
+	static char *function       = "pyvhdi_file_open_file_object";
+	int result                  = 0;
 
 	if( pyvhdi_file == NULL )
 	{
@@ -617,7 +622,7 @@ PyObject *pyvhdi_file_open_file_object(
 		return( NULL );
 	}
 	if( pyvhdi_file_object_initialize(
-	     &file_io_handle,
+	     &( pyvhdi_file->file_io_handle ),
 	     file_object,
 	     &error ) != 1 )
 	{
@@ -636,7 +641,7 @@ PyObject *pyvhdi_file_open_file_object(
 
 	result = libvhdi_file_open_file_io_handle(
 	          pyvhdi_file->file,
-                  file_io_handle,
+                  pyvhdi_file->file_io_handle,
                   LIBVHDI_OPEN_READ,
 	          &error );
 
@@ -661,10 +666,10 @@ PyObject *pyvhdi_file_open_file_object(
 	return( Py_None );
 
 on_error:
-	if( file_io_handle != NULL )
+	if( pyvhdi_file->file_io_handle != NULL )
 	{
 		libbfio_handle_free(
-		 &file_io_handle,
+		 &( pyvhdi_file->file_io_handle ),
 		 NULL );
 	}
 	return( NULL );
@@ -712,6 +717,30 @@ PyObject *pyvhdi_file_close(
 		 &error );
 
 		return( NULL );
+	}
+	if( pyvhdi_file->file_io_handle != NULL )
+	{
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libbfio_handle_free(
+		          &( pyvhdi_file->file_io_handle ),
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyvhdi_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to free libbfio file IO handle.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			return( NULL );
+		}
 	}
 	Py_IncRef(
 	 Py_None );
@@ -820,14 +849,14 @@ PyObject *pyvhdi_file_read_buffer(
 /* Reads data at a specific offset
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyvhdi_file_read_random(
+PyObject *pyvhdi_file_read_buffer_at_offset(
            pyvhdi_file_t *pyvhdi_file,
            PyObject *arguments,
            PyObject *keywords )
 {
 	libcerror_error_t *error    = NULL;
 	PyObject *string_object     = NULL;
-	static char *function       = "pyvhdi_file_read_random";
+	static char *function       = "pyvhdi_file_read_buffer_at_offset";
 	static char *keyword_list[] = { "size", "offset", NULL };
 	off64_t read_offset         = 0;
 	ssize_t read_count          = 0;
@@ -889,7 +918,7 @@ PyObject *pyvhdi_file_read_random(
 
 	Py_BEGIN_ALLOW_THREADS
 
-	read_count = libvhdi_file_read_random(
+	read_count = libvhdi_file_read_buffer_at_offset(
 	              pyvhdi_file->file,
 	              PyString_AsString(
 	               string_object ),
