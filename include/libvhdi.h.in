@@ -278,7 +278,7 @@ ssize_t libvhdi_file_read_buffer(
  * Returns the number of bytes read or -1 on error
  */
 LIBVHDI_EXTERN \
-ssize_t libvhdi_file_read_buffer_at_ofset(
+ssize_t libvhdi_file_read_buffer_at_offset(
          libvhdi_file_t *file,
          void *buffer,
          size_t buffer_size,
@@ -347,6 +347,8 @@ int libvhdi_file_set_parent_file(
 
 /* Reads (media) data at a specific offset
  * Returns the number of bytes read or -1 on error
+ *
+ * This function is deprecated use libvhdi_file_read_buffer_at_ofset instead
  */
 LIBVHDI_DEPRECATED \
 LIBVHDI_EXTERN \

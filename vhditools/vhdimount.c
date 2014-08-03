@@ -1919,7 +1919,7 @@ int __stdcall vhdimount_dokan_GetFileInformation(
 		}
 		use_mount_time = 1;
 	}
-	if( qcowmount_dokan_set_file_information(
+	if( vhdimount_dokan_set_file_information(
 	     file_information,
 	     media_size,
 	     number_of_sub_items,
