@@ -10,8 +10,16 @@ Package: libvhdi
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: libvhdi-dbg
 Description: Library to access the Virtual Hard Disk (VHD) image format
  libvhdi is a library to access the Virtual Hard Disk (VHD) image format.
+
+Package: libvhdi-dbg
+Architecture: any
+Section: debug
+Depends: libvhdi (= ${Source-Version}), ${misc:Depends}
+Description: Debugging symbols for libvhdi
+ Debugging symbols for libvhdi.
 
 Package: libvhdi-dev
 Section: libdevel
@@ -31,6 +39,14 @@ Package: libvhdi-python
 Section: python
 Architecture: any
 Depends: libvhdi (= ${Source-Version}), ${shlibs:Depends}, ${python:Depends}
+Suggests: libvhdi-python-dbg
 Description: Python bindings for libvhdi
  Python bindings for libvhdi.
+
+Package: libvhdi-python-dbg
+Section: debug
+Architecture: any
+Depends: libvhdi-python (= ${Source-Version})
+Description: Debugging symbols for libvhdi-python
+ Debugging symbols for libvhdi-python.
 

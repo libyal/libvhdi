@@ -72,7 +72,7 @@ PyTypeObject pyvhdi_disk_types_type_object = {
 	0,
 	/* tp_as_buffer */
 	0,
-        /* tp_flags */
+	/* tp_flags */
 	Py_TPFLAGS_DEFAULT,
 	/* tp_doc */
 	"pyvhdi disk types object (wraps LIBVHDI_DISK_TYPES)",
@@ -145,26 +145,26 @@ int pyvhdi_disk_types_init_type(
 		return( -1 );
 	}
 	if( PyDict_SetItemString(
-             type_object->tp_dict,
-             "FIXED",
-             PyInt_FromLong(
-              LIBVHDI_DISK_TYPE_FIXED ) ) != 0 )
+	     type_object->tp_dict,
+	     "FIXED",
+	     PyInt_FromLong(
+	      LIBVHDI_DISK_TYPE_FIXED ) ) != 0 )
 	{
 		goto on_error;
 	}
 	if( PyDict_SetItemString(
-             type_object->tp_dict,
-             "DYNAMIC",
-             PyInt_FromLong(
-              LIBVHDI_DISK_TYPE_DYNAMIC ) ) != 0 )
+	     type_object->tp_dict,
+	     "DYNAMIC",
+	     PyInt_FromLong(
+	      LIBVHDI_DISK_TYPE_DYNAMIC ) ) != 0 )
 	{
 		goto on_error;
 	}
 	if( PyDict_SetItemString(
-             type_object->tp_dict,
-             "DIFFERENTIAL",
-             PyInt_FromLong(
-              LIBVHDI_DISK_TYPE_DIFFERENTIAL ) ) != 0 )
+	     type_object->tp_dict,
+	     "DIFFERENTIAL",
+	     PyInt_FromLong(
+	      LIBVHDI_DISK_TYPE_DIFFERENTIAL ) ) != 0 )
 	{
 		goto on_error;
 	}

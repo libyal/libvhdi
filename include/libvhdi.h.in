@@ -285,18 +285,6 @@ ssize_t libvhdi_file_read_buffer_at_ofset(
          off64_t offset,
          libvhdi_error_t **error );
 
-/* Reads (media) data at a specific offset
- * Returns the number of bytes read or -1 on error
- */
-LIBVHDI_DEPRECATED \
-LIBVHDI_EXTERN \
-ssize_t libvhdi_file_read_random(
-         libvhdi_file_t *file,
-         void *buffer,
-         size_t buffer_size,
-         off64_t offset,
-         libvhdi_error_t **error );
-
 #ifdef TODO_WRITE_SUPPORT
 
 /* Writes (media) data at the current offset
@@ -352,6 +340,22 @@ int libvhdi_file_set_parent_file(
      libvhdi_file_t *file,
      libvhdi_file_t *parent_file,
      libvhdi_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * File functions - deprecated
+ * ------------------------------------------------------------------------- */
+
+/* Reads (media) data at a specific offset
+ * Returns the number of bytes read or -1 on error
+ */
+LIBVHDI_DEPRECATED \
+LIBVHDI_EXTERN \
+ssize_t libvhdi_file_read_random(
+         libvhdi_file_t *file,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libvhdi_error_t **error );
 
 /* -------------------------------------------------------------------------
  * Meta data functions

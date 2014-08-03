@@ -101,13 +101,6 @@ stamp-h1
 /include/libvhdi/types.h
 /libvhdi/libvhdi.rc
 /libvhdi/libvhdi_definitions.h
-/macosx/Introduction.rtf
-/macosx/libvhdi.pmdoc/01bin.xml
-/macosx/libvhdi.pmdoc/02include.xml
-/macosx/libvhdi.pmdoc/03lib.xml
-/macosx/libvhdi.pmdoc/04share.xml
-/macosx/libvhdi.pmdoc/05python.xml
-/macosx/libvhdi.pmdoc/index.xml
 /pyvhdi/setup.py
 /tests/input
 /tests/tmp

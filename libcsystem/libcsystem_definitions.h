@@ -25,11 +25,11 @@
 #include <common.h>
 #include <types.h>
 
-#define LIBCSYSTEM_VERSION			20140105
+#define LIBCSYSTEM_VERSION			20140505
 
 /* The libcsystem version string
  */
-#define LIBCSYSTEM_VERSION_STRING		"20140105"
+#define LIBCSYSTEM_VERSION_STRING		"20140505"
 
 #endif
 

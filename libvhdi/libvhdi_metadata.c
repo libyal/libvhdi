@@ -59,7 +59,7 @@ int libvhdi_file_get_format_version(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal file - missing IO handle.",
+		 "%s: invalid file - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -122,7 +122,7 @@ int libvhdi_file_get_disk_type(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal file - missing IO handle.",
+		 "%s: invalid file - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -173,7 +173,7 @@ int libvhdi_file_get_media_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal file - missing IO handle.",
+		 "%s: invalid file - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -269,7 +269,7 @@ int libvhdi_file_get_parent_identifier(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal file - missing IO handle.",
+		 "%s: invalid file - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -329,7 +329,7 @@ int libvhdi_file_get_utf8_parent_filename_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal file - missing IO handle.",
+		 "%s: invalid file - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -389,7 +389,7 @@ int libvhdi_file_get_utf8_parent_filename(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal file - missing IO handle.",
+		 "%s: invalid file - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -449,7 +449,7 @@ int libvhdi_file_get_utf16_parent_filename_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal file - missing IO handle.",
+		 "%s: invalid file - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -509,7 +509,7 @@ int libvhdi_file_get_utf16_parent_filename(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal file - missing IO handle.",
+		 "%s: invalid file - missing IO handle.",
 		 function );
 
 		return( -1 );

@@ -16,6 +16,10 @@ TODO
 
 Tools:
 
+20140803
+* bug fix in Python-bindings
+* updated dependencies
+
 20140330
 * worked on Python bindings
 * worked on setup.py

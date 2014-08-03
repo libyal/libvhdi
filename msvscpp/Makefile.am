@@ -1,5 +1,5 @@
 MSVSCPP_FILES = \
-	dokan_dll/dokan_dll.vcproj \
+	dokan/dokan.vcproj \
 	libbfio/libbfio.vcproj \
 	libcdata/libcdata.vcproj \
 	libcerror/libcerror.vcproj \
@@ -14,8 +14,8 @@ MSVSCPP_FILES = \
 	libfcache/libfcache.vcproj \
 	libfdata/libfdata.vcproj \
 	libfguid/libfguid.vcproj \
-	libvhdi_dll/libvhdi_dll.vcproj \
 	libuna/libuna.vcproj \
+	libvhdi/libvhdi.vcproj \
 	pyvhdi/pyvhdi.vcproj \
 	vhdi_test_open_close/vhdi_test_open_close.vcproj \
 	vhdi_test_read/vhdi_test_read.vcproj \

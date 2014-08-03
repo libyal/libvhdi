@@ -22,6 +22,8 @@
 #include <common.h>
 #include <types.h>
 
+#include <stdio.h>
+
 #include "libcsystem_libcerror.h"
 #include "libcsystem_libcstring.h"
 #include "libcsystem_support.h"

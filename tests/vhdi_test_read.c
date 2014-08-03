@@ -160,10 +160,10 @@ int vhdi_test_read_buffer(
 	return( result );
 }
 
-/* Tests libvhdi_file_read_random
+/* Tests libvhdi_file_read_buffer_at_offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int vhdi_test_read_random(
+int vhdi_test_read_buffer_at_offset(
      libvhdi_file_t *file,
      off64_t input_offset,
      size64_t input_size,
@@ -188,7 +188,7 @@ int vhdi_test_read_random(
 
 	fprintf(
 	 stdout,
-	 "Testing reading random with offset: %" PRIi64 " and size: %" PRIu64 "\t",
+	 "Testing reading buffer at offset: %" PRIi64 " with size: %" PRIu64 "\t",
 	 input_offset,
 	 input_size );
 
@@ -200,7 +200,7 @@ int vhdi_test_read_random(
 		{
 			read_size = (size_t) remaining_size;
 		}
-		read_count = libvhdi_file_read_random(
+		read_count = libvhdi_file_read_buffer_at_offset(
 			      file,
 			      buffer,
 			      read_size,
@@ -414,7 +414,7 @@ int vhdi_test_read_from_file(
 		return( result );
 	}
 
-	/* Case 1: test random read
+	/* Case 1: test buffer at offset read
 	 */
 
 	/* Test: offset: <media_size / 7> size: <media_size / 2>
@@ -541,13 +541,13 @@ int vhdi_test_read_from_file(
 			return( result );
 		}
 	}
-	/* Case 3: test random read
+	/* Case 3: test buffer at offset read
 	 */
 
 	/* Test: offset: <media_size / 7> size: <media_size / 2>
 	 * Expected result: offset: < ( media_size / 7 ) + ( media_size / 2 ) > size: <media_size / 2>
 	 */
-	result = vhdi_test_read_random(
+	result = vhdi_test_read_buffer_at_offset(
 	          file,
 	          (off64_t) ( media_size / 7 ),
 	          media_size / 2,
@@ -558,14 +558,14 @@ int vhdi_test_read_from_file(
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test read random.\n" );
+		 "Unable to test read buffer at offset.\n" );
 
 		return( result );
 	}
 	/* Test: offset: <media_size / 7> size: <media_size / 2>
 	 * Expected result: offset: < ( media_size / 7 ) + ( media_size / 2 ) > size: <media_size / 2>
 	 */
-	result = vhdi_test_read_random(
+	result = vhdi_test_read_buffer_at_offset(
 	          file,
 	          (off64_t) ( media_size / 7 ),
 	          media_size / 2,
@@ -576,7 +576,7 @@ int vhdi_test_read_from_file(
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test read random.\n" );
+		 "Unable to test read buffer at offset.\n" );
 
 		return( result );
 	}
