@@ -16,6 +16,9 @@ TODO
 
 Tools:
 
+20140929
+* removed README.macosx
+
 20140803
 * bug fix in Python-bindings
 * updated dependencies
