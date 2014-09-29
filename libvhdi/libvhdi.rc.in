@@ -28,7 +28,7 @@ BEGIN
       VALUE "OriginalFilename",		"libvhdi.dll\0"
       VALUE "ProductName",		"libvhdi\0"
       VALUE "ProductVersion",		"@VERSION@" "\0"
-      VALUE "Comments",			"For more information visit http://code.google.com/p/libvhdi/\0"
+      VALUE "Comments",			"For more information visit https://github.com/libyal/libvhdi/\0"
     END
   END
   BLOCK "VarFileInfo"

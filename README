@@ -1,4 +1,22 @@
-See:
-* http://code.google.com/p/libvhdi/wiki/Building
-* README.macosx
+libvhdi is a library to access the Virtual Hard Disk (VHD) image format.
+
+Read supported formats:
+* VHD version 1
+
+Supported image types:
+* Fixed-size hard disk image
+* Dynamic-size (or sparse) hard disk image
+* Differential (or differencing) hard disk image
+  * Note that an undo disk image (.vud) is also a differential image
+
+Work in progress:
+* Dokan library support
+
+Planned:
+* Multi-threading support
+* Python 3 support
+
+For more information see:
+* Project documentation: https://github.com/libyal/libvhdi/wiki/Home
+* How to build from source: https://github.com/libyal/libvhdi/wiki/Building
 
