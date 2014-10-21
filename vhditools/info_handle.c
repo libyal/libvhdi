@@ -27,6 +27,7 @@
 #include "info_handle.h"
 #include "vhditools_libcerror.h"
 #include "vhditools_libcnotify.h"
+#include "vhditools_libcstring.h"
 #include "vhditools_libfguid.h"
 #include "vhditools_libvhdi.h"
 

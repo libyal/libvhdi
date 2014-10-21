@@ -28,6 +28,7 @@
 
 #include "vhditools_libcerror.h"
 #include "vhditools_libcnotify.h"
+#include "vhditools_libcstring.h"
 #include "vhditools_libvhdi.h"
 
 #if defined( __cplusplus )
