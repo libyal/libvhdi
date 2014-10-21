@@ -104,6 +104,8 @@ stamp-h1
 /include/libvhdi/types.h
 /libvhdi/libvhdi.rc
 /libvhdi/libvhdi_definitions.h
+/vhditools/vhdiinfo
+/vhditools/vhdimount
 /pyvhdi/setup.py
 /tests/input
 /tests/tmp
