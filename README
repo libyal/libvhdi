@@ -1,5 +1,9 @@
 libvhdi is a library to access the Virtual Hard Disk (VHD) image format.
 
+Project information:
+* Status: alpha
+* Licence: LGPLv3+
+
 Read supported formats:
 * VHD version 1
 
