@@ -84,13 +84,13 @@ else
 			then
 				if test -f "input/.libvhdi/${DIRNAME}/files";
 				then
-					TESTFILES=`cat input/.libvhdi/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
+					TEST_FILES=`cat input/.libvhdi/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
 				else
-					TESTFILES=`ls ${TESTDIR}/*`;
+					TEST_FILES=`ls -1 ${TESTDIR}/* 2> /dev/null`;
 				fi
-				for TESTFILE in ${TESTFILES};
+				for TEST_FILE in ${TEST_FILES};
 				do
-					if ! PYTHONPATH=../pyvhdi/.libs/ ${PYTHON} pyvhdi_test_open_close.py ${TESTFILE};
+					if ! PYTHONPATH=../pyvhdi/.libs/ ${PYTHON} pyvhdi_test_open_close.py ${TEST_FILE};
 					then
 						exit ${EXIT_FAILURE};
 					fi
