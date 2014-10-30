@@ -17,7 +17,7 @@ able to process this type of disk image format.
 [cols="1,5"]
 |===
 | Author(s): | Joachim Metz <joachim.metz@gmail.com>
-| Abstract: |s document contains information about the Virtual Hard Disk (VHD) Image format 
+| Abstract: | This document contains information about the Virtual Hard Disk (VHD) Image format 
 | Classification: | Public
 | Keywords: | Virtual Hard Disk, VHD, Virtual PC, Virtual Server, Hyper-V Server
 |===
