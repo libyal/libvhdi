@@ -125,8 +125,8 @@ Contains the number of seconds since January 1, 2000 00:00:00 UTC
 | 32 | 4 | | Creator version +
 Where the upper 16-bit are the major version and the lower 16-bit the minor version
 | 36 | 4 | | Creator (host) operating system
-| 40 | 8 | | Disk size
-| Contains the size of the disk in bytes
+| 40 | 8 | | Disk size +
+Contains the size of the disk in bytes
 | 48 | 8 | | Data size +
 Contains the size of the data in bytes
 | 56 | 4 | | Disk geometry
