@@ -18,6 +18,7 @@ TESTS = \
 	$(TESTS_PYVHDI)
 
 check_SCRIPTS = \
+	pyvhdi_test_open_close.py \
 	test_pyvhdi_open_close.sh \
 	test_open_close.sh \
 	test_pyvhdi_open_close.sh \
