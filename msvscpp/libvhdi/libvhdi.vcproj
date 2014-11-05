@@ -280,6 +280,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libvhdi\libvhdi_libcthreads.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libvhdi\libvhdi_libfcache.h"
 				>
 			</File>

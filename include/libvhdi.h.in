@@ -94,6 +94,7 @@ int libvhdi_check_file_signature(
      libvhdi_error_t **error );
 
 #if defined( LIBVHDI_HAVE_WIDE_CHARACTER_TYPE )
+
 /* Determines if a file is a VHDI file (check for the VHDI file signature)
  * Returns 1 if true, 0 if not or -1 on error
  */
@@ -101,9 +102,11 @@ LIBVHDI_EXTERN \
 int libvhdi_check_file_signature_wide(
      const wchar_t *filename,
      libvhdi_error_t **error );
+
 #endif
 
 #if defined( LIBVHDI_HAVE_BFIO )
+
 /* Determines if a file is a VHDI file (check for the VHDI file signature) using a Basic File IO (bfio) handle
  * Returns 1 if true, 0 if not or -1 on error
  */
@@ -111,6 +114,7 @@ LIBVHDI_EXTERN \
 int libvhdi_check_file_signature_file_io_handle(
      libbfio_handle_t *file_io_handle,
      libvhdi_error_t **error );
+
 #endif
 
 /* -------------------------------------------------------------------------
@@ -233,6 +237,7 @@ int libvhdi_file_open(
      libvhdi_error_t **error );
 
 #if defined( LIBVHDI_HAVE_WIDE_CHARACTER_TYPE )
+
 /* Opens a file
  * Returns 1 if successful or -1 on error
  */
@@ -242,9 +247,11 @@ int libvhdi_file_open_wide(
      const wchar_t *filename,
      int access_flags,
      libvhdi_error_t **error );
+
 #endif
 
 #if defined( LIBVHDI_HAVE_BFIO )
+
 /* Opens a file using a Basic File IO (bfio) handle
  * Returns 1 if successful or -1 on error
  */
@@ -254,6 +261,7 @@ int libvhdi_file_open_file_io_handle(
      libbfio_handle_t *file_io_handle,
      int access_flags,
      libvhdi_error_t **error );
+
 #endif
 
 /* Closes a file
@@ -340,24 +348,6 @@ int libvhdi_file_set_parent_file(
      libvhdi_file_t *file,
      libvhdi_file_t *parent_file,
      libvhdi_error_t **error );
-
-/* -------------------------------------------------------------------------
- * File functions - deprecated
- * ------------------------------------------------------------------------- */
-
-/* Reads (media) data at a specific offset
- * Returns the number of bytes read or -1 on error
- *
- * This function is deprecated use libvhdi_file_read_buffer_at_ofset instead
- */
-LIBVHDI_DEPRECATED \
-LIBVHDI_EXTERN \
-ssize_t libvhdi_file_read_random(
-         libvhdi_file_t *file,
-         void *buffer,
-         size_t buffer_size,
-         off64_t offset,
-         libvhdi_error_t **error );
 
 /* -------------------------------------------------------------------------
  * Meta data functions

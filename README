@@ -15,9 +15,9 @@ Supported image types:
 
 Work in progress:
 * Dokan library support
+* Thread-safety in file API functions
 
 Planned:
-* Multi-threading support
 * Python 3 support
 
 For more information see:

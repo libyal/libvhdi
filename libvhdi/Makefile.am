@@ -37,6 +37,7 @@ libvhdi_la_SOURCES = \
 	libvhdi_libclocale.h \
 	libvhdi_libcnotify.h \
 	libvhdi_libcstring.h \
+	libvhdi_libcthreads.h \
 	libvhdi_libfcache.h \
 	libvhdi_libfdata.h \
 	libvhdi_libfguid.h \

@@ -34,6 +34,7 @@
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcnotify.h"
 #include "libvhdi_libcstring.h"
+#include "libvhdi_libcthreads.h"
 #include "libvhdi_libfcache.h"
 #include "libvhdi_libfdata.h"
 
@@ -96,7 +97,10 @@ int libvhdi_file_initialize(
 		 "%s: unable to clear file.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 internal_file );
+
+		return( -1 );
 	}
 	if( libvhdi_io_handle_initialize(
 	     &( internal_file->io_handle ),
@@ -123,6 +127,21 @@ int libvhdi_file_initialize(
 
 		goto on_error;
 	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_initialize(
+	     &( internal_file->read_write_lock ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to intialize read/write lock.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	*file = (libvhdi_file_t *) internal_file;
 
 	return( 1 );
@@ -130,6 +149,12 @@ int libvhdi_file_initialize(
 on_error:
 	if( internal_file != NULL )
 	{
+		if( internal_file->io_handle != NULL )
+		{
+			libvhdi_io_handle_free(
+			 &( internal_file->io_handle ),
+			 NULL );
+		}
 		memory_free(
 		 internal_file );
 	}
@@ -180,6 +205,21 @@ int libvhdi_file_free(
 		}
 		*file = NULL;
 
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+		if( libcthreads_read_write_lock_free(
+		     &( internal_file->read_write_lock ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free read/write lock.",
+			 function );
+
+			result = -1;
+		}
+#endif
 		if( libvhdi_io_handle_free(
 		     &( internal_file->io_handle ),
 		     error ) != 1 )
@@ -359,8 +399,38 @@ int libvhdi_file_open(
 
 		goto on_error;
 	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	internal_file->file_io_handle_created_in_library = 1;
 
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -496,8 +566,38 @@ int libvhdi_file_open_wide(
 
 		goto on_error;
 	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	internal_file->file_io_handle_created_in_library = 1;
 
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -510,7 +610,7 @@ on_error:
 	return( -1 );
 }
 
-#endif
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Opens a file using a Basic File IO (bfio) handle
  * Returns 1 if successful or -1 on error
@@ -525,6 +625,7 @@ int libvhdi_file_open_file_io_handle(
 	static char *function                  = "libvhdi_file_open_file_io_handle";
 	int bfio_access_flags                  = 0;
 	int file_io_handle_is_open             = 0;
+	int file_io_handle_opened_in_library   = 0;
 
 	if( file == NULL )
 	{
@@ -608,7 +709,7 @@ int libvhdi_file_open_file_io_handle(
 
 			goto on_error;
 		}
-		internal_file->file_io_handle_opened_in_library = 1;
+		file_io_handle_opened_in_library = 1;
 	}
 	if( libvhdi_file_open_read(
 	     internal_file,
@@ -624,22 +725,49 @@ int libvhdi_file_open_file_io_handle(
 
 		goto on_error;
 	}
-	internal_file->file_io_handle = file_io_handle;
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
 
+		return( -1 );
+	}
+#endif
+	internal_file->file_io_handle                   = file_io_handle;
+	internal_file->file_io_handle_opened_in_library = file_io_handle_opened_in_library;
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 
 on_error:
 	if( ( file_io_handle_is_open == 0 )
-	 && ( internal_file->file_io_handle_opened_in_library != 0 ) )
+	 && ( file_io_handle_opened_in_library != 0 ) )
 	{
 		libbfio_handle_close(
 		 file_io_handle,
 		 error );
-
-		internal_file->file_io_handle_opened_in_library = 0;
 	}
-	internal_file->file_io_handle = NULL;
-
 	return( -1 );
 }
 
@@ -678,6 +806,21 @@ int libvhdi_file_close(
 
 		return( -1 );
 	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -788,6 +931,21 @@ int libvhdi_file_close(
 
 		result = -1;
 	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -859,6 +1017,21 @@ int libvhdi_file_open_read(
 
 		return( -1 );
 	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libbfio_handle_get_size(
 	     file_io_handle,
 	     &file_size,
@@ -1047,6 +1220,21 @@ int libvhdi_file_open_read(
 
 		goto on_error;
 	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -1068,32 +1256,38 @@ on_error:
 		 &( internal_file->block_table ),
 		 NULL );
 	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_file->read_write_lock,
+	 NULL );
+#endif
 	return( -1 );
 }
 
-/* Reads (media) data from the last current into a buffer
+/* Reads (media) data from the last current into a buffer using a Basic File IO (bfio) handle
+ * This function is not multi-thread safe acquire write lock before call
  * Returns the number of bytes read or -1 on error
  */
-ssize_t libvhdi_file_read_buffer(
-         libvhdi_file_t *file,
+ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
+         libvhdi_internal_file_t *internal_file,
+         libbfio_handle_t *file_io_handle,
          void *buffer,
          size_t buffer_size,
          libcerror_error_t **error )
 {
-	libvhdi_data_block_t *data_block       = NULL;
-	libvhdi_internal_file_t *internal_file = NULL;
-	static char *function                  = "libvhdi_file_read_buffer";
-	off64_t block_file_offset              = 0;
-	off64_t element_data_offset            = 0;
-	size_t buffer_offset                   = 0;
-	size_t read_size                       = 0;
-	uint64_t block_offset                  = 0;
-	uint64_t block_sector_offset           = 0;
-	uint64_t block_table_index             = 0;
-	uint32_t block_table_entry             = 0;
-	uint8_t block_is_sparse                = 0;
+	libvhdi_data_block_t *data_block = NULL;
+	static char *function            = "libvhdi_internal_file_read_buffer_from_file_io_handle";
+	off64_t block_file_offset        = 0;
+	off64_t element_data_offset      = 0;
+	size_t buffer_offset             = 0;
+	size_t read_size                 = 0;
+	uint64_t block_offset            = 0;
+	uint64_t block_sector_offset     = 0;
+	uint64_t block_table_index       = 0;
+	uint32_t block_table_entry       = 0;
+	uint8_t block_is_sparse          = 0;
 
-	if( file == NULL )
+	if( internal_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -1104,8 +1298,6 @@ ssize_t libvhdi_file_read_buffer(
 
 		return( -1 );
 	}
-	internal_file = (libvhdi_internal_file_t *) file;
-
 	if( internal_file->io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -1380,6 +1572,83 @@ ssize_t libvhdi_file_read_buffer(
 	return( (ssize_t) buffer_offset );
 }
 
+/* Reads (media) data from the last current into a buffer
+ * Returns the number of bytes read or -1 on error
+ */
+ssize_t libvhdi_file_read_buffer(
+         libvhdi_file_t *file,
+         void *buffer,
+         size_t buffer_size,
+         libcerror_error_t **error )
+{
+	libvhdi_internal_file_t *internal_file = NULL;
+	static char *function                  = "libvhdi_file_read_buffer";
+	ssize_t read_count                     = 0;
+
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libvhdi_internal_file_t *) file;
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	read_count = libvhdi_internal_file_read_buffer_from_file_io_handle(
+		      internal_file,
+		      internal_file->file_io_handle,
+		      buffer,
+		      buffer_size,
+		      error );
+
+	if( read_count == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read buffer.",
+		 function );
+
+		read_count = -1;
+	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( read_count );
+}
+
 /* Reads (media) data at a specific offset
  * Returns the number of bytes read or -1 on error
  */
@@ -1390,11 +1659,40 @@ ssize_t libvhdi_file_read_buffer_at_offset(
          off64_t offset,
          libcerror_error_t **error )
 {
-	static char *function = "libvhdi_file_read_buffer_at_offset";
-	ssize_t read_count    = 0;
+	libvhdi_internal_file_t *internal_file = NULL;
+	static char *function                  = "libvhdi_file_read_buffer_from_file_io_handle";
+	ssize_t read_count                     = 0;
 
-	if( libvhdi_file_seek_offset(
-	     file,
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libvhdi_internal_file_t *) file;
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libvhdi_internal_file_seek_offset(
+	     internal_file,
 	     offset,
 	     SEEK_SET,
 	     error ) == -1 )
@@ -1406,15 +1704,16 @@ ssize_t libvhdi_file_read_buffer_at_offset(
 		 "%s: unable to seek offset.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	read_count = libvhdi_file_read_buffer(
-	              file,
-	              buffer,
-	              buffer_size,
-	              error );
+	read_count = libvhdi_internal_file_read_buffer_from_file_io_handle(
+		      internal_file,
+		      internal_file->file_io_handle,
+		      buffer,
+		      buffer_size,
+		      error );
 
-	if( read_count <= -1 )
+	if( read_count == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1423,57 +1722,32 @@ ssize_t libvhdi_file_read_buffer_at_offset(
 		 "%s: unable to read buffer.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	return( read_count );
-}
-
-/* Reads (media) data at a specific offset
- * Returns the number of bytes read or -1 on error
- */
-ssize_t libvhdi_file_read_random(
-         libvhdi_file_t *file,
-         void *buffer,
-         size_t buffer_size,
-         off64_t offset,
-         libcerror_error_t **error )
-{
-	static char *function = "libvhdi_file_read_random";
-	ssize_t read_count    = 0;
-
-	if( libvhdi_file_seek_offset(
-	     file,
-	     offset,
-	     SEEK_SET,
-	     error ) == -1 )
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	read_count = libvhdi_file_read_buffer(
-	              file,
-	              buffer,
-	              buffer_size,
-	              error );
-
-	if( read_count <= -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read buffer.",
-		 function );
-
-		return( -1 );
-	}
+#endif
 	return( read_count );
+
+on_error:
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_file->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 #ifdef TODO_WRITE_SUPPORT
@@ -1596,18 +1870,18 @@ ssize_t libvhdi_file_write_buffer_at_offset(
 #endif /* TODO_WRITE_SUPPORT */
 
 /* Seeks a certain offset of the (media) data
+ * This function is not multi-thread safe acquire write lock before call
  * Returns the offset if seek is successful or -1 on error
  */
-off64_t libvhdi_file_seek_offset(
-         libvhdi_file_t *file,
+off64_t libvhdi_internal_file_seek_offset(
+         libvhdi_internal_file_t *internal_file,
          off64_t offset,
          int whence,
          libcerror_error_t **error )
 {
-	libvhdi_internal_file_t *internal_file = NULL;
-	static char *function                  = "libvhdi_file_seek_offset";
+	static char *function = "libvhdi_file_seek_offset";
 
-	if( file == NULL )
+	if( internal_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -1618,8 +1892,6 @@ off64_t libvhdi_file_seek_offset(
 
 		return( -1 );
 	}
-	internal_file = (libvhdi_internal_file_t *) file;
-
 	if( internal_file->io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -1665,6 +1937,81 @@ off64_t libvhdi_file_seek_offset(
 	}
 	internal_file->current_offset = offset;
 
+	return( offset );
+}
+
+/* Seeks a certain offset of the (media) data
+ * Returns the offset if seek is successful or -1 on error
+ */
+off64_t libvhdi_file_seek_offset(
+         libvhdi_file_t *file,
+         off64_t offset,
+         int whence,
+         libcerror_error_t **error )
+{
+	libvhdi_internal_file_t *internal_file = NULL;
+	static char *function                  = "libvhdi_file_seek_offset";
+
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libvhdi_internal_file_t *) file;
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	offset = libvhdi_internal_file_seek_offset(
+	          internal_file,
+	          offset,
+	          whence,
+	          error );
+
+	if( offset == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset.",
+		 function );
+
+		offset = -1;
+	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( offset );
 }
 
@@ -1714,8 +2061,38 @@ int libvhdi_file_get_offset(
 
 		return( -1 );
 	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	*offset = internal_file->current_offset;
 
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 
@@ -1765,6 +2142,21 @@ int libvhdi_file_set_parent_file(
 
 		return( -1 );
 	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libvhdi_io_handle_set_parent_file(
 	     internal_file->io_handle,
 	     parent_file,
@@ -1777,8 +2169,31 @@ int libvhdi_file_set_parent_file(
                  "%s: unable to set parent file in IO handle.",
                  function );
 
+		goto on_error;
+	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
+#endif
 	return( 1 );
+
+on_error:
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_file->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 

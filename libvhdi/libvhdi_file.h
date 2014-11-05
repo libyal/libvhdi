@@ -30,6 +30,7 @@
 #include "libvhdi_io_handle.h"
 #include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
+#include "libvhdi_libcthreads.h"
 #include "libvhdi_libfcache.h"
 #include "libvhdi_libfdata.h"
 
@@ -80,6 +81,12 @@ struct libvhdi_internal_file
 	/* The data block cache
 	 */
 	libfcache_cache_t *data_block_cache;
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	/* The read/write lock
+	 */
+	libcthreads_read_write_lock_t *read_write_lock;
+#endif
 };
 
 LIBVHDI_EXTERN \
@@ -130,6 +137,13 @@ int libvhdi_file_open_read(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );
 
+ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
+         libvhdi_internal_file_t *internal_file,
+         libbfio_handle_t *file_io_handle,
+         void *buffer,
+         size_t buffer_size,
+         libcerror_error_t **error );
+
 LIBVHDI_EXTERN \
 ssize_t libvhdi_file_read_buffer(
          libvhdi_file_t *file,
@@ -171,6 +185,12 @@ ssize_t libvhdi_file_write_buffer_at_offset(
          libcerror_error_t **error );
 
 #endif /* TODO_WRITE_SUPPORT */
+
+off64_t libvhdi_internal_file_seek_offset(
+         libvhdi_internal_file_t *internal_file,
+         off64_t offset,
+         int whence,
+         libcerror_error_t **error );
 
 LIBVHDI_EXTERN \
 off64_t libvhdi_file_seek_offset(

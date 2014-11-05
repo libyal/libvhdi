@@ -93,13 +93,6 @@ PyMethodDef pyvhdi_file_object_methods[] = {
 	  "\n"
 	  "Reads a buffer of data at a specific offset." },
 
-	{ "read_random",
-	  (PyCFunction) pyvhdi_file_read_buffer_at_offset,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "read_random(size, offset) -> String\n"
-	  "\n"
-	  "Reads a buffer of data at a specific offset." },
-
 	{ "seek_offset",
 	  (PyCFunction) pyvhdi_file_seek_offset,
 	  METH_VARARGS | METH_KEYWORDS,

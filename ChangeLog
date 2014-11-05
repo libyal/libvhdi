@@ -1,8 +1,9 @@
 TODO
-* remove deprecated functions
-  - libvhdi_file_read_random
-  - pyvhdi file.read_random
+* fix test crashing on input/basic/diff-dynamic.vhd
+
+* complete multi-threading support
 * complete differential images support
+
 * debug
   - print disk type
   - print feature flags
@@ -14,7 +15,11 @@ TODO
 * read backup file footer ?
 * update man pages
 
-Tools:
+20141105
+* worked on multi-threading support
+* removed deprecated functions
+  - libvhdi_file_read_random
+  - pyvhdi file.read_random
 
 20141029
 * bug fix in Python-bindings
