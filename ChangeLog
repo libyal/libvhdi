@@ -1,6 +1,4 @@
 TODO
-* fix test crashing on input/basic/diff-dynamic.vhd
-
 * complete multi-threading support
 * complete differential images support
 

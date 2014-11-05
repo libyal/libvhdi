@@ -308,6 +308,8 @@ int libvhdi_file_get_identifier(
 
 		return( -1 );
 	}
+	internal_file = (libvhdi_internal_file_t *) file;
+
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
@@ -323,8 +325,6 @@ int libvhdi_file_get_identifier(
 		return( -1 );
 	}
 #endif
-	internal_file = (libvhdi_internal_file_t *) file;
-
 	if( libvhdi_io_handle_get_identifier(
 	     internal_file->io_handle,
 	     guid,
