@@ -1478,7 +1478,7 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 		{
 			if( libfdata_vector_get_element_value_at_offset(
 			     internal_file->data_block_vector,
-			     (intptr_t *) internal_file->file_io_handle,
+			     (intptr_t *) file_io_handle,
 			     internal_file->data_block_cache,
 			     block_file_offset,
 			     &element_data_offset,
