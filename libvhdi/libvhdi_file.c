@@ -1660,7 +1660,7 @@ ssize_t libvhdi_file_read_buffer_at_offset(
          libcerror_error_t **error )
 {
 	libvhdi_internal_file_t *internal_file = NULL;
-	static char *function                  = "libvhdi_file_read_buffer_from_file_io_handle";
+	static char *function                  = "libvhdi_file_read_buffer_at_offset";
 	ssize_t read_count                     = 0;
 
 	if( file == NULL )
