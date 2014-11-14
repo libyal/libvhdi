@@ -1,4 +1,5 @@
 TODO
+* fix info_handle_file_fprint: unable to retrieve parent filename string size.
 * complete multi-threading support
 * complete differential images support
 
@@ -12,6 +13,9 @@ TODO
 * read data block + bitmap at once
 * read backup file footer ?
 * update man pages
+
+20141114
+* code clean up
 
 20141105
 * worked on multi-threading support

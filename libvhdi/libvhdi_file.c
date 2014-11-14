@@ -761,8 +761,7 @@ int libvhdi_file_open_file_io_handle(
 	return( 1 );
 
 on_error:
-	if( ( file_io_handle_is_open == 0 )
-	 && ( file_io_handle_opened_in_library != 0 ) )
+	if( file_io_handle_opened_in_library != 0 )
 	{
 		libbfio_handle_close(
 		 file_io_handle,
