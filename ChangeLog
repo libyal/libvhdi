@@ -3,6 +3,10 @@ TODO
 * complete multi-threading support
 * complete differential images support
 
+Tests:
+* Test concurrent read from diff image and parent
+* Add verify test
+
 * debug
   - print disk type
   - print feature flags
@@ -13,6 +17,9 @@ TODO
 * read data block + bitmap at once
 * read backup file footer ?
 * update man pages
+
+20141129
+* code clean up
 
 20141114
 * code clean up

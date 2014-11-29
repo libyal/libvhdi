@@ -85,7 +85,7 @@ int libvhdi_set_codepage(
      int codepage,
      libvhdi_error_t **error );
 
-/* Determines if a file is a VHDI file (check for the VHDI file signature)
+/* Determines if a file contains a VHDI file signature
  * Returns 1 if true, 0 if not or -1 on error
  */
 LIBVHDI_EXTERN \
@@ -95,7 +95,7 @@ int libvhdi_check_file_signature(
 
 #if defined( LIBVHDI_HAVE_WIDE_CHARACTER_TYPE )
 
-/* Determines if a file is a VHDI file (check for the VHDI file signature)
+/* Determines if a file contains a VHDI file signature
  * Returns 1 if true, 0 if not or -1 on error
  */
 LIBVHDI_EXTERN \
@@ -103,7 +103,7 @@ int libvhdi_check_file_signature_wide(
      const wchar_t *filename,
      libvhdi_error_t **error );
 
-#endif
+#endif /* defined( LIBVHDI_HAVE_WIDE_CHARACTER_TYPE ) */
 
 #if defined( LIBVHDI_HAVE_BFIO )
 
@@ -115,7 +115,7 @@ int libvhdi_check_file_signature_file_io_handle(
      libbfio_handle_t *file_io_handle,
      libvhdi_error_t **error );
 
-#endif
+#endif /* defined( LIBVHDI_HAVE_BFIO ) */
 
 /* -------------------------------------------------------------------------
  * Notify functions
@@ -248,7 +248,7 @@ int libvhdi_file_open_wide(
      int access_flags,
      libvhdi_error_t **error );
 
-#endif
+#endif /* defined( LIBVHDI_HAVE_WIDE_CHARACTER_TYPE ) */
 
 #if defined( LIBVHDI_HAVE_BFIO )
 
@@ -262,7 +262,7 @@ int libvhdi_file_open_file_io_handle(
      int access_flags,
      libvhdi_error_t **error );
 
-#endif
+#endif /* defined( LIBVHDI_HAVE_BFIO ) */
 
 /* Closes a file
  * Returns 0 if successful or -1 on error
