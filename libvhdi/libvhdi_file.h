@@ -82,7 +82,7 @@ struct libvhdi_internal_file
 	 */
 	libfcache_cache_t *data_block_cache;
 
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	/* The read/write lock
 	 */
 	libcthreads_read_write_lock_t *read_write_lock;

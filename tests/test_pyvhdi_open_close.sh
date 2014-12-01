@@ -40,7 +40,7 @@ list_contains()
 	return ${EXIT_FAILURE};
 }
 
-PYTHON="/usr/bin/python";
+PYTHON=`which python`;
 
 if ! test -x ${PYTHON};
 then

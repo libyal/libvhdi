@@ -87,7 +87,7 @@ int libvhdi_file_get_format_version(
 
 		return( -1 );
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -105,7 +105,7 @@ int libvhdi_file_get_format_version(
 	*major_version = ( internal_file->io_handle->format_version >> 16 ) & 0x0000ffffUL;
 	*minor_version = internal_file->io_handle->format_version & 0x0000ffffUL;
 
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -169,7 +169,7 @@ int libvhdi_file_get_disk_type(
 
 		return( -1 );
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -186,7 +186,7 @@ int libvhdi_file_get_disk_type(
 #endif
 	*disk_type = internal_file->io_handle->disk_type;
 
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -250,7 +250,7 @@ int libvhdi_file_get_media_size(
 
 		return( -1 );
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -267,7 +267,7 @@ int libvhdi_file_get_media_size(
 #endif
 	*media_size = internal_file->io_handle->media_size;
 
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -310,7 +310,7 @@ int libvhdi_file_get_identifier(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -340,7 +340,7 @@ int libvhdi_file_get_identifier(
 
 		goto on_error;
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -358,7 +358,7 @@ int libvhdi_file_get_identifier(
 	return( 1 );
 
 on_error:
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	libcthreads_read_write_lock_release_for_read(
 	 internal_file->read_write_lock,
 	 NULL );
@@ -403,7 +403,7 @@ int libvhdi_file_get_parent_identifier(
 
 		return( -1 );
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -438,7 +438,7 @@ int libvhdi_file_get_parent_identifier(
 			goto on_error;
 		}
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -456,7 +456,7 @@ int libvhdi_file_get_parent_identifier(
 	return( result );
 
 on_error:
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	libcthreads_read_write_lock_release_for_read(
 	 internal_file->read_write_lock,
 	 NULL );
@@ -501,7 +501,7 @@ int libvhdi_file_get_utf8_parent_filename_size(
 
 		return( -1 );
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -535,7 +535,7 @@ int libvhdi_file_get_utf8_parent_filename_size(
 			goto on_error;
 		}
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -553,7 +553,7 @@ int libvhdi_file_get_utf8_parent_filename_size(
 	return( result );
 
 on_error:
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	libcthreads_read_write_lock_release_for_read(
 	 internal_file->read_write_lock,
 	 NULL );
@@ -599,7 +599,7 @@ int libvhdi_file_get_utf8_parent_filename(
 
 		return( -1 );
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -634,7 +634,7 @@ int libvhdi_file_get_utf8_parent_filename(
 			goto on_error;
 		}
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -652,7 +652,7 @@ int libvhdi_file_get_utf8_parent_filename(
 	return( result );
 
 on_error:
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	libcthreads_read_write_lock_release_for_read(
 	 internal_file->read_write_lock,
 	 NULL );
@@ -697,7 +697,7 @@ int libvhdi_file_get_utf16_parent_filename_size(
 
 		return( -1 );
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -731,7 +731,7 @@ int libvhdi_file_get_utf16_parent_filename_size(
 			goto on_error;
 		}
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -749,7 +749,7 @@ int libvhdi_file_get_utf16_parent_filename_size(
 	return( result );
 
 on_error:
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	libcthreads_read_write_lock_release_for_read(
 	 internal_file->read_write_lock,
 	 NULL );
@@ -795,7 +795,7 @@ int libvhdi_file_get_utf16_parent_filename(
 
 		return( -1 );
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -830,7 +830,7 @@ int libvhdi_file_get_utf16_parent_filename(
 			goto on_error;
 		}
 	}
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_file->read_write_lock,
 	     error ) != 1 )
@@ -848,7 +848,7 @@ int libvhdi_file_get_utf16_parent_filename(
 	return( result );
 
 on_error:
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	libcthreads_read_write_lock_release_for_read(
 	 internal_file->read_write_lock,
 	 NULL );
