@@ -18,6 +18,13 @@ Tests:
 * read backup file footer ?
 * update man pages
 
+20141221
+* worked on Python 3 support
+* worked on tests
+
+20141205
+* worked on test scripts
+
 20141129
 * code clean up
 

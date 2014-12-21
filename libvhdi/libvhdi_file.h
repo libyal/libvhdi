@@ -169,6 +169,13 @@ ssize_t libvhdi_file_read_random(
 
 #ifdef TODO_WRITE_SUPPORT
 
+ssize_t libvhdi_internal_file_write_buffer_to_file_io_handle(
+         libvhdi_internal_file_t *internal_file,
+         libbfio_handle_t *file_io_handle,
+         void *buffer,
+         size_t buffer_size,
+         libcerror_error_t **error );
+
 LIBVHDI_EXTERN \
 ssize_t libvhdi_file_write_buffer(
          libvhdi_file_t *file,

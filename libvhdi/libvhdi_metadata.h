@@ -34,6 +34,12 @@ extern "C" {
 #endif
 
 LIBVHDI_EXTERN \
+int libvhdi_file_get_media_size(
+     libvhdi_file_t *file,
+     size64_t *media_size,
+     libcerror_error_t **error );
+
+LIBVHDI_EXTERN \
 int libvhdi_file_get_format_version(
      libvhdi_file_t *file,
      uint16_t *major_version,
@@ -44,12 +50,6 @@ LIBVHDI_EXTERN \
 int libvhdi_file_get_disk_type(
      libvhdi_file_t *file,
      uint32_t *disk_type,
-     libcerror_error_t **error );
-
-LIBVHDI_EXTERN \
-int libvhdi_file_get_media_size(
-     libvhdi_file_t *file,
-     size64_t *media_size,
      libcerror_error_t **error );
 
 LIBVHDI_EXTERN \

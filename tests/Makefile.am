@@ -17,7 +17,8 @@ AM_CPPFLAGS = \
 
 if HAVE_PYTHON
 TESTS_PYVHDI = \
-	test_pyvhdi_open_close.sh
+	test_pyvhdi_open_close.sh \
+	test_pyvhdi_seek.sh
 endif
 
 TESTS = \
@@ -29,9 +30,11 @@ TESTS = \
 
 check_SCRIPTS = \
 	pyvhdi_test_open_close.py \
+	pyvhdi_test_seek.py \
 	test_pyvhdi_open_close.sh \
 	test_open_close.sh \
 	test_pyvhdi_open_close.sh \
+	test_pyvhdi_seek.sh \
 	test_read.sh \
 	test_runner.sh \
 	test_seek.sh \

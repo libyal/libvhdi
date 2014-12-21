@@ -32,10 +32,8 @@
 #include "pyvhdi_unused.h"
 
 PyTypeObject pyvhdi_disk_types_type_object = {
-	PyObject_HEAD_INIT( NULL )
+	PyVarObject_HEAD_INIT( NULL, 0 )
 
-	/* ob_size */
-	0,
 	/* tp_name */
 	"pyvhdi.disk_types",
 	/* tp_basicsize */
@@ -134,6 +132,8 @@ PyTypeObject pyvhdi_disk_types_type_object = {
 int pyvhdi_disk_types_init_type(
      PyTypeObject *type_object )
 {
+	PyObject *value_object = NULL;
+
 	if( type_object == NULL )
 	{
 		return( -1 );
@@ -144,27 +144,45 @@ int pyvhdi_disk_types_init_type(
 	{
 		return( -1 );
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBVHDI_DISK_TYPE_FIXED );
+#else
+	value_object = PyInt_FromLong(
+	                LIBVHDI_DISK_TYPE_FIXED );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "FIXED",
-	     PyInt_FromLong(
-	      LIBVHDI_DISK_TYPE_FIXED ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBVHDI_DISK_TYPE_DYNAMIC );
+#else
+	value_object = PyInt_FromLong(
+	                LIBVHDI_DISK_TYPE_DYNAMIC );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "DYNAMIC",
-	     PyInt_FromLong(
-	      LIBVHDI_DISK_TYPE_DYNAMIC ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBVHDI_DISK_TYPE_DIFFERENTIAL );
+#else
+	value_object = PyInt_FromLong(
+	                LIBVHDI_DISK_TYPE_DIFFERENTIAL );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "DIFFERENTIAL",
-	     PyInt_FromLong(
-	      LIBVHDI_DISK_TYPE_DIFFERENTIAL ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
@@ -249,7 +267,8 @@ int pyvhdi_disk_types_init(
 void pyvhdi_disk_types_free(
       pyvhdi_disk_types_t *pyvhdi_disk_types )
 {
-	static char *function = "pyvhdi_disk_types_free";
+	struct _typeobject *ob_type = NULL;
+	static char *function       = "pyvhdi_disk_types_free";
 
 	if( pyvhdi_disk_types == NULL )
 	{
@@ -260,25 +279,28 @@ void pyvhdi_disk_types_free(
 
 		return;
 	}
-	if( pyvhdi_disk_types->ob_type == NULL )
+	ob_type = Py_TYPE(
+	           pyvhdi_disk_types );
+
+	if( ob_type == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid disk types - missing ob_type.",
+		 PyExc_ValueError,
+		 "%s: missing ob_type.",
 		 function );
 
 		return;
 	}
-	if( pyvhdi_disk_types->ob_type->tp_free == NULL )
+	if( ob_type->tp_free == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid disk types - invalid ob_type - missing tp_free.",
+		 PyExc_ValueError,
+		 "%s: invalid ob_type - missing tp_free.",
 		 function );
 
 		return;
 	}
-	pyvhdi_disk_types->ob_type->tp_free(
+	ob_type->tp_free(
 	 (PyObject*) pyvhdi_disk_types );
 }
 

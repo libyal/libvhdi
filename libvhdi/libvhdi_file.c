@@ -1263,7 +1263,7 @@ on_error:
 	return( -1 );
 }
 
-/* Reads (media) data from the last current into a buffer using a Basic File IO (bfio) handle
+/* Reads (media) data from the current offset into a buffer using a Basic File IO (bfio) handle
  * This function is not multi-thread safe acquire write lock before call
  * Returns the number of bytes read or -1 on error
  */
@@ -1571,7 +1571,7 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 	return( (ssize_t) buffer_offset );
 }
 
-/* Reads (media) data from the last current into a buffer
+/* Reads (media) data from the current offset into a buffer
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libvhdi_file_read_buffer(
@@ -1597,6 +1597,17 @@ ssize_t libvhdi_file_read_buffer(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
+	if( internal_file->file_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing file IO handle.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_file->read_write_lock,
@@ -1675,6 +1686,17 @@ ssize_t libvhdi_file_read_buffer_at_offset(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
+	if( internal_file->file_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing file IO handle.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_file->read_write_lock,
@@ -1751,6 +1773,23 @@ on_error:
 
 #ifdef TODO_WRITE_SUPPORT
 
+/* Writes (media) data at the current offset from a buffer using a Basic File IO (bfio) handle
+ * the necessary settings of the write values must have been made
+ * Will initialize write if necessary
+ * This function is not multi-thread safe acquire write lock before call
+ * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
+ */
+ssize_t libvhdi_internal_file_write_buffer_to_file_io_handle(
+         libvhdi_internal_file_t *internal_file,
+         libbfio_handle_t *file_io_handle,
+         void *buffer,
+         size_t buffer_size,
+         libcerror_error_t **error )
+{
+/* TODO implement */
+	return( -1 );
+}
+
 /* Writes (media) data at the current offset
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
@@ -1764,6 +1803,7 @@ ssize_t libvhdi_file_write_buffer(
 {
 	libvhdi_internal_file_t *internal_file = NULL;
 	static char *function                  = "libvhdi_file_write_buffer";
+	ssize_t write_count                    = 0;
 
 	if( file == NULL )
 	{
@@ -1778,45 +1818,69 @@ ssize_t libvhdi_file_write_buffer(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
-	if( internal_file->io_handle == NULL )
+	if( internal_file->file_io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing IO handle.",
+		 "%s: invalid file - missing file IO handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( buffer == NULL )
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	if( buffer_size > (size_t) SSIZE_MAX )
+#endif
+	write_count = libvhdi_internal_file_write_buffer_to_file_io_handle(
+	               internal_file,
+	               internal_file->file_io_handle,
+	               buffer,
+	               buffer_size,
+	               error );
+
+	if( write_count == -1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid element data size value exceeds maximum.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to write buffer.",
+		 function );
+
+		write_count = -1;
+	}
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	/* TODO */
-
-	return( -1 );
+#endif
+	return( write_count );
 }
 
-/* Writes (media) data in VHD format at a specific offset,
+/* Writes (media) data at a specific offset,
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
@@ -1828,11 +1892,51 @@ ssize_t libvhdi_file_write_buffer_at_offset(
          off64_t offset,
          libcerror_error_t **error )
 {
-	static char *function = "libvhdi_file_write_buffer_at_offset";
-	ssize_t write_count   = 0;
+	libvhdi_internal_file_t *internal_file = NULL;
+	static char *function                  = "libvhdi_file_write_buffer_at_offset";
+	ssize_t write_count                    = 0;
 
-	if( libvhdi_file_seek_offset(
-	     file,
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libvhdi_internal_file_t *) file;
+
+	if( internal_file->file_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing file IO handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libvhdi_internal_file_seek_offset(
+	     internal_file,
 	     offset,
 	     SEEK_SET,
 	     error ) == -1 )
@@ -1844,26 +1948,50 @@ ssize_t libvhdi_file_write_buffer_at_offset(
 		 "%s: unable to seek offset.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	write_count = libvhdi_file_write_buffer(
-	               file,
+	write_count = libvhdi_internal_file_write_buffer_to_file_io_handle(
+	               internal_file,
+	               internal_file->file_io_handle,
 	               buffer,
 	               buffer_size,
 	               error );
 
-	if( write_count <= -1 )
+	if( write_count == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_WRITE_FAILED,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to write buffer.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
+#endif
 	return( write_count );
+
+on_error:
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_file->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 #endif /* TODO_WRITE_SUPPORT */
@@ -1964,6 +2092,17 @@ off64_t libvhdi_file_seek_offset(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
+	if( internal_file->file_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing file IO handle.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_file->read_write_lock,
@@ -2045,6 +2184,17 @@ int libvhdi_file_get_offset(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid file - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->file_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing file IO handle.",
 		 function );
 
 		return( -1 );
