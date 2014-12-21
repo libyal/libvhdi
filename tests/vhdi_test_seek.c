@@ -427,7 +427,6 @@ int vhdi_test_seek_file(
 {
 	libvhdi_file_t *file = NULL;
 	size64_t media_size  = 0;
-	size_t string_length = 0;
 	int result           = 0;
 
 	if( libvhdi_file_initialize(
@@ -526,7 +525,6 @@ int vhdi_test_seek_file_no_open(
      libcerror_error_t **error )
 {
 	libvhdi_file_t *file  = NULL;
-	size_t string_length  = 0;
 	off64_t result_offset = 0;
 	int result            = 0;
 
