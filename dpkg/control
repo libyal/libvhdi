@@ -1,13 +1,11 @@
 Source: libvhdi
-Section: unknown
 Priority: extra
 Maintainer: Joachim Metz <joachim.metz@gmail.com>
 Build-Depends: debhelper (>= 7), autotools-dev, libfuse-dev, python-dev
-Standards-Version: 3.8.3
+Standards-Version: 3.9.5
 Homepage: https://github.com/libyal/libvhdi/
 
 Package: libvhdi
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: libvhdi-dbg
@@ -17,28 +15,28 @@ Description: Library to access the Virtual Hard Disk (VHD) image format
 Package: libvhdi-dbg
 Architecture: any
 Section: debug
-Depends: libvhdi (= ${Source-Version}), ${misc:Depends}
+Depends: libvhdi (= ${binary:Version}), ${misc:Depends}
 Description: Debugging symbols for libvhdi
  Debugging symbols for libvhdi.
 
 Package: libvhdi-dev
 Section: libdevel
 Architecture: any
-Depends: libvhdi (= ${Source-Version})
+Depends: libvhdi (= ${binary:Version}), ${misc:Depends}
 Description: Header files and libraries for developing applications for libvhdi
  Header files and libraries for developing applications for libvhdi.
 
 Package: libvhdi-tools
 Section: utils
 Architecture: any
-Depends: libvhdi (= ${Source-Version}), ${shlibs:Depends}
+Depends: libvhdi (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Several tools for reading Virtual Hard Disk (VHD) image files
  Several tools for reading Virtual Hard Disk (VHD) image files.
 
 Package: libvhdi-python
 Section: python
 Architecture: any
-Depends: libvhdi (= ${Source-Version}), ${shlibs:Depends}, ${python:Depends}
+Depends: libvhdi (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Suggests: libvhdi-python-dbg
 Description: Python bindings for libvhdi
  Python bindings for libvhdi.
@@ -46,7 +44,7 @@ Description: Python bindings for libvhdi
 Package: libvhdi-python-dbg
 Section: debug
 Architecture: any
-Depends: libvhdi-python (= ${Source-Version})
+Depends: libvhdi-python (= ${binary:Version}), ${misc:Depends}
 Description: Debugging symbols for libvhdi-python
  Debugging symbols for libvhdi-python.
 
