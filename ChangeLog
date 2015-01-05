@@ -16,7 +16,9 @@ Tests:
 * what about geomerty and disk size calculation
 * read data block + bitmap at once
 * read backup file footer ?
-* update man pages
+
+20150105
+* 2015 update
 
 20141229
 * updated dpkg files
