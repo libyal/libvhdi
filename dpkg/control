@@ -1,4 +1,5 @@
 Source: libvhdi
+Section: libs
 Priority: extra
 Maintainer: Joachim Metz <joachim.metz@gmail.com>
 Build-Depends: debhelper (>= 7), autotools-dev, libfuse-dev, python-dev
