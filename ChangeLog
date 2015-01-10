@@ -17,6 +17,9 @@ Tests:
 * read data block + bitmap at once
 * read backup file footer ?
 
+20150110
+* updated version for release
+
 20150105
 * 2015 update
 
