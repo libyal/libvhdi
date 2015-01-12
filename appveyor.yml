@@ -11,7 +11,7 @@ configuration:
 
 install:
   - cmd: git clone https://github.com/libyal/libyal.git
-  - cmd: git clone https://github.com/joachimmetz/dokan.git
+  - cmd: git clone https://github.com/joachimmetz/dokan.git && move dokan ..\
 
 before_build:
   - ps: .\synclibs.ps1
