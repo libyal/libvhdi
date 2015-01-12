@@ -10,13 +10,13 @@ configuration:
   - Release
 
 install:
-  - cmd: git clone https://github.com/libyal/libyal.git
+  - cmd: git clone https://github.com/libyal/libyal.git && move libyal ..\
   - cmd: git clone https://github.com/joachimmetz/dokan.git && move dokan ..\
 
 before_build:
   - ps: .\synclibs.ps1
   - ps: .\autogen.ps1
-  - cmd: C:\Python27\python.exe libyal\msvscpp-convert.py --to 2010 msvscpp\libvhdi.sln
+  - cmd: C:\Python27\python.exe ..\libyal\msvscpp-convert.py --to 2010 msvscpp\libvhdi.sln
 
 build:
   project: vs2010\libvhdi.sln
