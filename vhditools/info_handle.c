@@ -581,7 +581,7 @@ int info_handle_file_fprint(
 		  &value_string_size,
 		  error );
 #endif
-	if( result != 1 )
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
