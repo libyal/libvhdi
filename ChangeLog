@@ -17,6 +17,9 @@ Tests:
 * read data block + bitmap at once
 * read backup file footer ?
 
+20150905
+* updated dependencies
+
 20150125
 * vhdiinfo: fix for handling missing parent filename
 
