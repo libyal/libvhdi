@@ -46,6 +46,9 @@ GETTEXT_FILES = \
 PKGCONFIG_FILES = \
 	libvhdi.pc.in
 
+SETUP_PY_FILES = \
+	setup.py
+
 SPEC_FILES = \
 	libvhdi.spec \
 	libvhdi.spec.in
@@ -54,6 +57,7 @@ EXTRA_DIST = \
 	$(DPKG_FILES) \
 	$(GETTEXT_FILES) \
 	$(PKGCONFIG_FILES) \
+	$(SETUP_PY_FILES) \
 	$(SPEC_FILES)
 
 MAINTAINERCLEANFILES = \

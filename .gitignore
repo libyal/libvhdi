@@ -114,7 +114,6 @@ stamp-h[1-9]
 /libvhdi/libvhdi_definitions.h
 /vhditools/vhdiinfo
 /vhditools/vhdimount
-/pyvhdi/setup.py
 /tests/input
 /tests/tmp*
 /tests/vhdi_test_open_close
