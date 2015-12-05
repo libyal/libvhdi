@@ -17,6 +17,9 @@ Tests:
 * read data block + bitmap at once
 * read backup file footer ?
 
+20151205
+* worked on Python bindings
+
 20150905
 * updated dependencies
 
