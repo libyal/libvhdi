@@ -36,6 +36,7 @@
 #include "libvhdi_libfdata.h"
 #include "libvhdi_libfguid.h"
 #include "libvhdi_libuna.h"
+#include "libvhdi_metadata.h"
 #include "libvhdi_unused.h"
 
 #include "vhdi_dynamic_disk_header.h"

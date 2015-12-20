@@ -1,5 +1,5 @@
 = Virtual Hard Disk (VHD) image format
-Analysis the Virtual PC VHD format
+Analysis of the Virtual PC VHD format
 
 :toc:
 :toclevels: 4
