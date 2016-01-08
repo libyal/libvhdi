@@ -113,6 +113,7 @@ stamp-h[1-9]
 /include/libvhdi/types.h
 /libvhdi/libvhdi.rc
 /libvhdi/libvhdi_definitions.h
+/pyvhdi[23]/*.[ch]
 /vhditools/vhdiinfo
 /vhditools/vhdimount
 /tests/input

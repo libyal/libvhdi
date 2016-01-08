@@ -21,6 +21,8 @@ SUBDIRS = \
 	libcsystem \
 	vhditools \
 	pyvhdi \
+	pyvhdi2 \
+	pyvhdi3 \
 	po \
 	manuals \
 	tests \
@@ -34,8 +36,10 @@ DPKG_FILES = \
 	dpkg/copyright \
 	dpkg/copyright.in \
 	dpkg/rules \
-	dpkg/libvhdi-dev.docs \
 	dpkg/libvhdi.docs \
+	dpkg/libvhdi-dev.docs \
+	dpkg/libvhdi-python.docs \
+	dpkg/libvhdi-python3.docs \
 	dpkg/libvhdi-tools.docs \
 	dpkg/source/format
 
