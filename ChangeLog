@@ -17,6 +17,9 @@ Tests:
 * read data block + bitmap at once
 * read backup file footer ?
 
+20160108
+* 2016 update
+
 20151220
 * updated dependencies
 * changes for deployment
