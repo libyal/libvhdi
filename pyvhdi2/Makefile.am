@@ -55,7 +55,7 @@ pyvhdi_la_CPPFLAGS = $(PYTHON2_CPPFLAGS)
 pyvhdi_la_LDFLAGS  = -module -avoid-version $(PYTHON2_LDFLAGS)
 
 $(BUILT_SOURCES):
-	/bin/cp -f $(top_srcdir)/pyvhdi/pyvhdi*.[ch] .
+	/bin/cp -f $(top_srcdir)/pyvhdi/$@ $@
 
 endif
 
