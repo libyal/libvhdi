@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libvhdi],
- [20160109],
+ [20160111],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -215,8 +215,8 @@ AC_CONFIG_FILES([libvhdi/Makefile])
 AC_CONFIG_FILES([libcsystem/Makefile])
 AC_CONFIG_FILES([vhditools/Makefile])
 AC_CONFIG_FILES([pyvhdi/Makefile])
-AC_CONFIG_FILES([pyvhdi2/Makefile])
-AC_CONFIG_FILES([pyvhdi3/Makefile])
+AC_CONFIG_FILES([pyvhdi-python2/Makefile])
+AC_CONFIG_FILES([pyvhdi-python3/Makefile])
 AC_CONFIG_FILES([po/Makefile.in])
 AC_CONFIG_FILES([po/Makevars])
 AC_CONFIG_FILES([manuals/Makefile])

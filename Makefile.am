@@ -21,8 +21,8 @@ SUBDIRS = \
 	libcsystem \
 	vhditools \
 	pyvhdi \
-	pyvhdi2 \
-	pyvhdi3 \
+	pyvhdi-python2 \
+	pyvhdi-python3 \
 	po \
 	manuals \
 	tests \
