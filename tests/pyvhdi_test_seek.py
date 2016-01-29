@@ -20,6 +20,7 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from __future__ import print_function
 import argparse
 import os
 import sys
@@ -41,29 +42,32 @@ def get_whence_string(whence):
 
 
 def pyvhdi_test_seek_offset(
-    vhdi_file, input_offset, input_whence, output_offset):
+    vhdi_file, input_offset, input_whence, expected_offset):
 
   print("Testing seek of offset: {0:d} and whence: {1:s}\t".format(
-      input_offset, get_whence_string(input_whence)))
+      input_offset, get_whence_string(input_whence)), end="")
 
+  error_string = ""
   result = True
   try:
     vhdi_file.seek(input_offset, input_whence)
 
-    if result:
-      result_offset = vhdi_file.get_offset()
-      if output_offset != result_offset:
-        result = False
+    result_offset = vhdi_file.get_offset()
+    if expected_offset != result_offset:
+      result = False
 
   except Exception as exception:
-    print(str(exception))
-    if output_offset != -1:
+    error_string = str(exception)
+    if expected_offset != -1:
       result = False
 
   if not result:
     print("(FAIL)")
   else:
     print("(PASS)")
+
+  if error_string:
+    print(error_string)
   return result
 
 
@@ -192,21 +196,25 @@ def pyvhdi_test_seek_file_object(filename):
 
 
 def pyvhdi_test_seek_file_no_open(filename):
-  print("Testing seek of offset without open:\n")
+  print("Testing seek of offset without open:\t", end="")
 
   vhdi_file = pyvhdi.file()
 
+  error_string = ""
   result = False
   try:
     vhdi_file.seek(0, os.SEEK_SET)
   except Exception as exception:
-    print(str(exception))
+    error_string = str(exception)
     result = True
 
   if not result:
     print("(FAIL)")
   else:
     print("(PASS)")
+
+  if error_string:
+    print(error_string)
   return result
 
 
@@ -217,8 +225,6 @@ def main():
   args_parser.add_argument(
       "source", nargs="?", action="store", metavar="FILENAME",
       default=None, help="The source filename.")
-
-  options = args_parser.parse_args()
 
   if not options.source:
     print("Source value is missing.")

@@ -12,12 +12,14 @@ AM_CPPFLAGS = \
 	@LIBCFILE_CPPFLAGS@ \
 	@LIBCPATH_CPPFLAGS@ \
 	@LIBBFIO_CPPFLAGS@ \
+	@LIBCSYSTEM_CPPFLAGS@ \
 	@PTHREAD_CPPFLAGS@ \
 	@LIBVHDI_DLL_IMPORT@
 
-if HAVE_PYTHON
+if HAVE_PYTHON_TESTS
 TESTS_PYVHDI = \
 	test_pyvhdi_open_close.sh \
+	test_pyvhdi_read.sh \
 	test_pyvhdi_seek.sh
 endif
 
@@ -30,10 +32,12 @@ TESTS = \
 
 check_SCRIPTS = \
 	pyvhdi_test_open_close.py \
+	pyvhdi_test_read.py \
 	pyvhdi_test_seek.py \
 	test_pyvhdi_open_close.sh \
 	test_open_close.sh \
 	test_pyvhdi_open_close.sh \
+	test_pyvhdi_read.sh \
 	test_pyvhdi_seek.sh \
 	test_read.sh \
 	test_runner.sh \
@@ -51,12 +55,14 @@ check_PROGRAMS = \
 vhdi_test_open_close_SOURCES = \
 	vhdi_test_libcerror.h \
 	vhdi_test_libcstring.h \
+	vhdi_test_libcsystem.h \
 	vhdi_test_libcthreads.h \
 	vhdi_test_libvhdi.h \
 	vhdi_test_open_close.c \
 	vhdi_test_unused.h
 
 vhdi_test_open_close_LDADD = \
+	@LIBCSYSTEM_LIBADD@ \
 	../libvhdi/libvhdi.la \
 	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
@@ -66,12 +72,14 @@ vhdi_test_open_close_LDADD = \
 vhdi_test_read_SOURCES = \
 	vhdi_test_libcerror.h \
 	vhdi_test_libcstring.h \
+	vhdi_test_libcsystem.h \
 	vhdi_test_libcthreads.h \
 	vhdi_test_libvhdi.h \
 	vhdi_test_read.c \
 	vhdi_test_unused.h
 
 vhdi_test_read_LDADD = \
+	@LIBCSYSTEM_LIBADD@ \
 	../libvhdi/libvhdi.la \
 	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
@@ -81,12 +89,14 @@ vhdi_test_read_LDADD = \
 vhdi_test_seek_SOURCES = \
 	vhdi_test_libcerror.h \
 	vhdi_test_libcstring.h \
+	vhdi_test_libcsystem.h \
 	vhdi_test_libcthreads.h \
 	vhdi_test_libvhdi.h \
 	vhdi_test_seek.c \
 	vhdi_test_unused.h
 
 vhdi_test_seek_LDADD = \
+	@LIBCSYSTEM_LIBADD@ \
 	../libvhdi/libvhdi.la \
 	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \

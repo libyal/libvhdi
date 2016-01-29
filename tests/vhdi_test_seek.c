@@ -20,15 +20,15 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include <stdio.h>
-
 #include "vhdi_test_libcerror.h"
 #include "vhdi_test_libcstring.h"
+#include "vhdi_test_libcsystem.h"
 #include "vhdi_test_libvhdi.h"
 #include "vhdi_test_unused.h"
 
@@ -106,11 +106,11 @@ int vhdi_test_seek_offset(
 	{
 		if( result != 1 )
 		{
-			libvhdi_error_backtrace_fprint(
+			libcerror_error_backtrace_fprint(
 			 error,
 			 stderr );
 		}
-		libvhdi_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -427,6 +427,7 @@ int vhdi_test_seek_file(
 {
 	libvhdi_file_t *file = NULL;
 	size64_t media_size  = 0;
+	size_t string_length = 0;
 	int result           = 0;
 
 	if( libvhdi_file_initialize(
@@ -525,6 +526,7 @@ int vhdi_test_seek_file_no_open(
      libcerror_error_t **error )
 {
 	libvhdi_file_t *file  = NULL;
+	size_t string_length  = 0;
 	off64_t result_offset = 0;
 	int result            = 0;
 
@@ -575,11 +577,11 @@ int vhdi_test_seek_file_no_open(
 	{
 		if( result != 1 )
 		{
-			libvhdi_error_backtrace_fprint(
+			libcerror_error_backtrace_fprint(
 			 *error,
 			 stderr );
 		}
-		libvhdi_error_free(
+		libcerror_error_free(
 		 error );
 	}
 	if( libvhdi_file_free(
@@ -614,9 +616,27 @@ int main( int argc, char * const argv[] )
 {
 	libcerror_error_t *error              = NULL;
 	libcstring_system_character_t *source = NULL;
+	libcstring_system_integer_t option    = 0;
 	int result                            = 0;
 
-	if( argc < 2 )
+	while( ( option = libcsystem_getopt(
+	                   argc,
+	                   argv,
+	                   _LIBCSTRING_SYSTEM_STRING( "" ) ) ) != (libcstring_system_integer_t) -1 )
+	{
+		switch( option )
+		{
+			case (libcstring_system_integer_t) '?':
+			default:
+				fprintf(
+				 stderr,
+				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+				 argv[ optind - 1 ] );
+
+				return( EXIT_FAILURE );
+		}
+	}
+	if( optind == argc )
 	{
 		fprintf(
 		 stderr,
@@ -624,7 +644,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	source = argv[ 1 ];
+	source = argv[ optind ];
 
 #if defined( HAVE_DEBUG_OUTPUT ) && defined( VHDI_TEST_SEEK_VERBOSE )
 	libvhdi_notify_set_verbose(
@@ -662,10 +682,10 @@ int main( int argc, char * const argv[] )
 on_error:
 	if( error != NULL )
 	{
-		libvhdi_error_backtrace_fprint(
+		libcerror_error_backtrace_fprint(
 		 error,
 		 stderr );
-		libvhdi_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( EXIT_FAILURE );

@@ -20,15 +20,15 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include <stdio.h>
-
-#include "vhdi_test_libcstring.h"
 #include "vhdi_test_libcerror.h"
+#include "vhdi_test_libcstring.h"
+#include "vhdi_test_libcsystem.h"
 #include "vhdi_test_libcthreads.h"
 #include "vhdi_test_libvhdi.h"
 #include "vhdi_test_unused.h"
@@ -49,9 +49,9 @@ int vhdi_test_seek_offset(
      int input_whence,
      off64_t expected_offset )
 {
-	libvhdi_error_t *error = NULL;
-	off64_t result_offset  = 0;
-	int result             = 0;
+	libcerror_error_t *error = NULL;
+	off64_t result_offset    = 0;
+	int result               = 0;
 
 	if( file == NULL )
 	{
@@ -78,11 +78,11 @@ int vhdi_test_seek_offset(
 	{
 		if( result != 1 )
 		{
-			libvhdi_error_backtrace_fprint(
+			libcerror_error_backtrace_fprint(
 			 error,
 			 stderr );
 		}
-		libvhdi_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -98,12 +98,12 @@ int vhdi_test_read_buffer(
 {
 	uint8_t buffer[ VHDI_TEST_READ_BUFFER_SIZE ];
 
-	libvhdi_error_t *error  = NULL;
-	size64_t remaining_size = 0;
-	size64_t result_size    = 0;
-	size_t read_size        = 0;
-	ssize_t read_count      = 0;
-	int result              = 0;
+	libcerror_error_t *error = NULL;
+	size64_t remaining_size  = 0;
+	size64_t result_size     = 0;
+	size_t read_size         = 0;
+	ssize_t read_count       = 0;
+	int result               = 0;
 
 	if( file == NULL )
 	{
@@ -152,11 +152,11 @@ int vhdi_test_read_buffer(
 	{
 		if( result != 1 )
 		{
-			libvhdi_error_backtrace_fprint(
+			libcerror_error_backtrace_fprint(
 			 error,
 			 stderr );
 		}
-		libvhdi_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -174,13 +174,13 @@ int vhdi_test_read_buffer_at_offset(
 {
 	uint8_t buffer[ VHDI_TEST_READ_BUFFER_SIZE ];
 
-	libvhdi_error_t *error  = NULL;
-	off64_t result_offset   = 0;
-	size64_t remaining_size = 0;
-	size64_t result_size    = 0;
-	size_t read_size        = 0;
-	ssize_t read_count      = 0;
-	int result              = 0;
+	libcerror_error_t *error = NULL;
+	off64_t result_offset    = 0;
+	size64_t remaining_size  = 0;
+	size64_t result_size     = 0;
+	size_t read_size         = 0;
+	ssize_t read_count       = 0;
+	int result               = 0;
 
 	if( file == NULL )
 	{
@@ -267,11 +267,11 @@ int vhdi_test_read_buffer_at_offset(
 	{
 		if( result != 1 )
 		{
-			libvhdi_error_backtrace_fprint(
+			libcerror_error_backtrace_fprint(
 			 error,
 			 stderr );
 		}
-		libvhdi_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -721,7 +721,7 @@ int vhdi_test_read_from_file_multi_thread(
 
 		expected_offset = (off64_t) number_of_iterations * VHDI_TEST_READ_BUFFER_SIZE;
 
-		if( expected_offset > media_size )
+		if( (size64_t) expected_offset > media_size )
 		{
 			expected_offset = media_size;
 
@@ -859,18 +859,40 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libvhdi_error_t *error = NULL;
-	libvhdi_file_t *file   = NULL;
-	size64_t media_size    = 0;
+	libcerror_error_t *error              = NULL;
+	libvhdi_file_t *file                  = NULL;
+	libcstring_system_character_t *source = NULL;
+	libcstring_system_integer_t option    = 0;
+	size64_t media_size                   = 0;
+	size_t string_length                  = 0;
 
-	if( argc < 2 )
+	while( ( option = libcsystem_getopt(
+	                   argc,
+	                   argv,
+	                   _LIBCSTRING_SYSTEM_STRING( "" ) ) ) != (libcstring_system_integer_t) -1 )
+	{
+		switch( option )
+		{
+			case (libcstring_system_integer_t) '?':
+			default:
+				fprintf(
+				 stderr,
+				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+				 argv[ optind - 1 ] );
+
+				return( EXIT_FAILURE );
+		}
+	}
+	if( optind == argc )
 	{
 		fprintf(
 		 stderr,
-		 "Missing filename.\n" );
+		 "Missing source file or device.\n" );
 
 		return( EXIT_FAILURE );
 	}
+	source = argv[ optind ];
+
 #if defined( HAVE_DEBUG_OUTPUT ) && defined( VHDI_TEST_READ_VERBOSE )
 	libvhdi_notify_set_verbose(
 	 1 );
@@ -893,13 +915,13 @@ int main( int argc, char * const argv[] )
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libvhdi_file_open_wide(
 	     file,
-	     argv[ 1 ],
+	     source,
 	     LIBVHDI_OPEN_READ,
 	     &error ) != 1 )
 #else
 	if( libvhdi_file_open(
 	     file,
-	     argv[ 1 ],
+	     source,
 	     LIBVHDI_OPEN_READ,
 	     &error ) != 1 )
 #endif
@@ -976,10 +998,10 @@ int main( int argc, char * const argv[] )
 on_error:
 	if( error != NULL )
 	{
-		libvhdi_error_backtrace_fprint(
+		libcerror_error_backtrace_fprint(
 		 error,
 		 stderr );
-		libvhdi_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	if( file != NULL )

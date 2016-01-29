@@ -219,8 +219,7 @@ def main():
       options.source, "r"):
     return False
 
-  if not pyvhdi_test_multi_open_close_file_object(
-      options.source, "r"):
+  if not pyvhdi_test_multi_open_close_file_object(options.source, "r"):
     return False
 
   return True
