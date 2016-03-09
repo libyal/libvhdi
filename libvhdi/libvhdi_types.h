@@ -33,15 +33,15 @@
 
 /* The following type definitions hide internal data structures
  */
-#if defined( HAVE_DEBUG_OUTPUT )
-typedef struct libvhdi_file {}		libvhdi_file_t;
+#if defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI )
+typedef struct libvhdi_file {}	libvhdi_file_t;
 
 #else
 typedef intptr_t libvhdi_file_t;
 
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI ) */
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBVHDI ) */
 
-#endif
+#endif /* !defined( _LIBVHDI_INTERNAL_TYPES_H ) */
 

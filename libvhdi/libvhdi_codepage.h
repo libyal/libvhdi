@@ -80,11 +80,11 @@ enum LIBVHDI_CODEPAGES
 	LIBVHDI_CODEPAGE_WINDOWS_1258			= 1258
 };
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBVHDI ) */
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBVHDI_INTERNAL_CODEPAGE_H ) */
 

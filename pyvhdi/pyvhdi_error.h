@@ -28,7 +28,7 @@
 #include "pyvhdi_libcerror.h"
 #include "pyvhdi_python.h"
 
-#define PYVHDI_ERROR_STRING_SIZE		2048
+#define PYVHDI_ERROR_STRING_SIZE	2048
 
 #if defined( __cplusplus )
 extern "C" {
@@ -56,5 +56,5 @@ void pyvhdi_error_raise(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYVHDI_ERROR_H ) */
 

@@ -53,11 +53,11 @@ LIBVHDI_EXTERN \
 int libvhdi_notify_stream_close(
      libcerror_error_t **error );
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBVHDI ) */
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBVHDI_NOTIFY_H ) */
 
