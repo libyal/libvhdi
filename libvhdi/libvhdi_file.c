@@ -1280,6 +1280,7 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 	off64_t element_data_offset      = 0;
 	size_t buffer_offset             = 0;
 	size_t read_size                 = 0;
+	ssize_t read_count               = 0;
 	uint64_t block_offset            = 0;
 	uint64_t block_sector_offset     = 0;
 	uint64_t block_table_index       = 0;
@@ -1309,7 +1310,7 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 		return( -1 );
 	}
 	if( ( internal_file->io_handle->parent_filename != NULL )
-	 && ( internal_file->io_handle->parent_file == NULL ) )
+	 && ( internal_file->parent_file == NULL ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -1554,21 +1555,60 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 				 "\n" );
 			}
 #endif
-			/* Handle sparse block
-			 */
-			if( memory_set(
-			     &( ( (uint8_t *) buffer )[ buffer_offset ] ),
-			     0,
-			     read_size ) == NULL )
+			if( internal_file->parent_file == NULL )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to set sparse data in buffer.",
-				 function );
+				/* Handle sparse block
+				 */
+				if( memory_set(
+				     &( ( (uint8_t *) buffer )[ buffer_offset ] ),
+				     0,
+				     read_size ) == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set sparse data in buffer.",
+					 function );
 
-				return( -1 );
+					return( -1 );
+				}
+			}
+			else
+			{
+				if( libvhdi_file_seek_offset(
+				     internal_file->parent_file,
+				     internal_file->current_offset,
+				     SEEK_SET,
+				     error ) == -1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_SEEK_FAILED,
+					 "%s: unable to seek offset: %" PRIi64 " in parent.",
+					 function,
+					 internal_file->current_offset );
+
+					return( -1 );
+				}
+				read_count = libvhdi_file_read_buffer(
+					      internal_file->parent_file,
+					      &( ( (uint8_t *) buffer )[ buffer_offset ] ),
+					      read_size,
+					      error );
+
+				if( read_count != (ssize_t) read_size )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read grain data from parent.",
+					 function );
+
+					return( -1 );
+				}
 			}
 		}
 		internal_file->current_offset += read_size;
@@ -2043,7 +2083,7 @@ off64_t libvhdi_internal_file_seek_offset(
 		return( -1 );
 	}
 	if( ( internal_file->io_handle->parent_filename != NULL )
-	 && ( internal_file->io_handle->parent_file == NULL ) )
+	 && ( internal_file->parent_file == NULL ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -2277,8 +2317,11 @@ int libvhdi_file_set_parent_file(
      libvhdi_file_t *parent_file,
      libcerror_error_t **error )
 {
+	uint8_t identifier[ 16 ];
+
 	libvhdi_internal_file_t *internal_file = NULL;
 	static char *function                  = "libvhdi_file_set_parent_file";
+	int result                             = 1;
 
 	if( file == NULL )
 	{
@@ -2315,6 +2358,21 @@ int libvhdi_file_set_parent_file(
 
 		return( -1 );
 	}
+	if( libvhdi_file_get_identifier(
+	     parent_file,
+	     identifier,
+	     16,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve identifier from parent file.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_file->read_write_lock,
@@ -2330,20 +2388,22 @@ int libvhdi_file_set_parent_file(
 		return( -1 );
 	}
 #endif
-	if( libvhdi_io_handle_set_parent_file(
-	     internal_file->io_handle,
-	     parent_file,
-	     error ) != 1 )
+	if( memory_compare(
+	     internal_file->io_handle->parent_identifier,
+	     identifier,
+	     16 ) != 0 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-                 "%s: unable to set parent file in IO handle.",
-                 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: mismatch in identifier.",
+		 function );
 
 		goto on_error;
 	}
+	internal_file->parent_file = parent_file;
+
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_file->read_write_lock,
@@ -2359,7 +2419,7 @@ int libvhdi_file_set_parent_file(
 		return( -1 );
 	}
 #endif
-	return( 1 );
+	return( result );
 
 on_error:
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )

@@ -1434,63 +1434,6 @@ int libvhdi_io_handle_get_utf16_parent_filename(
 	return( 1 );
 }
 
-/* Sets the parent file
- * Returns 1 if successful or -1 on error
- */
-int libvhdi_io_handle_set_parent_file(
-     libvhdi_io_handle_t *io_handle,
-     libvhdi_file_t *parent_file,
-     libcerror_error_t **error )
-{
-	uint8_t identifier[ 16 ];
-
-	static char *function = "libvhdi_io_handle_set_parent_file";
-
-	if( io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( libvhdi_file_get_identifier(
-	     parent_file,
-	     identifier,
-	     16,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve identifier from parent file.",
-		 function );
-
-		return( -1 );
-	}
-	if( memory_compare(
-	     io_handle->parent_identifier,
-	     identifier,
-	     16 ) != 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: mismatch in identifier.",
-		 function );
-
-		return( -1 );
-	}
-	io_handle->parent_file = parent_file;
-
-	return( 1 );
-}
-
 /* Reads a data block
  * Callback function for the data block vector
  * Returns 1 if successful or -1 on error

@@ -152,7 +152,7 @@ def pyvhdi_test_read(vhdi_file):
 
   # Test: offset: 0 size: <media_size>
   # Expected result: offset: 0 size: <media_size>
-  read_offset = media_size
+  read_offset = 0
   read_size = media_size
 
   if not pyvhdi_test_seek_offset_and_read_buffer(

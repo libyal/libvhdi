@@ -89,10 +89,6 @@ struct libvhdi_io_handle
 	 */
 	size_t parent_filename_size;
 
-	/* The parent file
-	 */
-	libvhdi_file_t *parent_file;
-
 	/* Value to indicate if abort was signalled
 	 */
 	int abort;
@@ -157,11 +153,6 @@ int libvhdi_io_handle_get_utf16_parent_filename(
      size_t utf16_string_size,
      libcerror_error_t **error );
 
-int libvhdi_io_handle_set_parent_file(
-     libvhdi_io_handle_t *io_handle,
-     libvhdi_file_t *parent_file,
-     libcerror_error_t **error );
-
 int libvhdi_io_handle_read_data_block(
      libvhdi_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
@@ -179,5 +170,5 @@ int libvhdi_io_handle_read_data_block(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBVHDI_IO_HANDLE_H ) */
 
