@@ -1,5 +1,5 @@
 /*
- * The internal libcpath header
+ * Metadata functions for the Python object definition of the libvhdi file
  *
  * Copyright (C) 2012-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,30 +19,34 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _VHDITOOLS_LIBCPATH_H )
-#define _VHDITOOLS_LIBCPATH_H
+#if !defined( _PYVHDI_METADATA_H )
+#define _PYVHDI_METADATA_H
 
 #include <common.h>
+#include <types.h>
 
-/* Define HAVE_LOCAL_LIBCPATH for local use of libcpath
- */
-#if defined( HAVE_LOCAL_LIBCPATH )
+#include "pyvhdi_libvhdi.h"
+#include "pyvhdi_python.h"
 
-#include <libcpath_definitions.h>
-#include <libcpath_path.h>
-
-#else
-
-/* If libtool DLL support is enabled set LIBCPATH_DLL_IMPORT
- * before including libcpath.h
- */
-#if defined( _WIN32 ) && defined( DLL_IMPORT )
-#define LIBCPATH_DLL_IMPORT
+#if defined( __cplusplus )
+extern "C" {
 #endif
 
-#include <libcpath.h>
+PyObject *pyvhdi_file_get_media_size(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments );
 
-#endif /* defined( HAVE_LOCAL_LIBCPATH ) */
+PyObject *pyvhdi_file_get_parent_identifier(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments );
 
-#endif /* !defined( _VHDITOOLS_LIBCPATH_H ) */
+PyObject *pyvhdi_file_get_parent_filename(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments );
+
+#if defined( __cplusplus )
+}
+#endif
+
+#endif /* !defined( _PYVHDI_METADATA_H ) */
 

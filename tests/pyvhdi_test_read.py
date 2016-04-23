@@ -239,8 +239,22 @@ def pyvhdi_test_read_file(filename):
   vhdi_file = pyvhdi.file()
 
   vhdi_file.open(filename, "r")
+
+  vhdi_parent_file = None
+  if vhdi_file.parent_identifier:
+    vhdi_parent_file = pyvhdi.file()
+
+    parent_filename = os.path.join(
+      os.path.dirname(filename), vhdi_file.parent_filename)
+    vhdi_parent_file.open(parent_filename, "r")
+
+    vhdi_file.set_parent(vhdi_parent_file)
+
   result = pyvhdi_test_read(vhdi_file)
   vhdi_file.close()
+
+  if vhdi_parent_file:
+    vhdi_parent_file.close()
 
   return result
 
@@ -251,8 +265,22 @@ def pyvhdi_test_read_file_object(filename):
   vhdi_file = pyvhdi.file()
 
   vhdi_file.open_file_object(file_object, "r")
+
+  vhdi_parent_file = None
+  if vhdi_file.parent_identifier:
+    vhdi_parent_file = pyvhdi.file()
+
+    parent_filename = os.path.join(
+      os.path.dirname(filename), vhdi_file.parent_filename)
+    vhdi_parent_file.open(parent_filename, "r")
+
+    vhdi_file.set_parent(vhdi_parent_file)
+
   result = pyvhdi_test_read(vhdi_file)
   vhdi_file.close()
+
+  if vhdi_parent_file:
+    vhdi_parent_file.close()
 
   return result
 

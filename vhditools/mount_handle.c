@@ -610,22 +610,6 @@ int mount_handle_open_input_parent_file(
 
 		goto on_error;
 	}
-	if( parent_path != NULL )
-	{
-		if( mount_handle->basename != NULL )
-		{
-			memory_free(
-			 parent_path );
-		}
-		parent_path = NULL;
-	}
-	if( parent_filename != NULL )
-	{
-		memory_free(
-		 parent_filename );
-
-		parent_filename = NULL;
-	}
 	if( mount_handle_open_input_parent_file(
 	     mount_handle,
 	     parent_input_file,
@@ -668,6 +652,22 @@ int mount_handle_open_input_parent_file(
 		 function );
 
 		goto on_error;
+	}
+	if( parent_path != NULL )
+	{
+		if( mount_handle->basename != NULL )
+		{
+			memory_free(
+			 parent_path );
+		}
+		parent_path = NULL;
+	}
+	if( parent_filename != NULL )
+	{
+		memory_free(
+		 parent_filename );
+
+		parent_filename = NULL;
 	}
 	return( 1 );
 

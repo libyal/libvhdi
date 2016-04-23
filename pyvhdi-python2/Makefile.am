@@ -35,6 +35,7 @@ BUILT_SOURCES = \
 	pyvhdi_libcstring.h \
 	pyvhdi_libfguid.h \
 	pyvhdi_libvhdi.h \
+	pyvhdi_metadata.c pyvhdi_metadata.h \
 	pyvhdi_python.h \
 	pyvhdi_unused.h
 

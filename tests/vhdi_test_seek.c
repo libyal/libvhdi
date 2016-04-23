@@ -27,6 +27,7 @@
 #endif
 
 #include "vhdi_test_libcerror.h"
+#include "vhdi_test_libcpath.h"
 #include "vhdi_test_libcstring.h"
 #include "vhdi_test_libcsystem.h"
 #include "vhdi_test_libvhdi.h"
@@ -119,11 +120,12 @@ int vhdi_test_seek_offset(
 /* Tests seeking in a file
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int vhdi_test_seek(
+int vhdi_test_seek_file(
      libvhdi_file_t *file,
      size64_t media_size )
 {
-	int result = 0;
+	size64_t seek_offset = 0;
+	int result           = 0;
 
 	if( file == NULL )
 	{
@@ -140,11 +142,13 @@ int vhdi_test_seek(
 	/* Test: SEEK_SET offset: 0
 	 * Expected result: 0
 	 */
+	seek_offset = 0;
+
 	result = vhdi_test_seek_offset(
 	          file,
-	          0,
+	          seek_offset,
 	          SEEK_SET,
-	          0 );
+	          seek_offset );
 
 	if( result != 1 )
 	{
@@ -157,11 +161,13 @@ int vhdi_test_seek(
 	/* Test: SEEK_SET offset: <media_size>
 	 * Expected result: <media_size>
 	 */
+	seek_offset = (off64_t) media_size;
+
 	result = vhdi_test_seek_offset(
 	          file,
-	          (off64_t) media_size,
+	          seek_offset,
 	          SEEK_SET,
-	          (off64_t) media_size );
+	          seek_offset );
 
 	if( result != 1 )
 	{
@@ -174,11 +180,13 @@ int vhdi_test_seek(
 	/* Test: SEEK_SET offset: <media_size / 5>
 	 * Expected result: <media_size / 5>
 	 */
+	seek_offset = (off64_t) ( media_size / 5 );
+
 	result = vhdi_test_seek_offset(
 	          file,
-	          (off64_t) ( media_size / 5 ),
+	          seek_offset,
 	          SEEK_SET,
-	          (off64_t) ( media_size / 5 ) );
+	          seek_offset );
 
 	if( result != 1 )
 	{
@@ -191,11 +199,13 @@ int vhdi_test_seek(
 	/* Test: SEEK_SET offset: <media_size + 987>
 	 * Expected result: <media_size + 987>
 	 */
+	seek_offset = (off64_t) ( media_size + 987 );
+
 	result = vhdi_test_seek_offset(
 	          file,
-	          (off64_t) ( media_size + 987 ),
+	          seek_offset,
 	          SEEK_SET,
-	          (off64_t) ( media_size + 987 ) );
+	          seek_offset );
 
 	if( result != 1 )
 	{
@@ -208,9 +218,11 @@ int vhdi_test_seek(
 	/* Test: SEEK_SET offset: -987
 	 * Expected result: -1
 	 */
+	seek_offset = -987;
+
 	result = vhdi_test_seek_offset(
 	          file,
-	          -987,
+	          seek_offset,
 	          SEEK_SET,
 	          -1 );
 
@@ -225,9 +237,11 @@ int vhdi_test_seek(
 	/* Test: SEEK_CUR offset: 0
 	 * Expected result: <media_size + 987>
 	 */
+	seek_offset = 0;
+
 	result = vhdi_test_seek_offset(
 	          file,
-	          0,
+	          seek_offset,
 	          SEEK_CUR,
 	          (off64_t) ( media_size + 987 ) );
 
@@ -242,9 +256,11 @@ int vhdi_test_seek(
 	/* Test: SEEK_CUR offset: <-1 * (media_size + 987)>
 	 * Expected result: 0
 	 */
+	seek_offset = -1 * (off64_t) ( media_size + 987 );
+
 	result = vhdi_test_seek_offset(
 	          file,
-	          -1 * (off64_t) ( media_size + 987 ),
+	          seek_offset,
 	          SEEK_CUR,
 	          0 );
 
@@ -259,11 +275,13 @@ int vhdi_test_seek(
 	/* Test: SEEK_CUR offset: <media_size / 3>
 	 * Expected result: <media_size / 3>
 	 */
+	seek_offset = (off64_t) ( media_size / 3 );
+
 	result = vhdi_test_seek_offset(
 	          file,
-	          (off64_t) ( media_size / 3 ),
+	          seek_offset,
 	          SEEK_CUR,
-	          (off64_t) ( media_size / 3 ) );
+	          seek_offset );
 
 	if( result != 1 )
 	{
@@ -273,6 +291,8 @@ int vhdi_test_seek(
 
 		return( result );
 	}
+	seek_offset = -2 * (off64_t) ( media_size / 3 );
+
 	if( media_size == 0 )
 	{
 		/* Test: SEEK_CUR offset: <-2 * (media_size / 3)>
@@ -280,7 +300,7 @@ int vhdi_test_seek(
 		 */
 		result = vhdi_test_seek_offset(
 		          file,
-		          -2 * (off64_t) ( media_size / 3 ),
+		          seek_offset,
 		          SEEK_CUR,
 		          0 );
 
@@ -300,7 +320,7 @@ int vhdi_test_seek(
 		 */
 		result = vhdi_test_seek_offset(
 		          file,
-		          -2 * (off64_t) ( media_size / 3 ),
+		          seek_offset,
 		          SEEK_CUR,
 		          -1 );
 
@@ -316,9 +336,11 @@ int vhdi_test_seek(
 	/* Test: SEEK_END offset: 0
 	 * Expected result: <media_size>
 	 */
+	seek_offset = 0;
+
 	result = vhdi_test_seek_offset(
 	          file,
-	          0,
+	          seek_offset,
 	          SEEK_END,
 	          (off64_t) media_size );
 
@@ -333,9 +355,11 @@ int vhdi_test_seek(
 	/* Test: SEEK_END offset: <-1 * media_size>
 	 * Expected result: 0
 	 */
+	seek_offset = -1 * (off64_t) media_size;
+
 	result = vhdi_test_seek_offset(
 	          file,
-	          -1 * (off64_t) media_size,
+	          seek_offset,
 	          SEEK_END,
 	          0 );
 
@@ -350,11 +374,13 @@ int vhdi_test_seek(
 	/* Test: SEEK_END offset: <-1 * (media_size / 4)>
 	 * Expected result: <media_size - (media_size / 4)>
 	 */
+	seek_offset = (off64_t) ( media_size / 4 );
+
 	result = vhdi_test_seek_offset(
 	          file,
-	          -1 * (off64_t) ( media_size / 4 ),
+	          -1 * seek_offset,
 	          SEEK_END,
-	          (off64_t) media_size - (off64_t) ( media_size / 4 ) );
+	          (off64_t) media_size - seek_offset );
 
 	if( result != 1 )
 	{
@@ -367,9 +393,11 @@ int vhdi_test_seek(
 	/* Test: SEEK_END offset: 542
 	 * Expected result: <media_size + 542>
 	 */
+	seek_offset = 542;
+
 	result = vhdi_test_seek_offset(
 	          file,
-	          542,
+	          seek_offset,
 	          SEEK_END,
 	          (off64_t) ( media_size + 542 ) );
 
@@ -384,9 +412,11 @@ int vhdi_test_seek(
 	/* Test: SEEK_END offset: <-1 * (media_size + 542)>
 	 * Expected result: -1
 	 */
+	seek_offset = -1 * (off64_t) ( media_size + 542 );
+
 	result = vhdi_test_seek_offset(
 	          file,
-	          -1 * (off64_t) ( media_size + 542 ),
+	          seek_offset,
 	          SEEK_END,
 	          -1 );
 
@@ -418,17 +448,303 @@ int vhdi_test_seek(
 	return( result );
 }
 
+/* Opens the parent input file
+ * Returns 1 if successful, 0 if no parent or -1 on error
+ */
+int vhdi_test_seek_open_parent(
+     libcstring_system_character_t *filename,
+     libvhdi_file_t *file,
+     libvhdi_file_t **parent_file,
+     libcerror_error_t **error )
+{
+	uint8_t guid[ 16 ];
+
+	libcstring_system_character_t *basename_end        = NULL;
+	libcstring_system_character_t *parent_basename_end = NULL;
+	libcstring_system_character_t *parent_filename     = NULL;
+	libcstring_system_character_t *parent_path         = NULL;
+	static char *function                              = "vhdi_test_seek_open_parent";
+	size_t basename_length                             = 0;
+	size_t filename_length                             = 0;
+	size_t parent_basename_length                      = 0;
+	size_t parent_filename_size                        = 0;
+	size_t parent_path_size                            = 0;
+	int entry_index                                    = 0;
+	int result                                         = 0;
+
+	if( parent_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid parent file.",
+		 function );
+
+		return( -1 );
+	}
+	result = libvhdi_file_get_parent_identifier(
+	          file,
+	          guid,
+	          16,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent content identifier.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 1 )
+	{
+		return( 0 );
+	}
+	filename_length = libcstring_system_string_length(
+	                   filename );
+
+	basename_end = libcstring_system_string_search_character_reverse(
+	                filename,
+	                (libcstring_system_character_t) LIBCPATH_SEPARATOR,
+	                filename_length + 1 );
+
+	if( basename_end != NULL )
+	{
+		basename_length = (size_t) ( basename_end - filename );
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libvhdi_file_get_utf16_parent_filename_size(
+		  file,
+		  &parent_filename_size,
+		  error );
+#else
+	result = libvhdi_file_get_utf8_parent_filename_size(
+		  file,
+		  &parent_filename_size,
+		  error );
+#endif
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent filename size.",
+		 function );
+
+		goto on_error;
+	}
+	if( parent_filename_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing parent filename.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( parent_filename_size > (size_t) SSIZE_MAX )
+	 || ( ( sizeof( libcstring_system_character_t ) * parent_filename_size ) > (size_t) SSIZE_MAX ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid parent filename size value exceeds maximum.",
+		 function );
+
+		goto on_error;
+	}
+	parent_filename = libcstring_system_string_allocate(
+			   parent_filename_size );
+
+	if( parent_filename == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create parent filename string.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libvhdi_file_get_utf16_parent_filename(
+		  file,
+		  (uint16_t *) parent_filename,
+		  parent_filename_size,
+		  error );
+#else
+	result = libvhdi_file_get_utf8_parent_filename(
+		  file,
+		  (uint8_t *) parent_filename,
+		  parent_filename_size,
+		  error );
+#endif
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent filename.",
+		 function );
+
+		goto on_error;
+	}
+	parent_basename_end = libcstring_system_string_search_character_reverse(
+	                       parent_filename,
+	                       (libcstring_system_character_t) '\\',
+	                       parent_filename_size );
+
+	if( parent_basename_end != NULL )
+	{
+		parent_basename_length = (size_t) ( parent_basename_end - parent_filename ) + 1;
+	}
+	if( basename_length == 0 )
+	{
+		parent_path      = &( parent_filename[ parent_basename_length ] );
+		parent_path_size = parent_filename_size - ( parent_basename_length + 1 );
+	}
+	else
+	{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libcpath_path_join_wide(
+		     &parent_path,
+		     &parent_path_size,
+		     filename,
+		     basename_length,
+		     &( parent_filename[ parent_basename_length ] ),
+		     parent_filename_size - ( parent_basename_length + 1 ),
+		     error ) != 1 )
+#else
+		if( libcpath_path_join(
+		     &parent_path,
+		     &parent_path_size,
+		     filename,
+		     basename_length,
+		     &( parent_filename[ parent_basename_length ] ),
+		     parent_filename_size - ( parent_basename_length + 1 ),
+		     error ) != 1 )
+#endif
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create parent path.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( libvhdi_file_initialize(
+	     parent_file,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize parent input file.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libvhdi_file_open_wide(
+	     *parent_file,
+	     parent_path,
+	     LIBVHDI_OPEN_READ,
+	     error ) != 1 )
+#else
+	if( libvhdi_file_open(
+	     *parent_file,
+	     parent_path,
+	     LIBVHDI_OPEN_READ,
+	     error ) != 1 )
+#endif
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open parent input file: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 function,
+		 parent_path );
+
+		goto on_error;
+	}
+	if( libvhdi_file_set_parent_file(
+	     file,
+	     *parent_file,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set parent input file.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( basename_length != 0 )
+	 && ( parent_path != NULL ) )
+	{
+		memory_free(
+		 parent_path );
+
+		parent_path = NULL;
+	}
+	if( parent_filename != NULL )
+	{
+		memory_free(
+		 parent_filename );
+
+		parent_filename = NULL;
+	}
+	return( 1 );
+
+on_error:
+	if( *parent_file != NULL )
+	{
+		libvhdi_file_free(
+		 parent_file,
+		 NULL );
+	}
+	if( ( basename_length != 0 )
+	 && ( parent_path != NULL ) )
+	{
+		memory_free(
+		 parent_path );
+	}
+	if( parent_filename != NULL )
+	{
+		memory_free(
+		 parent_filename );
+	}
+	return( -1 );
+}
+
 /* Tests seeking in a file
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int vhdi_test_seek_file(
+int vhdi_test_seek(
      libcstring_system_character_t *source,
      libcerror_error_t **error )
 {
-	libvhdi_file_t *file = NULL;
-	size64_t media_size  = 0;
-	size_t string_length = 0;
-	int result           = 0;
+	libvhdi_file_t *file        = NULL;
+	libvhdi_file_t *parent_file = NULL;
+	size64_t media_size         = 0;
+	int result                  = 0;
 
 	if( libvhdi_file_initialize(
 	     &file,
@@ -460,6 +776,18 @@ int vhdi_test_seek_file(
 
 		goto on_error;
 	}
+	if( vhdi_test_seek_open_parent(
+	     source,
+	     file,
+	     &parent_file,
+	     error ) == -1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to open parent file.\n" );
+
+		goto on_error;
+	}
 	if( libvhdi_file_get_media_size(
 	     file,
 	     &media_size,
@@ -471,7 +799,7 @@ int vhdi_test_seek_file(
 
 		goto on_error;
 	}
-	result = vhdi_test_seek(
+	result = vhdi_test_seek_file(
 	          file,
 	          media_size );
 
@@ -503,6 +831,29 @@ int vhdi_test_seek_file(
 
 		goto on_error;
 	}
+	if( parent_file != NULL )
+	{
+		if( libvhdi_file_close(
+		     parent_file,
+		     error ) != 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to close parent file.\n" );
+
+			goto on_error;
+		}
+		if( libvhdi_file_free(
+		     &parent_file,
+		     error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to free parent file.\n" );
+
+			goto on_error;
+		}
+	}
 	return( result );
 
 on_error:
@@ -515,18 +866,26 @@ on_error:
 		 &file,
 		 NULL );
 	}
+	if( parent_file != NULL )
+	{
+		libvhdi_file_close(
+		 parent_file,
+		 NULL );
+		libvhdi_file_free(
+		 &parent_file,
+		 NULL );
+	}
 	return( -1 );
 }
 
 /* Tests seeking in a file without opening it
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int vhdi_test_seek_file_no_open(
+int vhdi_test_seek_no_open(
      libcstring_system_character_t *source VHDI_TEST_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
 	libvhdi_file_t *file  = NULL;
-	size_t string_length  = 0;
 	off64_t result_offset = 0;
 	int result            = 0;
 
@@ -653,11 +1012,9 @@ int main( int argc, char * const argv[] )
 	 stderr,
 	 NULL );
 #endif
-	result = vhdi_test_seek_file(
-	          source,
-	          &error );
-
-	if( result != 1 )
+	if( vhdi_test_seek(
+	     source,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -665,11 +1022,9 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	result = vhdi_test_seek_file_no_open(
-	          source,
-	          &error );
-
-	if( result != 1 )
+	if( vhdi_test_seek_no_open(
+	     source,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,

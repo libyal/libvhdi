@@ -96,5 +96,5 @@ int libvhdi_file_get_utf16_parent_filename(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBVHDI_METADATA_H ) */
 

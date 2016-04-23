@@ -73,6 +73,7 @@ vhdi_test_open_close_LDADD = \
 
 vhdi_test_read_SOURCES = \
 	vhdi_test_libcerror.h \
+	vhdi_test_libcpath.h \
 	vhdi_test_libcstring.h \
 	vhdi_test_libcsystem.h \
 	vhdi_test_libcthreads.h \
@@ -82,6 +83,7 @@ vhdi_test_read_SOURCES = \
 
 vhdi_test_read_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
 	../libvhdi/libvhdi.la \
 	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
@@ -90,6 +92,7 @@ vhdi_test_read_LDADD = \
 
 vhdi_test_seek_SOURCES = \
 	vhdi_test_libcerror.h \
+	vhdi_test_libcpath.h \
 	vhdi_test_libcstring.h \
 	vhdi_test_libcsystem.h \
 	vhdi_test_libcthreads.h \
@@ -99,6 +102,7 @@ vhdi_test_seek_SOURCES = \
 
 vhdi_test_seek_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
 	../libvhdi/libvhdi.la \
 	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \

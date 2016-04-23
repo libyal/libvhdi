@@ -628,6 +628,17 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 
 		return( -1 );
 	}
+	if( io_handle->parent_filename != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid IO handle - parent filename value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( next_offset == NULL )
 	{
 		libcerror_error_set(
@@ -756,53 +767,49 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 
 		goto on_error;
 	}
-	for( parent_filename_size = 0;
-	     ( parent_filename_size + 1 ) < 512;
-	     parent_filename_size += 2 )
+	parent_filename_size = 0;
+
+	while( parent_filename_size < ( 512 - 1 ) )
 	{
 		if( ( ( (vhdi_dynamic_disk_header_t *) dynamic_disk_header_data )->parent_filename[ parent_filename_size ] == 0 )
 		 && ( ( (vhdi_dynamic_disk_header_t *) dynamic_disk_header_data )->parent_filename[ parent_filename_size + 1 ] == 0 ) )
 		{
 			break;
 		}
+		parent_filename_size += 2;
 	}
-	parent_filename_size += 2;
-
-	if( io_handle->parent_filename != NULL )
+	if( parent_filename_size > 0 )
 	{
-		memory_free(
-		 io_handle->parent_filename );
+		parent_filename_size += 2;
 
-		io_handle->parent_filename      = NULL;
-		io_handle->parent_filename_size = 0;
-	}
-	io_handle->parent_filename = (uint8_t *) memory_allocate(
-	                                          sizeof( uint8_t ) * parent_filename_size );
+		io_handle->parent_filename = (uint8_t *) memory_allocate(
+		                                          sizeof( uint8_t ) * parent_filename_size );
 
-	if( io_handle->parent_filename == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create parent filename.",
-		 function );
+		if( io_handle->parent_filename == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create parent filename.",
+			 function );
 
-		goto on_error;
-	}
-	if( memory_copy(
-	     io_handle->parent_filename,
-	     ( (vhdi_dynamic_disk_header_t *) dynamic_disk_header_data )->parent_filename,
-	     parent_filename_size ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy parent filename.",
-		 function );
+			goto on_error;
+		}
+		if( memory_copy(
+		     io_handle->parent_filename,
+		     ( (vhdi_dynamic_disk_header_t *) dynamic_disk_header_data )->parent_filename,
+		     parent_filename_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy parent filename.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
 	}
 	io_handle->parent_filename_size = parent_filename_size;
 

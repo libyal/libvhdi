@@ -197,6 +197,10 @@
 				RelativePath="..\..\pyvhdi\pyvhdi_integer.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\pyvhdi\pyvhdi_metadata.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -253,6 +257,10 @@
 			</File>
 			<File
 				RelativePath="..\..\pyvhdi\pyvhdi_libvhdi.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyvhdi\pyvhdi_metadata.h"
 				>
 			</File>
 			<File

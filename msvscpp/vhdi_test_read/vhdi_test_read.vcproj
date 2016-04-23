@@ -190,6 +190,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\tests\vhdi_test_libcpath.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\vhdi_test_libcstring.h"
 				>
 			</File>

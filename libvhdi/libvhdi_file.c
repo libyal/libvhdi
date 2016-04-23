@@ -1308,6 +1308,18 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 
 		return( -1 );
 	}
+	if( ( internal_file->io_handle->parent_filename != NULL )
+	 && ( internal_file->io_handle->parent_file == NULL ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - invalid IO handle - missing parent file.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_file->current_offset < 0 )
 	{
 		libcerror_error_set(
@@ -2026,6 +2038,18 @@ off64_t libvhdi_internal_file_seek_offset(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid file - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( internal_file->io_handle->parent_filename != NULL )
+	 && ( internal_file->io_handle->parent_file == NULL ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - invalid IO handle - missing parent file.",
 		 function );
 
 		return( -1 );

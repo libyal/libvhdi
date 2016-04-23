@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _VHDITOOLS_LIBCPATH_H )
-#define _VHDITOOLS_LIBCPATH_H
+#if !defined( _VHDI_TEST_LIBCPATH_H )
+#define _VHDI_TEST_LIBCPATH_H
 
 #include <common.h>
 
@@ -42,7 +42,7 @@
 
 #include <libcpath.h>
 
-#endif /* defined( HAVE_LOCAL_LIBCPATH ) */
+#endif /* !defined( _VHDI_TEST_LIBCPATH_H ) */
 
-#endif /* !defined( _VHDITOOLS_LIBCPATH_H ) */
+#endif /* !defined( _VHDI_TEST_LIBCPATH_H ) */
 

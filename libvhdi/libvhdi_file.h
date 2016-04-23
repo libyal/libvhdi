@@ -222,5 +222,5 @@ int libvhdi_file_set_parent_file(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBVHDI_INTERNAL_FILE_H ) */
 
