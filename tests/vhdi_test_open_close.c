@@ -42,8 +42,42 @@ int vhdi_test_single_open_close_file(
 	libcerror_error_t *error = NULL;
 	libvhdi_file_t *file     = NULL;
 	static char *function    = "vhdi_test_single_open_close_file";
-	size_t string_length     = 0;
+	char *access_string      = NULL;
 	int result               = 0;
+
+	if( access_flags == LIBVHDI_OPEN_READ )
+	{
+		access_string = "read";
+	}
+	else if( access_flags == LIBVHDI_OPEN_WRITE )
+	{
+		access_string = "write";
+	}
+	else
+	{
+		access_string = "UNKNOWN";
+	}
+	fprintf(
+	 stdout,
+	 "Testing single open close of: " );
+
+	if( filename != NULL )
+	{
+		fprintf(
+		 stdout,
+		 "%" PRIs_LIBCSTRING_SYSTEM "",
+		 filename );
+	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "NULL" );
+	}
+	fprintf(
+	 stdout,
+	 " with access: %s\t",
+	 access_string );
 
 	if( libvhdi_file_initialize(
 	     &file,
@@ -157,8 +191,42 @@ int vhdi_test_multi_open_close_file(
 	libcerror_error_t *error = NULL;
 	libvhdi_file_t *file     = NULL;
 	static char *function    = "vhdi_test_multi_open_close_file";
-	size_t string_length     = 0;
+	char *access_string      = NULL;
 	int result               = 0;
+
+	if( access_flags == LIBVHDI_OPEN_READ )
+	{
+		access_string = "read";
+	}
+	else if( access_flags == LIBVHDI_OPEN_WRITE )
+	{
+		access_string = "write";
+	}
+	else
+	{
+		access_string = "UNKNOWN";
+	}
+	fprintf(
+	 stdout,
+	 "Testing multi open close of: " );
+
+	if( filename != NULL )
+	{
+		fprintf(
+		 stdout,
+		 "%" PRIs_LIBCSTRING_SYSTEM "",
+		 filename );
+	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "NULL" );
+	}
+	fprintf(
+	 stdout,
+	 " with access: %s\t",
+	 access_string );
 
 	if( libvhdi_file_initialize(
 	     &file,
@@ -298,7 +366,6 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcerror_error_t *error              = NULL;
 	libcstring_system_character_t *source = NULL;
 	libcstring_system_integer_t option    = 0;
 
@@ -339,11 +406,6 @@ int main( int argc, char * const argv[] )
 
 	/* Case 0: single open and close of a file using filename
 	 */
-	fprintf(
-	 stdout,
-	 "Testing single open close of: %s with access: read\t",
-	 source );
-
 	if( vhdi_test_single_open_close_file(
 	     source,
 	     LIBVHDI_OPEN_READ,
@@ -355,10 +417,6 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	fprintf(
-	 stdout,
-	 "Testing single open close of: NULL with access: read\t" );
-
 	if( vhdi_test_single_open_close_file(
 	     NULL,
 	     LIBVHDI_OPEN_READ,
@@ -370,11 +428,6 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	fprintf(
-	 stdout,
-	 "Testing single open close of: %s with access: write\t",
-	 source );
-
 	if( vhdi_test_single_open_close_file(
 	     source,
 	     LIBVHDI_OPEN_WRITE,
@@ -388,11 +441,6 @@ int main( int argc, char * const argv[] )
 	}
 	/* Case 1: multiple open and close of a file using filename
 	 */
-	fprintf(
-	 stdout,
-	 "Testing multi open close of: %s with access: read\t",
-	 source );
-
 	if( vhdi_test_multi_open_close_file(
 	     source,
 	     LIBVHDI_OPEN_READ,

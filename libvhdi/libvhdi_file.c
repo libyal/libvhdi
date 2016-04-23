@@ -2006,7 +2006,7 @@ off64_t libvhdi_internal_file_seek_offset(
          int whence,
          libcerror_error_t **error )
 {
-	static char *function = "libvhdi_file_seek_offset";
+	static char *function = "libvhdi_internal_file_seek_offset";
 
 	if( internal_file == NULL )
 	{

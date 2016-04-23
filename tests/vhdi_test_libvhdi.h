@@ -19,19 +19,19 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _VHDITOOLS_LIBVHDI_H )
-#define _VHDITOOLS_LIBVHDI_H
+#if !defined( _VHDI_TEST_LIBVHDI_H )
+#define _VHDI_TEST_LIBVHDI_H
 
 #include <common.h>
 
-/* If Cygwin libtool DLL support is enabled set LIBVHDI_DLL_IMPORT
- * before including libvhdi.h
+/* If Cygwin libtool DLL support is enabled and do not want to create static
+ * executables set LIBVHDI_DLL_IMPORT before including libvhdi.h
  */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
+#if defined( _WIN32 ) && defined( DLL_EXPORT ) && !defined( HAVE_STATIC_EXECUTABLES )
 #define LIBVHDI_DLL_IMPORT
 #endif
 
 #include <libvhdi.h>
 
-#endif
+#endif /* !defined( _VHDI_TEST_LIBVHDI_H ) */
 

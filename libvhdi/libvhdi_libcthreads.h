@@ -56,9 +56,9 @@
 
 #include <libcthreads.h>
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBCTHREADS ) */
 
 #endif /* defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT ) */
 
-#endif
+#endif /* !defined( _LIBVHDI_LIBCTHREADS_H ) */
 

@@ -1,5 +1,5 @@
 /*
- * The internal libcstring header
+ * GUID functions
  *
  * Copyright (C) 2012-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,33 +19,25 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _VHDI_TEST_LIBCSTRING_H )
-#define _VHDI_TEST_LIBCSTRING_H
+#if !defined( _PYVHDI_GUID_H )
+#define _PYVHDI_GUID_H
 
 #include <common.h>
+#include <types.h>
 
-/* Define HAVE_LOCAL_LIBCSTRING for local use of libcstring
- */
-#if defined( HAVE_LOCAL_LIBCSTRING )
+#include "pyvhdi_python.h"
 
-#include <libcstring_definitions.h>
-#include <libcstring_narrow_string.h>
-#include <libcstring_system_string.h>
-#include <libcstring_types.h>
-#include <libcstring_wide_string.h>
-
-#else
-
-/* If libtool DLL support is enabled set LIBCSTRING_DLL_IMPORT
- * before including libcstring.h
- */
-#if defined( _WIN32 ) && defined( DLL_IMPORT )
-#define LIBCSTRING_DLL_IMPORT
+#if defined( __cplusplus )
+extern "C" {
 #endif
 
-#include <libcstring.h>
+PyObject *pyvhdi_string_new_from_guid(
+           const uint8_t *guid_buffer,
+           size_t guid_buffer_size );
 
-#endif /* defined( HAVE_LOCAL_LIBCSTRING ) */
+#if defined( __cplusplus )
+}
+#endif
 
-#endif /* !defined( _VHDI_TEST_LIBCSTRING_H ) */
+#endif /* !defined( _PYVHDI_GUID_H ) */
 

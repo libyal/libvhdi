@@ -121,6 +121,7 @@ stamp-h[1-9]
 /vhditools/vhdimount
 /tests/input
 /tests/tmp*
+/tests/vhdi_test_get_version
 /tests/vhdi_test_open_close
 /tests/vhdi_test_read
 /tests/vhdi_test_seek

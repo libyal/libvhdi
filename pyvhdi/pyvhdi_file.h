@@ -86,6 +86,11 @@ PyObject *pyvhdi_file_open_file_object(
            PyObject *arguments,
            PyObject *keywords );
 
+PyObject *pyvhdi_file_set_parent(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments,
+           PyObject *keywords );
+
 PyObject *pyvhdi_file_close(
            pyvhdi_file_t *pyvhdi_file,
            PyObject *arguments );
@@ -113,9 +118,17 @@ PyObject *pyvhdi_file_get_media_size(
            pyvhdi_file_t *pyvhdi_file,
            PyObject *arguments );
 
+PyObject *pyvhdi_file_get_parent_identifier(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments );
+
+PyObject *pyvhdi_file_get_parent_filename(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments );
+
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _PYVHDI_FILE_H ) */
 

@@ -43,7 +43,7 @@ struct info_handle
 	 */
 	libvhdi_file_t *input_file;
 
-	/* The nofication output stream
+	/* The notification output stream
 	 */
 	FILE *notify_stream;
 };

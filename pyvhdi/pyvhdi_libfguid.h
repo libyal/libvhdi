@@ -1,5 +1,5 @@
 /*
- * The internal libcstring header
+ * The internal libfguid header
  *
  * Copyright (C) 2012-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,33 +19,31 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _VHDI_TEST_LIBCSTRING_H )
-#define _VHDI_TEST_LIBCSTRING_H
+#if !defined( _PYVHDI_LIBFGUID_H )
+#define _PYVHDI_LIBFGUID_H
 
 #include <common.h>
 
-/* Define HAVE_LOCAL_LIBCSTRING for local use of libcstring
+/* Define HAVE_LOCAL_LIBFGUID for local use of libfguid
  */
-#if defined( HAVE_LOCAL_LIBCSTRING )
+#if defined( HAVE_LOCAL_LIBFGUID )
 
-#include <libcstring_definitions.h>
-#include <libcstring_narrow_string.h>
-#include <libcstring_system_string.h>
-#include <libcstring_types.h>
-#include <libcstring_wide_string.h>
+#include <libfguid_definitions.h>
+#include <libfguid_identifier.h>
+#include <libfguid_types.h>
 
 #else
 
-/* If libtool DLL support is enabled set LIBCSTRING_DLL_IMPORT
- * before including libcstring.h
+/* If libtool DLL support is enabled set LIBFGUID_DLL_IMPORT
+ * before including libfguid.h
  */
 #if defined( _WIN32 ) && defined( DLL_IMPORT )
-#define LIBCSTRING_DLL_IMPORT
+#define LIBFGUID_DLL_IMPORT
 #endif
 
-#include <libcstring.h>
+#include <libfguid.h>
 
-#endif /* defined( HAVE_LOCAL_LIBCSTRING ) */
+#endif
 
-#endif /* !defined( _VHDI_TEST_LIBCSTRING_H ) */
+#endif /* !defined( _PYVHDI_LIBFGUID_H ) */
 

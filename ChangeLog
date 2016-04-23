@@ -17,6 +17,11 @@ Tests:
 * read data block + bitmap at once
 * read backup file footer ?
 
+20160423
+* Changes to Python bindings
+* Worked on tests
+* Worked on diff image parent support
+
 20160111
 * Changes to Python bindings
 

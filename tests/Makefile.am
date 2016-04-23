@@ -18,39 +18,41 @@ AM_CPPFLAGS = \
 
 if HAVE_PYTHON_TESTS
 TESTS_PYVHDI = \
-	test_pyvhdi_open_close.sh \
-	test_pyvhdi_read.sh \
-	test_pyvhdi_seek.sh
+	test_python_functions.sh
 endif
 
 TESTS = \
-	test_open_close.sh \
-	test_seek.sh \
-	test_read.sh \
+	test_api_functions.sh \
 	test_vhdiinfo.sh \
 	$(TESTS_PYVHDI)
 
 check_SCRIPTS = \
+	pyvhdi_test_get_version.py \
 	pyvhdi_test_open_close.py \
 	pyvhdi_test_read.py \
 	pyvhdi_test_seek.py \
-	test_pyvhdi_open_close.sh \
-	test_open_close.sh \
-	test_pyvhdi_open_close.sh \
-	test_pyvhdi_read.sh \
-	test_pyvhdi_seek.sh \
-	test_read.sh \
+	test_api_functions.sh \
+	test_python_functions.sh \
 	test_runner.sh \
-	test_seek.sh \
 	test_vhdiinfo.sh
 
 EXTRA_DIST = \
 	$(check_SCRIPTS)
 
 check_PROGRAMS = \
+	vhdi_test_get_version \
 	vhdi_test_open_close \
 	vhdi_test_read \
 	vhdi_test_seek
+
+vhdi_test_get_version_SOURCES = \
+	vhdi_test_libcstring.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_get_version.c
+
+vhdi_test_get_version_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCSTRING_LIBADD@
 
 vhdi_test_open_close_SOURCES = \
 	vhdi_test_libcerror.h \

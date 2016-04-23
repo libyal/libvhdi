@@ -17,6 +17,7 @@ MSVSCPP_FILES = \
 	libuna/libuna.vcproj \
 	libvhdi/libvhdi.vcproj \
 	pyvhdi/pyvhdi.vcproj \
+	vhdi_test_get_version/vhdi_test_get_version.vcproj \
 	vhdi_test_open_close/vhdi_test_open_close.vcproj \
 	vhdi_test_read/vhdi_test_read.vcproj \
 	vhdi_test_seek/vhdi_test_seek.vcproj \

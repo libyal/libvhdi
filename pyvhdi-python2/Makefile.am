@@ -16,7 +16,8 @@ AM_CFLAGS = \
 	@LIBUNA_CPPFLAGS@ \
 	@LIBCFILE_CPPFLAGS@ \
 	@LIBCPATH_CPPFLAGS@ \
-	@LIBBFIO_CPPFLAGS@
+	@LIBBFIO_CPPFLAGS@ \
+	@LIBFGUID_CPPFLAGS@
 
 am_pyvhdi_la_rpath = -rpath $(pyexecdir2)
 
@@ -26,11 +27,13 @@ BUILT_SOURCES = \
 	pyvhdi_error.c pyvhdi_error.h \
 	pyvhdi_file.c pyvhdi_file.h \
 	pyvhdi_file_object_io_handle.c pyvhdi_file_object_io_handle.h \
+	pyvhdi_guid.c pyvhdi_guid.h \
 	pyvhdi_integer.c pyvhdi_integer.h \
 	pyvhdi_libbfio.h \
 	pyvhdi_libcerror.h \
 	pyvhdi_libclocale.h \
 	pyvhdi_libcstring.h \
+	pyvhdi_libfguid.h \
 	pyvhdi_libvhdi.h \
 	pyvhdi_python.h \
 	pyvhdi_unused.h
@@ -49,7 +52,8 @@ pyvhdi_la_LIBADD = \
 	@LIBUNA_LIBADD@ \
 	@LIBCFILE_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
-	@LIBBFIO_LIBADD@
+	@LIBBFIO_LIBADD@ \
+	@LIBFGUID_LIBADD@
 
 pyvhdi_la_CPPFLAGS = $(PYTHON2_CPPFLAGS)
 pyvhdi_la_LDFLAGS  = -module -avoid-version $(PYTHON2_LDFLAGS)

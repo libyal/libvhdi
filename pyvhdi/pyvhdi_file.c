@@ -29,6 +29,7 @@
 #include "pyvhdi_error.h"
 #include "pyvhdi_file.h"
 #include "pyvhdi_file_object_io_handle.h"
+#include "pyvhdi_guid.h"
 #include "pyvhdi_integer.h"
 #include "pyvhdi_libbfio.h"
 #include "pyvhdi_libcerror.h"
@@ -39,13 +40,15 @@
 #include "pyvhdi_unused.h"
 
 #if !defined( LIBVHDI_HAVE_BFIO )
+
 LIBVHDI_EXTERN \
 int libvhdi_file_open_file_io_handle(
      libvhdi_file_t *file,
      libbfio_handle_t *file_io_handle,
      int access_flags,
      libvhdi_error_t **error );
-#endif
+
+#endif /* !defined( LIBVHDI_HAVE_BFIO ) */
 
 PyMethodDef pyvhdi_file_object_methods[] = {
 
@@ -71,6 +74,13 @@ PyMethodDef pyvhdi_file_object_methods[] = {
 	  "open_file_object(file_object, mode='r') -> None\n"
 	  "\n"
 	  "Opens a file using a file-like object." },
+
+	{ "set_parent",
+	  (PyCFunction) pyvhdi_file_set_parent,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "set_parent(parent_file) -> None\n"
+	  "\n"
+	  "Sets the parent file." },
 
 	{ "close",
 	  (PyCFunction) pyvhdi_file_close,
@@ -139,6 +149,20 @@ PyMethodDef pyvhdi_file_object_methods[] = {
 	  "\n"
 	  "Retrieves the size of the data." },
 
+	{ "get_parent_identifier",
+	  (PyCFunction) pyvhdi_file_get_parent_identifier,
+	  METH_NOARGS,
+	  "get_parent_identifier() -> Unicode string or None\n"
+	  "\n"
+	  "Retrieves the parent identifier (GUID)." },
+
+	{ "get_parent_filename",
+	  (PyCFunction) pyvhdi_file_get_parent_filename,
+	  METH_NOARGS,
+	  "get_parent_filename() -> Unicode string or None\n"
+	  "\n"
+	  "Retrieves the parent filename." },
+
 	/* Sentinel */
 	{ NULL, NULL, 0, NULL }
 };
@@ -149,6 +173,18 @@ PyGetSetDef pyvhdi_file_object_get_set_definitions[] = {
 	  (getter) pyvhdi_file_get_media_size,
 	  (setter) 0,
 	  "The media size.",
+	  NULL },
+
+	{ "parent_identifier",
+	  (getter) pyvhdi_file_get_parent_identifier,
+	  (setter) 0,
+	  "The parent identifier (GUID).",
+	  NULL },
+
+	{ "parent_filename",
+	  (getter) pyvhdi_file_get_parent_filename,
+	  (setter) 0,
+	  "The parent filename.",
 	  NULL },
 
 	/* Sentinel */
@@ -802,6 +838,67 @@ on_error:
 	return( NULL );
 }
 
+/* Sets the parent file
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyvhdi_file_set_parent(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	pyvhdi_file_t *pyvhdi_parent_file = NULL;
+	libcerror_error_t *error          = NULL;
+	static char *keyword_list[]       = { "parent_file", NULL };
+	static char *function             = "pyvhdi_file_set_parent";
+	int result                        = 0;
+
+	if( pyvhdi_file == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file.",
+		 function );
+
+		return( NULL );
+	}
+	if( PyArg_ParseTupleAndKeywords(
+	     arguments,
+	     keywords,
+	     "O!",
+	     keyword_list,
+	     &pyvhdi_file_type_object,
+	     &pyvhdi_parent_file ) == 0)
+	{
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libvhdi_file_set_parent_file(
+	          pyvhdi_file->file,
+	          pyvhdi_parent_file->file,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyvhdi_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to set parent file.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	Py_IncRef(
+	 Py_None );
+
+	return( Py_None );
+}
+
 /* Closes a file
  * Returns a Python object if successful or NULL on error
  */
@@ -884,12 +981,14 @@ PyObject *pyvhdi_file_read_buffer(
            PyObject *keywords )
 {
 	libcerror_error_t *error    = NULL;
+	PyObject *integer_object    = NULL;
 	PyObject *string_object     = NULL;
 	static char *function       = "pyvhdi_file_read_buffer";
 	static char *keyword_list[] = { "size", NULL };
 	char *buffer                = NULL;
+	size64_t read_size          = 0;
 	ssize_t read_count          = 0;
-	int read_size               = -1;
+	int result                  = 0;
 
 	if( pyvhdi_file == NULL )
 	{
@@ -903,24 +1002,121 @@ PyObject *pyvhdi_file_read_buffer(
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
-	     "|i",
+	     "|O",
 	     keyword_list,
-	     &read_size ) == 0 )
+	     &integer_object ) == 0 )
 	{
 		return( NULL );
 	}
-	if( read_size < 0 )
+	if( integer_object == NULL )
+	{
+		result = 0;
+	}
+	else
+	{
+		result = PyObject_IsInstance(
+		          integer_object,
+		          (PyObject *) &PyLong_Type );
+
+		if( result == -1 )
+		{
+			pyvhdi_error_fetch_and_raise(
+			 PyExc_RuntimeError,
+			 "%s: unable to determine if integer object is of type long.",
+			 function );
+
+			return( NULL );
+		}
+#if PY_MAJOR_VERSION < 3
+		else if( result == 0 )
+		{
+			PyErr_Clear();
+
+			result = PyObject_IsInstance(
+				  integer_object,
+				  (PyObject *) &PyInt_Type );
+
+			if( result == -1 )
+			{
+				pyvhdi_error_fetch_and_raise(
+				 PyExc_RuntimeError,
+				 "%s: unable to determine if integer object is of type int.",
+				 function );
+
+				return( NULL );
+			}
+		}
+#endif
+	}
+	if( result != 0 )
+	{
+		if( pyvhdi_integer_unsigned_copy_to_64bit(
+		     integer_object,
+		     (uint64_t *) &read_size,
+		     &error ) != 1 )
+		{
+			pyvhdi_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to convert integer object into read size.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			return( NULL );
+		}
+	}
+	else if( ( integer_object == NULL )
+	      || ( integer_object == Py_None ) )
+	{
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libvhdi_file_get_media_size(
+			  pyvhdi_file->file,
+			  &read_size,
+			  &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyvhdi_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to retrieve media size.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			return( NULL );
+		}
+	}
+	else
 	{
 		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid argument read size value less than zero.",
+		 PyExc_TypeError,
+		 "%s: unsupported integer object type.",
 		 function );
 
 		return( NULL );
 	}
-	/* Make sure the data fits into the memory buffer
+	if( read_size == 0 )
+	{
+#if PY_MAJOR_VERSION >= 3
+		string_object = PyBytes_FromString(
+		                 "" );
+#else
+		string_object = PyString_FromString(
+		                 "" );
+#endif
+		return( string_object );
+	}
+	/* Make sure the data fits into a memory buffer
 	 */
-	if( read_size > INT_MAX )
+	if( ( read_size > (size64_t) INT_MAX )
+	 || ( read_size > (size64_t) SSIZE_MAX ) )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
@@ -937,6 +1133,8 @@ PyObject *pyvhdi_file_read_buffer(
 	buffer = PyBytes_AsString(
 	          string_object );
 #else
+	/* Note that a size of 0 is not supported
+	 */
 	string_object = PyString_FromStringAndSize(
 	                 NULL,
 	                 read_size );
@@ -999,13 +1197,15 @@ PyObject *pyvhdi_file_read_buffer_at_offset(
            PyObject *keywords )
 {
 	libcerror_error_t *error    = NULL;
+	PyObject *integer_object    = NULL;
 	PyObject *string_object     = NULL;
 	static char *function       = "pyvhdi_file_read_buffer_at_offset";
 	static char *keyword_list[] = { "size", "offset", NULL };
 	char *buffer                = NULL;
 	off64_t read_offset         = 0;
+	size64_t read_size          = 0;
 	ssize_t read_count          = 0;
-	int read_size               = 0;
+	int result                  = 0;
 
 	if( pyvhdi_file == NULL )
 	{
@@ -1019,25 +1219,114 @@ PyObject *pyvhdi_file_read_buffer_at_offset(
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
-	     "i|L",
+	     "OL",
 	     keyword_list,
-	     &read_size,
+	     &integer_object,
 	     &read_offset ) == 0 )
 	{
 		return( NULL );
 	}
-	if( read_size < 0 )
+	result = PyObject_IsInstance(
+	          integer_object,
+	          (PyObject *) &PyLong_Type );
+
+	if( result == -1 )
 	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid argument read size value less than zero.",
+		pyvhdi_error_fetch_and_raise(
+	         PyExc_RuntimeError,
+		 "%s: unable to determine if integer object is of type long.",
 		 function );
 
 		return( NULL );
 	}
-	/* Make sure the data fits into the memory buffer
+#if PY_MAJOR_VERSION < 3
+	else if( result == 0 )
+	{
+		PyErr_Clear();
+
+		result = PyObject_IsInstance(
+		          integer_object,
+		          (PyObject *) &PyInt_Type );
+
+		if( result == -1 )
+		{
+			pyvhdi_error_fetch_and_raise(
+		         PyExc_RuntimeError,
+			 "%s: unable to determine if integer object is of type int.",
+			 function );
+
+			return( NULL );
+		}
+	}
+#endif
+	if( result != 0 )
+	{
+		if( pyvhdi_integer_unsigned_copy_to_64bit(
+		     integer_object,
+		     (uint64_t *) &read_size,
+		     &error ) != 1 )
+		{
+			pyvhdi_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to convert integer object into read size.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			return( NULL );
+		}
+	}
+	else if( integer_object == Py_None )
+	{
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libvhdi_file_get_media_size(
+			  pyvhdi_file->file,
+			  &read_size,
+			  &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyvhdi_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to retrieve media size.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			return( NULL );
+		}
+	}
+	else
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: unsupported integer object type.",
+		 function );
+
+		return( NULL );
+	}
+	if( read_size == 0 )
+	{
+#if PY_MAJOR_VERSION >= 3
+		string_object = PyBytes_FromString(
+		                 "" );
+#else
+		string_object = PyString_FromString(
+		                 "" );
+#endif
+		return( string_object );
+	}
+	/* Make sure the data fits into a memory buffer
 	 */
-	if( read_size > INT_MAX )
+	if( ( read_size > (size64_t) INT_MAX )
+	 || ( read_size > (size64_t) SSIZE_MAX ) )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
@@ -1046,17 +1335,6 @@ PyObject *pyvhdi_file_read_buffer_at_offset(
 
 		return( NULL );
 	}
-	if( read_offset < 0 )
-	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid argument read offset value less than zero.",
-		 function );
-
-		return( NULL );
-	}
-	/* Make sure the data fits into the memory buffer
-	 */
 #if PY_MAJOR_VERSION >= 3
 	string_object = PyBytes_FromStringAndSize(
 	                 NULL,
@@ -1065,6 +1343,8 @@ PyObject *pyvhdi_file_read_buffer_at_offset(
 	buffer = PyBytes_AsString(
 	          string_object );
 #else
+	/* Note that a size of 0 is not supported
+	 */
 	string_object = PyString_FromStringAndSize(
 	                 NULL,
 	                 read_size );
@@ -1283,5 +1563,181 @@ PyObject *pyvhdi_file_get_media_size(
 	                  (uint64_t) media_size );
 
 	return( integer_object );
+}
+
+/* Retrieves the parent identifier
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyvhdi_file_get_parent_identifier(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments PYVHDI_ATTRIBUTE_UNUSED )
+{
+	uint8_t guid_data[ 16 ];
+
+	libcerror_error_t *error = NULL;
+	PyObject *string_object  = NULL;
+	static char *function    = "pyvhdi_file_get_parent_identifier";
+	int result               = 0;
+
+	PYVHDI_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyvhdi_file == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libvhdi_file_get_parent_identifier(
+	          pyvhdi_file->file,
+	          guid_data,
+	          16,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyvhdi_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve parent identifier.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	string_object = pyvhdi_string_new_from_guid(
+			 guid_data,
+			 16 );
+
+	return( string_object );
+}
+
+/* Retrieves the parent filename
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyvhdi_file_get_parent_filename(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments PYVHDI_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error    = NULL;
+	PyObject *string_object     = NULL;
+	const char *errors          = NULL;
+	uint8_t *parent_filename    = NULL;
+	static char *function       = "pyvhdi_file_get_parent_filename";
+	size_t parent_filename_size = 0;
+	int result                  = 0;
+
+	PYVHDI_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyvhdi_file == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libvhdi_file_get_utf8_parent_filename_size(
+	          pyvhdi_file->file,
+	          &parent_filename_size,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyvhdi_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve parent filename size.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	else if( ( result == 0 )
+	      || ( parent_filename_size == 0 ) )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	parent_filename = (uint8_t *) PyMem_Malloc(
+	                               sizeof( uint8_t ) * parent_filename_size );
+
+	if( parent_filename == NULL )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: unable to create parent filename.",
+		 function );
+
+		goto on_error;
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libvhdi_file_get_utf8_parent_filename(
+		  pyvhdi_file->file,
+		  parent_filename,
+		  parent_filename_size,
+		  &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyvhdi_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve parent filename.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	/* Pass the string length to PyUnicode_DecodeUTF8
+	 * otherwise it makes the end of string character is part
+	 * of the string
+	 */
+	string_object = PyUnicode_DecodeUTF8(
+			 (char *) parent_filename,
+			 (Py_ssize_t) parent_filename_size - 1,
+			 errors );
+
+	PyMem_Free(
+	 parent_filename );
+
+	return( string_object );
+
+on_error:
+	if( parent_filename != NULL )
+	{
+		PyMem_Free(
+		 parent_filename );
+	}
+	return( NULL );
 }
 
