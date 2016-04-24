@@ -17,6 +17,9 @@ Tests:
 * read data block + bitmap at once
 * read backup file footer ?
 
+20160424
+* fixed byte order of identifiers
+
 20160423
 * Changes to Python bindings
 * Worked on tests

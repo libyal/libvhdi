@@ -319,6 +319,7 @@ int libvhdi_file_get_disk_type(
 }
 
 /* Retrieves the identifier
+ * The identifier is a big-endian GUID and is 16 bytes of size
  * Returns 1 if successful or -1 on error
  */
 int libvhdi_file_get_identifier(
@@ -411,6 +412,7 @@ on_error:
 }
 
 /* Retrieves the parent identifier
+ * The identifier is a big-endian GUID and is 16 bytes of size
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libvhdi_file_get_parent_identifier(

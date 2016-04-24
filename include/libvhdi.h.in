@@ -382,6 +382,7 @@ int libvhdi_file_get_media_size(
      libvhdi_error_t **error );
 
 /* Retrieves the identifier
+ * The identifier is a big-endian GUID and is 16 bytes of size
  * Returns 1 if successful or -1 on error
  */
 LIBVHDI_EXTERN \
@@ -392,6 +393,7 @@ int libvhdi_file_get_identifier(
      libvhdi_error_t **error );
 
 /* Retrieves the parent identifier
+ * The identifier is a big-endian GUID and is 16 bytes of size
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBVHDI_EXTERN \

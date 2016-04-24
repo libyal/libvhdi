@@ -466,7 +466,7 @@ int info_handle_file_fprint(
 	     guid,
 	     guid_data,
 	     16,
-	     LIBFGUID_ENDIAN_LITTLE,
+	     LIBFGUID_ENDIAN_BIG,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -532,7 +532,7 @@ int info_handle_file_fprint(
 		     guid,
 		     guid_data,
 		     16,
-		     LIBFGUID_ENDIAN_LITTLE,
+		     LIBFGUID_ENDIAN_BIG,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

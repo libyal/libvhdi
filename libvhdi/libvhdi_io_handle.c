@@ -470,7 +470,7 @@ int libvhdi_io_handle_read_file_footer(
 		     guid,
 		     ( (vhdi_file_footer_t *) file_footer_data )->identifier,
 		     16,
-		     LIBFGUID_ENDIAN_LITTLE,
+		     LIBFGUID_ENDIAN_BIG,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -879,7 +879,7 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 		     guid,
 		     ( (vhdi_dynamic_disk_header_t *) dynamic_disk_header_data )->parent_identifier,
 		     16,
-		     LIBFGUID_ENDIAN_LITTLE,
+		     LIBFGUID_ENDIAN_BIG,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
