@@ -25,6 +25,7 @@ bin_PROGRAMS = \
 	vhdimount
 
 vhdiinfo_SOURCES = \
+	byte_size_string.c byte_size_string.h \
 	info_handle.c info_handle.h \
 	vhdiinfo.c \
 	vhdioutput.c vhdioutput.h \

@@ -24,6 +24,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include "byte_size_string.h"
 #include "info_handle.h"
 #include "vhditools_libcerror.h"
 #include "vhditools_libcnotify.h"
@@ -299,9 +300,9 @@ int info_handle_file_fprint(
      info_handle_t *info_handle,
      libcerror_error_t **error )
 {
-	uint8_t guid_data[ 16 ];
-
+	libcstring_system_character_t byte_size_string[ 16 ];
 	libcstring_system_character_t guid_string[ 48 ];
+	uint8_t guid_data[ 16 ];
 
 	libfguid_identifier_t *guid                 = NULL;
 	libcstring_system_character_t *value_string = NULL;
@@ -411,11 +412,28 @@ int info_handle_file_fprint(
 
 		goto on_error;
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tMedia size:\t\t%" PRIu64 " bytes\n",
-	 media_size );
+	result = byte_size_string_create(
+	          byte_size_string,
+	          16,
+	          media_size,
+	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+	          NULL );
 
+	if( result == 1 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tMedia size:\t\t%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)\n",
+		 byte_size_string,
+		 media_size );
+	}
+	else
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tMedia size:\t\t%" PRIu64 " bytes\n",
+		 media_size );
+	}
 	if( libfguid_identifier_initialize(
 	     &guid,
 	     error ) != 1 )
