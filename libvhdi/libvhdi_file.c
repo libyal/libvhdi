@@ -37,6 +37,7 @@
 #include "libvhdi_libcthreads.h"
 #include "libvhdi_libfcache.h"
 #include "libvhdi_libfdata.h"
+#include "libvhdi_metadata.h"
 
 /* Creates a file
  * Make sure the value file is referencing, is set to NULL
