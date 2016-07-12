@@ -389,6 +389,30 @@ int libvhdi_check_file_signature_file_io_handle(
 			return( -1 );
 		}
 	}
+  size64_t fsize;
+  if( libbfio_handle_get_size(
+       file_io_handle,
+       &fsize,
+       error) == -1 )
+  {
+    libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_GENERIC,
+		 "%s: unable to retrieve size of file.",
+		 function );
+
+		if( file_io_handle_is_open == 0 )
+		{
+			libbfio_handle_close(
+			 file_io_handle,
+			 error );
+		}
+		return( -1 );
+  }
+  if( fsize < 512 ) {
+    return( 0 );
+  }
 	if( libbfio_handle_seek_offset(
 	     file_io_handle,
 	     -512,
