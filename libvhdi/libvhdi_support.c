@@ -438,7 +438,7 @@ int libvhdi_check_file_signature_file_io_handle(
 		 "%s: unable to read signature.",
 		 function );
 
-		goto on_error:
+		goto on_error;
 	}
 	if( file_io_handle_is_open == 0 )
 	{
@@ -455,7 +455,7 @@ int libvhdi_check_file_signature_file_io_handle(
 			 "%s: unable to close file.",
 			 function );
 
-			goto on_error:
+			goto on_error;
 		}
 	}
 	if( memory_compare(
