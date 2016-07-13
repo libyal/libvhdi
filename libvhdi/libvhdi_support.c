@@ -343,8 +343,9 @@ int libvhdi_check_file_signature_file_io_handle(
 	uint8_t signature[ 8 ];
 
 	static char *function      = "libvhdi_check_file_signature_file_io_handle";
+	size64_t file_size         = 0;
 	ssize_t read_count         = 0;
-	int file_io_handle_is_open = 0;
+	int file_io_handle_is_open = 1;
 
 	if( file_io_handle == NULL )
 	{
@@ -370,7 +371,7 @@ int libvhdi_check_file_signature_file_io_handle(
 		 "%s: unable to open file.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	else if( file_io_handle_is_open == 0 )
 	{
@@ -386,8 +387,26 @@ int libvhdi_check_file_signature_file_io_handle(
 			 "%s: unable to open file.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
+	}
+	if( libbfio_handle_get_size(
+	     file_io_handle,
+	     &file_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file size.",
+		 function );
+
+		goto on_error;
+	}
+	if( file_size < 512 )
+	{
+		return( 0 );
 	}
 	if( libbfio_handle_seek_offset(
 	     file_io_handle,
@@ -402,13 +421,7 @@ int libvhdi_check_file_signature_file_io_handle(
 		 "%s: unable to seek file header offset: -512 from the end.",
 		 function );
 
-		if( file_io_handle_is_open == 0 )
-		{
-			libbfio_handle_close(
-			 file_io_handle,
-			 error );
-		}
-		return( -1 );
+		goto on_error;
 	}
 	read_count = libbfio_handle_read_buffer(
 	              file_io_handle,
@@ -425,16 +438,12 @@ int libvhdi_check_file_signature_file_io_handle(
 		 "%s: unable to read signature.",
 		 function );
 
-		if( file_io_handle_is_open == 0 )
-		{
-			libbfio_handle_close(
-			 file_io_handle,
-			 error );
-		}
-		return( -1 );
+		goto on_error:
 	}
 	if( file_io_handle_is_open == 0 )
 	{
+		file_io_handle_is_open = 1;
+
 		if( libbfio_handle_close(
 		     file_io_handle,
 		     error ) != 0 )
@@ -446,7 +455,7 @@ int libvhdi_check_file_signature_file_io_handle(
 			 "%s: unable to close file.",
 			 function );
 
-			return( -1 );
+			goto on_error:
 		}
 	}
 	if( memory_compare(
@@ -457,5 +466,14 @@ int libvhdi_check_file_signature_file_io_handle(
 		return( 1 );
 	}
 	return( 0 );
+
+on_error:
+	if( file_io_handle_is_open == 0 )
+	{
+		libbfio_handle_close(
+		 file_io_handle,
+		 error );
+	}
+	return( -1 );
 }
 
