@@ -17,6 +17,7 @@ MSVSCPP_FILES = \
 	libuna/libuna.vcproj \
 	libvhdi/libvhdi.vcproj \
 	pyvhdi/pyvhdi.vcproj \
+	vhdi_test_error/vhdi_test_error.vcproj \
 	vhdi_test_get_version/vhdi_test_get_version.vcproj \
 	vhdi_test_open_close/vhdi_test_open_close.vcproj \
 	vhdi_test_read/vhdi_test_read.vcproj \
@@ -25,17 +26,8 @@ MSVSCPP_FILES = \
 	vhdimount/vhdimount.vcproj \
 	libvhdi.sln
 
-SCRIPT_FILES = \
-	scripts/vs2008_x64.sh \
-	scripts/vs2008_x64_sln.sed \
-	scripts/vs2008_x64_vcproj.sed \
-	scripts/vs2010_x64.sh \
-	scripts/vs2010_x64_sln.sed \
-	scripts/vs2010_x64_vcxproj.sed
-
 EXTRA_DIST = \
-	$(MSVSCPP_FILES) \
-	$(SCRIPT_FILES)
+	$(MSVSCPP_FILES)
 
 MAINTAINERCLEANFILES = \
 	Makefile.in

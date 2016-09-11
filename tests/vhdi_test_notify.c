@@ -1,5 +1,5 @@
 /*
- * Library get version test program
+ * Library notification functions test program
  *
  * Copyright (C) 2012-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -25,36 +25,67 @@
 #include <stdlib.h>
 #endif
 
-#include "vhdi_test_libcstring.h"
+#include "vhdi_test_libcerror.h"
 #include "vhdi_test_libvhdi.h"
 #include "vhdi_test_macros.h"
 #include "vhdi_test_unused.h"
 
-/* Tests retrieving the library version
+/* Tests the libvhdi_notify_set_verbose function
  * Returns 1 if successful or 0 if not
  */
-int vhdi_test_get_version(
+int vhdi_test_notify_set_verbose(
      void )
 {
-	const char *version_string = NULL;
-	int result                 = 0;
-
-	version_string = libvhdi_get_version();
-
-	result = libcstring_narrow_string_compare(
-	          version_string,
-	          LIBVHDI_VERSION_STRING,
-	          9 );
-
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
+	/* Test invocation of function only
+	 */
+	libvhdi_notify_set_verbose(
 	 0 );
 
 	return( 1 );
+}
 
-on_error:
-	return( 0 );
+/* Tests the libvhdi_notify_set_stream function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_notify_set_stream(
+     void )
+{
+	/* Test invocation of function only
+	 */
+	libvhdi_notify_set_stream(
+	 NULL,
+	 NULL );
+
+	return( 1 );
+}
+
+/* Tests the libvhdi_notify_stream_open function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_notify_stream_open(
+     void )
+{
+	/* Test invocation of function only
+	 */
+	libvhdi_notify_stream_open(
+	 NULL,
+	 NULL );
+
+	return( 1 );
+}
+
+/* Tests the libvhdi_notify_stream_close function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_notify_stream_close(
+     void )
+{
+	/* Test invocation of function only
+	 */
+	libvhdi_notify_stream_close(
+	 NULL );
+
+	return( 1 );
 }
 
 /* The main program
@@ -73,8 +104,20 @@ int main(
 	VHDI_TEST_UNREFERENCED_PARAMETER( argv )
 
 	VHDI_TEST_RUN(
-	 "libvhdi_get_version",
-	 vhdi_test_get_version() )
+	 "libvhdi_notify_set_verbose",
+	 vhdi_test_notify_set_verbose() )
+
+	VHDI_TEST_RUN(
+	 "libvhdi_notify_set_stream",
+	 vhdi_test_notify_set_stream() )
+
+	VHDI_TEST_RUN(
+	 "libvhdi_notify_stream_open",
+	 vhdi_test_notify_stream_open() )
+
+	VHDI_TEST_RUN(
+	 "libvhdi_notify_stream_close",
+	 vhdi_test_notify_stream_close() )
 
 	return( EXIT_SUCCESS );
 
