@@ -24,6 +24,10 @@
 
 #include <common.h>
 
+/* Define HAVE_LOCAL_LIBVHDI for local use of libvhdi
+ */
+#if !defined( HAVE_LOCAL_LIBVHDI )
+
 /* If libtool DLL support is enabled set LIBVHDI_DLL_EXPORT
  * before including libvhdi/extern.h
  */
@@ -33,5 +37,10 @@
 
 #include <libvhdi/extern.h>
 
+#else
+#define LIBVHDI_EXTERN	extern
+
 #endif
+
+#endif /* !defined( _LIBVHDI_INTERNAL_EXTERN_H ) */
 
