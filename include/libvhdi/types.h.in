@@ -207,5 +207,5 @@ typedef intptr_t libvhdi_file_t;
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBVHDI_TYPES_H ) */
 

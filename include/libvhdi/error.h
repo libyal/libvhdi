@@ -287,5 +287,5 @@ enum LIBVHDI_OUTPUT_ERROR
 	LIBVHDI_OUTPUT_ERROR_INSUFFICIENT_SPACE		= 1
 };
 
-#endif
+#endif /* !defined( _LIBVHDI_ERROR_H ) */
 

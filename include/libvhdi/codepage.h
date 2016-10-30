@@ -118,5 +118,5 @@ enum LIBVHDI_CODEPAGES
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBVHDI_CODEPAGE_H ) */
 
