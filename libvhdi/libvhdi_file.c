@@ -291,6 +291,7 @@ int libvhdi_file_open(
 	libbfio_handle_t *file_io_handle       = NULL;
 	libvhdi_internal_file_t *internal_file = NULL;
 	static char *function                  = "libvhdi_file_open";
+	size_t filename_length                 = 0;
 
 	if( file == NULL )
 	{
@@ -368,11 +369,13 @@ int libvhdi_file_open(
 		goto on_error;
 	}
 #endif
+	filename_length = libcstring_narrow_string_length(
+	                   filename );
+
 	if( libbfio_file_set_name(
 	     file_io_handle,
 	     filename,
-	     libcstring_narrow_string_length(
-	      filename ) + 1,
+	     filename_length + 1,
 	     error ) != 1 )
 	{
                 libcerror_error_set(
@@ -458,6 +461,7 @@ int libvhdi_file_open_wide(
 	libbfio_handle_t *file_io_handle       = NULL;
 	libvhdi_internal_file_t *internal_file = NULL;
 	static char *function                  = "libvhdi_file_open_wide";
+	size_t filename_length                 = 0;
 
 	if( file == NULL )
 	{
@@ -535,11 +539,13 @@ int libvhdi_file_open_wide(
 		goto on_error;
 	}
 #endif
+	filename_length = libcstring_wide_string_length(
+	                   filename );
+
 	if( libbfio_file_set_name_wide(
 	     file_io_handle,
 	     filename,
-	     libcstring_wide_string_length(
-	      filename ) + 1,
+	     filename_length + 1,
 	     error ) != 1 )
 	{
                 libcerror_error_set(
@@ -721,7 +727,7 @@ int libvhdi_file_open_file_io_handle(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read from file handle.",
+		 "%s: unable to read from file IO handle.",
 		 function );
 
 		goto on_error;

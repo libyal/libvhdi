@@ -116,13 +116,15 @@ int libvhdi_file_open(
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 LIBVHDI_EXTERN \
 int libvhdi_file_open_wide(
      libvhdi_file_t *file,
      const wchar_t *filename,
      int access_flags,
      libcerror_error_t **error );
-#endif
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 LIBVHDI_EXTERN \
 int libvhdi_file_open_file_io_handle(
@@ -157,14 +159,6 @@ ssize_t libvhdi_file_read_buffer(
 
 LIBVHDI_EXTERN \
 ssize_t libvhdi_file_read_buffer_at_offset(
-         libvhdi_file_t *file,
-         void *buffer,
-         size_t buffer_size,
-         off64_t offset,
-         libcerror_error_t **error );
-
-LIBVHDI_EXTERN \
-ssize_t libvhdi_file_read_random(
          libvhdi_file_t *file,
          void *buffer,
          size_t buffer_size,
