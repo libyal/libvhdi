@@ -1,5 +1,5 @@
 /*
- * Library get version test program
+ * Library support functions test program
  *
  * Copyright (C) 2012-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -30,7 +30,7 @@
 #include "vhdi_test_macros.h"
 #include "vhdi_test_unused.h"
 
-/* Tests retrieving the library version
+/* Tests the libvhdi_get_version function
  * Returns 1 if successful or 0 if not
  */
 int vhdi_test_get_version(
@@ -74,7 +74,7 @@ int main(
 
 	VHDI_TEST_RUN(
 	 "libvhdi_get_version",
-	 vhdi_test_get_version() )
+	 vhdi_test_get_version );
 
 	return( EXIT_SUCCESS );
 

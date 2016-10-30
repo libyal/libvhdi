@@ -123,23 +123,23 @@ int main(
 
 	VHDI_TEST_RUN(
 	 "libvhdi_error_free",
-	 vhdi_test_error_free() )
+	 vhdi_test_error_free );
 
 	VHDI_TEST_RUN(
 	 "libvhdi_error_fprint",
-	 vhdi_test_error_fprint() )
+	 vhdi_test_error_fprint );
 
 	VHDI_TEST_RUN(
 	 "libvhdi_error_sprint",
-	 vhdi_test_error_sprint() )
+	 vhdi_test_error_sprint );
 
 	VHDI_TEST_RUN(
 	 "libvhdi_error_backtrace_fprint",
-	 vhdi_test_error_backtrace_fprint() )
+	 vhdi_test_error_backtrace_fprint );
 
 	VHDI_TEST_RUN(
 	 "libvhdi_error_backtrace_sprint",
-	 vhdi_test_error_backtrace_sprint() )
+	 vhdi_test_error_backtrace_sprint );
 
 	return( EXIT_SUCCESS );
 

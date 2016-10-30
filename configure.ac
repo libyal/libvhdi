@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libvhdi],
- [20160911],
+ [20161030],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(

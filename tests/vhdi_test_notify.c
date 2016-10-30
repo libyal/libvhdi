@@ -105,19 +105,19 @@ int main(
 
 	VHDI_TEST_RUN(
 	 "libvhdi_notify_set_verbose",
-	 vhdi_test_notify_set_verbose() )
+	 vhdi_test_notify_set_verbose )
 
 	VHDI_TEST_RUN(
 	 "libvhdi_notify_set_stream",
-	 vhdi_test_notify_set_stream() )
+	 vhdi_test_notify_set_stream )
 
 	VHDI_TEST_RUN(
 	 "libvhdi_notify_stream_open",
-	 vhdi_test_notify_stream_open() )
+	 vhdi_test_notify_stream_open )
 
 	VHDI_TEST_RUN(
 	 "libvhdi_notify_stream_close",
-	 vhdi_test_notify_stream_close() )
+	 vhdi_test_notify_stream_close )
 
 	return( EXIT_SUCCESS );
 

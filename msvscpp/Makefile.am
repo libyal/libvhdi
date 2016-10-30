@@ -18,6 +18,7 @@ MSVSCPP_FILES = \
 	libvhdi/libvhdi.vcproj \
 	pyvhdi/pyvhdi.vcproj \
 	vhdi_test_error/vhdi_test_error.vcproj \
+	vhdi_test_notify/vhdi_test_notify.vcproj \
 	vhdi_test_open_close/vhdi_test_open_close.vcproj \
 	vhdi_test_read/vhdi_test_read.vcproj \
 	vhdi_test_seek/vhdi_test_seek.vcproj \
