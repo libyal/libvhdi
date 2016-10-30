@@ -64,5 +64,5 @@ int libvhdi_data_block_read(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBVHDI_DATA_BLOCK_H ) */
 

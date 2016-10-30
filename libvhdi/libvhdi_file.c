@@ -1173,7 +1173,7 @@ int libvhdi_file_open_read(
 			internal_file->io_handle->block_data_offset *= 512;
 		}
 	}
-	/* TODO clone function ? */
+/* TODO clone function ? */
 	if( libfdata_vector_initialize(
 	     &( internal_file->data_block_vector ),
 	     (size64_t) 512,

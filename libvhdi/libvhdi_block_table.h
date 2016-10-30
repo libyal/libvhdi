@@ -79,5 +79,5 @@ int libvhdi_block_table_read(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBVHDI_BLOCK_TABLE_H ) */
 

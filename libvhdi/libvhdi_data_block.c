@@ -74,7 +74,7 @@ int libvhdi_data_block_initialize(
 		return( -1 );
 	}
 	*data_block = memory_allocate_structure(
-	                  libvhdi_data_block_t );
+	               libvhdi_data_block_t );
 
 	if( *data_block == NULL )
 	{
