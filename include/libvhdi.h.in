@@ -107,7 +107,7 @@ int libvhdi_check_file_signature_wide(
 
 #if defined( LIBVHDI_HAVE_BFIO )
 
-/* Determines if a file is a VHDI file (check for the VHDI file signature) using a Basic File IO (bfio) handle
+/* Determines if a file contains a VHDI file signature using a Basic File IO (bfio) handle
  * Returns 1 if true, 0 if not or -1 on error
  */
 LIBVHDI_EXTERN \
@@ -313,7 +313,7 @@ ssize_t libvhdi_file_write_buffer(
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
  */
 LIBVHDI_EXTERN \
-ssize_t libvhdi_file_write_buffer_add_offset(
+ssize_t libvhdi_file_write_buffer_at_offset(
          libvhdi_file_t *file,
          const void *buffer,
          size_t buffer_size,
