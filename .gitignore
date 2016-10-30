@@ -125,11 +125,11 @@ stamp-h[1-9]
 /tests/input
 /tests/tmp*
 /tests/vhdi_test_error
-/tests/vhdi_test_get_version
 /tests/vhdi_test_notify
 /tests/vhdi_test_open_close
 /tests/vhdi_test_read
 /tests/vhdi_test_seek
+/tests/vhdi_test_support
 
 # Local library dependencies specific files
 /libbfio

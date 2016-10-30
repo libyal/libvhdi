@@ -41,10 +41,10 @@ EXTRA_DIST = \
 
 check_PROGRAMS = \
 	vhdi_test_error \
-	vhdi_test_get_version \
 	vhdi_test_open_close \
 	vhdi_test_read \
-	vhdi_test_seek
+	vhdi_test_seek \
+	vhdi_test_support
 
 vhdi_test_error_SOURCES = \
 	vhdi_test_error.c \
@@ -54,17 +54,6 @@ vhdi_test_error_SOURCES = \
 	vhdi_test_unused.h
 
 vhdi_test_error_LDADD = \
-	../libvhdi/libvhdi.la \
-	@LIBCSTRING_LIBADD@
-
-vhdi_test_get_version_SOURCES = \
-	vhdi_test_get_version.c \
-	vhdi_test_libcstring.h \
-	vhdi_test_libvhdi.h \
-	vhdi_test_macros.h \
-	vhdi_test_unused.h
-
-vhdi_test_get_version_LDADD = \
 	../libvhdi/libvhdi.la \
 	@LIBCSTRING_LIBADD@
 
@@ -122,6 +111,17 @@ vhdi_test_seek_LDADD = \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
 	@PTHREAD_LIBADD@
+
+vhdi_test_support_SOURCES = \
+	vhdi_test_libcstring.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_support.c \
+	vhdi_test_unused.h
+
+vhdi_test_support_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCSTRING_LIBADD@
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
