@@ -567,14 +567,14 @@ int vhdimount_fuse_readdir(
 {
 	char vhdimount_fuse_path[ 10 ];
 
-	libcerror_error_t *error  = NULL;
-	struct stat *stat_info    = NULL;
-	static char *function     = "vhdimount_fuse_readdir";
-	size_t path_length        = 0;
-	int input_file_index      = 0;
-	int number_of_inputs      = 0;
-	int result                = 0;
-	int string_index          = 0;
+	libcerror_error_t *error = NULL;
+	struct stat *stat_info   = NULL;
+	static char *function    = "vhdimount_fuse_readdir";
+	size_t path_length       = 0;
+	int input_file_index     = 0;
+	int number_of_inputs     = 0;
+	int result               = 0;
+	int string_index         = 0;
 
 	LIBCSYSTEM_UNREFERENCED_PARAMETER( offset )
 	LIBCSYSTEM_UNREFERENCED_PARAMETER( file_info )
@@ -1572,14 +1572,14 @@ int __stdcall vhdimount_dokan_FindFiles(
 
 	wchar_t vhdimount_dokan_path[ 10 ];
 
-	libcerror_error_t *error  = NULL;
-	static char *function     = "vhdimount_dokan_FindFiles";
-	size64_t media_size       = 0;
-	size_t path_length        = 0;
-	int input_file_index      = 0;
-	int number_of_inputs      = 0;
-	int result                = 0;
-	int string_index          = 0;
+	libcerror_error_t *error = NULL;
+	static char *function    = "vhdimount_dokan_FindFiles";
+	size64_t media_size      = 0;
+	size_t path_length       = 0;
+	int input_file_index     = 0;
+	int number_of_inputs     = 0;
+	int result               = 0;
+	int string_index         = 0;
 
 	if( path == NULL )
 	{
