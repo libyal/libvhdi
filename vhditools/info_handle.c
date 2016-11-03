@@ -86,14 +86,14 @@ int info_handle_initialize(
 			goto on_error;
 		}
 		if( libvhdi_file_initialize(
-		     &( ( *info_handle )->input_file ),
+		     &( ( *info_handle )->input ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize input file.",
+			 "%s: unable to initialize input.",
 			 function );
 
 			goto on_error;
@@ -136,17 +136,17 @@ int info_handle_free(
 	}
 	if( *info_handle != NULL )
 	{
-		if( ( *info_handle )->input_file != NULL )
+		if( ( *info_handle )->input != NULL )
 		{
 			if( libvhdi_file_free(
-			     &( ( *info_handle )->input_file ),
+			     &( ( *info_handle )->input ),
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free input file.",
+				 "%s: unable to free input.",
 				 function );
 
 				result = -1;
@@ -180,17 +180,17 @@ int info_handle_signal_abort(
 
 		return( -1 );
 	}
-	if( info_handle->input_file != NULL )
+	if( info_handle->input != NULL )
 	{
 		if( libvhdi_file_signal_abort(
-		     info_handle->input_file,
+		     info_handle->input,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to signal input file to abort.",
+			 "%s: unable to signal input to abort.",
 			 function );
 
 			return( -1 );
@@ -222,13 +222,13 @@ int info_handle_open_input(
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libvhdi_file_open_wide(
-	     info_handle->input_file,
+	     info_handle->input,
 	     filename,
 	     LIBVHDI_OPEN_READ,
 	     error ) != 1 )
 #else
 	if( libvhdi_file_open(
-	     info_handle->input_file,
+	     info_handle->input,
 	     filename,
 	     LIBVHDI_OPEN_READ,
 	     error ) != 1 )
@@ -238,7 +238,7 @@ int info_handle_open_input(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open input file.",
+		 "%s: unable to open input.",
 		 function );
 
 		return( -1 );
@@ -266,26 +266,26 @@ int info_handle_close(
 
 		return( -1 );
 	}
-	if( info_handle->input_file == NULL )
+	if( info_handle->input == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid info handle - missing input file.",
+		 "%s: invalid info handle - missing input.",
 		 function );
 
 		return( -1 );
 	}
 	if( libvhdi_file_close(
-	     info_handle->input_file,
+	     info_handle->input,
 	     error ) != 0 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close input file.",
+		 "%s: unable to close input.",
 		 function );
 
 		return( -1 );
@@ -293,10 +293,10 @@ int info_handle_close(
 	return( 0 );
 }
 
-/* Prints the file information to a stream
+/* Prints the input information to a stream
  * Returns 1 if successful or -1 on error
  */
-int info_handle_file_fprint(
+int info_handle_input_fprint(
      info_handle_t *info_handle,
      libcerror_error_t **error )
 {
@@ -306,7 +306,7 @@ int info_handle_file_fprint(
 
 	libfguid_identifier_t *guid                 = NULL;
 	libcstring_system_character_t *value_string = NULL;
-	static char *function                       = "info_handle_file_fprint";
+	static char *function                       = "info_handle_input_fprint";
 	size_t value_string_size                    = 0;
 	size64_t media_size                         = 0;
 	uint32_t disk_type                          = 0;
@@ -330,7 +330,7 @@ int info_handle_file_fprint(
 	 "Virtual Hard Disk (VHD) image information:\n" );
 
 	if( libvhdi_file_get_format_version(
-	     info_handle->input_file,
+	     info_handle->input,
 	     &major_version,
 	     &minor_version,
 	     error ) != 1 )
@@ -351,7 +351,7 @@ int info_handle_file_fprint(
 	 minor_version );
 
 	if( libvhdi_file_get_disk_type(
-	     info_handle->input_file,
+	     info_handle->input,
 	     &disk_type,
 	     error ) != 1 )
 	{
@@ -399,7 +399,7 @@ int info_handle_file_fprint(
 	 "\n" );
 
 	if( libvhdi_file_get_media_size(
-	     info_handle->input_file,
+	     info_handle->input,
 	     &media_size,
 	     error ) != 1 )
 	{
@@ -448,7 +448,7 @@ int info_handle_file_fprint(
 		goto on_error;
 	}
 	if( libvhdi_file_get_identifier(
-	     info_handle->input_file,
+	     info_handle->input,
 	     guid_data,
 	     16,
 	     error ) != 1 )
@@ -510,7 +510,7 @@ int info_handle_file_fprint(
 	 guid_string );
 
 	result = libvhdi_file_get_parent_identifier(
-	          info_handle->input_file,
+	          info_handle->input,
 	          guid_data,
 	          16,
 	          error );
@@ -590,12 +590,12 @@ int info_handle_file_fprint(
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libvhdi_file_get_utf16_parent_filename_size(
-		  info_handle->input_file,
+		  info_handle->input,
 		  &value_string_size,
 		  error );
 #else
 	result = libvhdi_file_get_utf8_parent_filename_size(
-		  info_handle->input_file,
+		  info_handle->input,
 		  &value_string_size,
 		  error );
 #endif
@@ -640,13 +640,13 @@ int info_handle_file_fprint(
 		}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libvhdi_file_get_utf16_parent_filename(
-			  info_handle->input_file,
+			  info_handle->input,
 			  (uint16_t *) value_string,
 			  value_string_size,
 			  error );
 #else
 		result = libvhdi_file_get_utf8_parent_filename(
-			  info_handle->input_file,
+			  info_handle->input,
 			  (uint8_t *) value_string,
 			  value_string_size,
 			  error );

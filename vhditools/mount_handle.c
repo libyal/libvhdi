@@ -91,7 +91,7 @@ int mount_handle_initialize(
 		goto on_error;
 	}
 	if( libcdata_array_initialize(
-	     &( ( *mount_handle )->input_files_array ),
+	     &( ( *mount_handle )->inputs_array ),
 	     0,
 	     error ) != 1 )
 	{
@@ -99,7 +99,7 @@ int mount_handle_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize input files array.",
+		 "%s: unable to initialize inputs array.",
 		 function );
 
 		goto on_error;
@@ -146,7 +146,7 @@ int mount_handle_free(
 			 ( *mount_handle )->basename );
 		}
 		if( libcdata_array_free(
-		     &( ( *mount_handle )->input_files_array ),
+		     &( ( *mount_handle )->inputs_array ),
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libvhdi_file_free,
 		     error ) != 1 )
 		{
@@ -154,7 +154,7 @@ int mount_handle_free(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free input files array.",
+			 "%s: unable to free inputs array.",
 			 function );
 
 			result = -1;
@@ -177,7 +177,7 @@ int mount_handle_signal_abort(
 	libvhdi_file_t *input_file = NULL;
 	static char *function      = "mount_handle_signal_abort";	
 	int input_file_index       = 0;
-	int number_of_input_files  = 0;
+	int number_of_inputs       = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -191,25 +191,25 @@ int mount_handle_signal_abort(
 		return( -1 );
 	}
 	if( libcdata_array_get_number_of_entries(
-	     mount_handle->input_files_array,
-	     &number_of_input_files,
+	     mount_handle->inputs_array,
+	     &number_of_inputs,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of input files.",
+		 "%s: unable to retrieve number of inputs.",
 		 function );
 
 		return( -1 );
 	}
-	for( input_file_index = number_of_input_files - 1;
+	for( input_file_index = number_of_inputs - 1;
 	     input_file_index > 0;
 	     input_file_index-- )
 	{
 		if( libcdata_array_get_entry_by_index(
-		     mount_handle->input_files_array,
+		     mount_handle->inputs_array,
 		     input_file_index,
 		     (intptr_t **) &input_file,
 		     error ) != 1 )
@@ -360,7 +360,7 @@ int mount_handle_open_input(
 		goto on_error;
 	}
 	if( libcdata_array_append_entry(
-	     mount_handle->input_files_array,
+	     mount_handle->inputs_array,
 	     &entry_index,
 	     (intptr_t *) input_file,
 	     error ) != 1 )
@@ -384,7 +384,7 @@ on_error:
 		 NULL );
 	}
 	libcdata_array_empty(
-	 mount_handle->input_files_array,
+	 mount_handle->inputs_array,
 	 (int (*)(intptr_t **, libcerror_error_t **)) &libvhdi_file_free,
 	 NULL );
 
@@ -639,7 +639,7 @@ int mount_handle_open_input_parent_file(
 		goto on_error;
 	}
 	if( libcdata_array_append_entry(
-	     mount_handle->input_files_array,
+	     mount_handle->inputs_array,
 	     &entry_index,
 	     (intptr_t *) parent_input_file,
 	     error ) != 1 )
@@ -702,7 +702,7 @@ int mount_handle_close(
 	libvhdi_file_t *input_file = NULL;
 	static char *function      = "mount_handle_close";
 	int input_file_index       = 0;
-	int number_of_input_files  = 0;
+	int number_of_inputs       = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -716,25 +716,25 @@ int mount_handle_close(
 		return( -1 );
 	}
 	if( libcdata_array_get_number_of_entries(
-	     mount_handle->input_files_array,
-	     &number_of_input_files,
+	     mount_handle->inputs_array,
+	     &number_of_inputs,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of input files.",
+		 "%s: unable to retrieve number of inputs.",
 		 function );
 
 		return( -1 );
 	}
-	for( input_file_index = number_of_input_files - 1;
+	for( input_file_index = number_of_inputs - 1;
 	     input_file_index > 0;
 	     input_file_index-- )
 	{
 		if( libcdata_array_get_entry_by_index(
-		     mount_handle->input_files_array,
+		     mount_handle->inputs_array,
 		     input_file_index,
 		     (intptr_t **) &input_file,
 		     error ) != 1 )
@@ -793,7 +793,7 @@ ssize_t mount_handle_read_buffer(
 		return( -1 );
 	}
 	if( libcdata_array_get_entry_by_index(
-	     mount_handle->input_files_array,
+	     mount_handle->inputs_array,
 	     input_file_index,
 	     (intptr_t **) &input_file,
 	     error ) != 1 )
@@ -854,7 +854,7 @@ off64_t mount_handle_seek_offset(
 		return( -1 );
 	}
 	if( libcdata_array_get_entry_by_index(
-	     mount_handle->input_files_array,
+	     mount_handle->inputs_array,
 	     input_file_index,
 	     (intptr_t **) &input_file,
 	     error ) != 1 )
@@ -914,7 +914,7 @@ int mount_handle_get_media_size(
 		return( -1 );
 	}
 	if( libcdata_array_get_entry_by_index(
-	     mount_handle->input_files_array,
+	     mount_handle->inputs_array,
 	     input_file_index,
 	     (intptr_t **) &input_file,
 	     error ) != 1 )
@@ -947,15 +947,15 @@ int mount_handle_get_media_size(
 	return( 1 );
 }
 
-/* Retrieves the number of input files
+/* Retrieves the number of inputs
  * Returns 1 if successful or -1 on error
  */
-int mount_handle_get_number_of_input_files(
+int mount_handle_get_number_of_inputs(
      mount_handle_t *mount_handle,
-     int *number_of_input_files,
+     int *number_of_inputs,
      libcerror_error_t **error )
 {
-	static char *function = "mount_handle_get_number_of_input_files";
+	static char *function = "mount_handle_get_number_of_inputs";
 
 	if( mount_handle == NULL )
 	{
@@ -969,15 +969,15 @@ int mount_handle_get_number_of_input_files(
 		return( -1 );
 	}
 	if( libcdata_array_get_number_of_entries(
-	     mount_handle->input_files_array,
-	     number_of_input_files,
+	     mount_handle->inputs_array,
+	     number_of_inputs,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of input files.",
+		 "%s: unable to retrieve number of inputs.",
 		 function );
 
 		return( -1 );

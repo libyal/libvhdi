@@ -39,9 +39,9 @@ typedef struct info_handle info_handle_t;
 
 struct info_handle
 {
-	/* The libvhdi input file
+	/* The input
 	 */
-	libvhdi_file_t *input_file;
+	libvhdi_file_t *input;
 
 	/* The notification output stream
 	 */
@@ -69,7 +69,7 @@ int info_handle_close(
      info_handle_t *info_handle,
      libcerror_error_t **error );
 
-int info_handle_file_fprint(
+int info_handle_input_fprint(
      info_handle_t *info_handle,
      libcerror_error_t **error );
 

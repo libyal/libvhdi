@@ -48,9 +48,9 @@ struct mount_handle
 	 */
 	size_t basename_size;
 
-	/* The input files array
+	/* The inputs array
 	 */
-	libcdata_array_t *input_files_array;
+	libcdata_array_t *inputs_array;
 
 	/* The notification output stream
 	 */
@@ -108,9 +108,9 @@ int mount_handle_get_media_size(
      size64_t *size,
      libcerror_error_t **error );
 
-int mount_handle_get_number_of_input_files(
+int mount_handle_get_number_of_inputs(
      mount_handle_t *mount_handle,
-     int *number_of_input_files,
+     int *number_of_inputs,
      libcerror_error_t **error );
 
 int mount_handle_set_basename(

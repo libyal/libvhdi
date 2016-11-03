@@ -24,10 +24,8 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libvhdi_block_table.h"
 #include "libvhdi_data_block.h"
 #include "libvhdi_definitions.h"
-#include "libvhdi_file.h"
 #include "libvhdi_io_handle.h"
 #include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
@@ -36,7 +34,6 @@
 #include "libvhdi_libfdata.h"
 #include "libvhdi_libfguid.h"
 #include "libvhdi_libuna.h"
-#include "libvhdi_metadata.h"
 #include "libvhdi_unused.h"
 
 #include "vhdi_dynamic_disk_header.h"

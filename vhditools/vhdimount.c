@@ -572,7 +572,7 @@ int vhdimount_fuse_readdir(
 	static char *function     = "vhdimount_fuse_readdir";
 	size_t path_length        = 0;
 	int input_file_index      = 0;
-	int number_of_input_files = 0;
+	int number_of_inputs      = 0;
 	int result                = 0;
 	int string_index          = 0;
 
@@ -625,30 +625,30 @@ int vhdimount_fuse_readdir(
 
 		goto on_error;
 	}
-	if( mount_handle_get_number_of_input_files(
+	if( mount_handle_get_number_of_inputs(
 	     vhdimount_mount_handle,
-	     &number_of_input_files,
+	     &number_of_inputs,
 	     &error ) != 1 )
 	{
 		libcerror_error_set(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of input files.",
+		 "%s: unable to retrieve number of inputs.",
 		 function );
 
 		result = -EIO;
 
 		goto on_error;
 	}
-	if( ( number_of_input_files < 0 )
-	 || ( number_of_input_files > 99 ) )
+	if( ( number_of_inputs < 0 )
+	 || ( number_of_inputs > 99 ) )
 	{
 		libcerror_error_set(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported number of input files.",
+		 "%s: unsupported number of inputs.",
 		 function );
 
 		result = -ENOENT;
@@ -716,7 +716,7 @@ int vhdimount_fuse_readdir(
 		goto on_error;
 	}
 	for( input_file_index = 1;
-	     input_file_index <= number_of_input_files;
+	     input_file_index <= number_of_inputs;
 	     input_file_index++ )
 	{
 		string_index = vhdimount_fuse_path_prefix_length;
@@ -1577,7 +1577,7 @@ int __stdcall vhdimount_dokan_FindFiles(
 	size64_t media_size       = 0;
 	size_t path_length        = 0;
 	int input_file_index      = 0;
-	int number_of_input_files = 0;
+	int number_of_inputs      = 0;
 	int result                = 0;
 	int string_index          = 0;
 
@@ -1628,30 +1628,30 @@ int __stdcall vhdimount_dokan_FindFiles(
 
 		goto on_error;
 	}
-	if( mount_handle_get_number_of_input_files(
+	if( mount_handle_get_number_of_inputs(
 	     vhdimount_mount_handle,
-	     &number_of_input_files,
+	     &number_of_inputs,
 	     &error ) != 1 )
 	{
 		libcerror_error_set(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of input files.",
+		 "%s: unable to retrieve number of inputs.",
 		 function );
 
 		result = -ERROR_GEN_FAILURE;
 
 		goto on_error;
 	}
-	if( ( number_of_input_files < 0 )
-	 || ( number_of_input_files > 99 ) )
+	if( ( number_of_inputs < 0 )
+	 || ( number_of_inputs > 99 ) )
 	{
 		libcerror_error_set(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported number of input files.",
+		 "%s: unsupported number of inputs.",
 		 function );
 
 		result = -ERROR_GEN_FAILURE;
@@ -1703,7 +1703,7 @@ int __stdcall vhdimount_dokan_FindFiles(
 		goto on_error;
 	}
 	for( input_file_index = 1;
-	     input_file_index <= number_of_input_files;
+	     input_file_index <= number_of_inputs;
 	     input_file_index++ )
 	{
 		string_index = vhdimount_dokan_path_prefix_length;

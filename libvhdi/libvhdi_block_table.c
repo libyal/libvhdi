@@ -249,6 +249,7 @@ int libvhdi_block_table_read(
 	static char *function          = "libvhdi_block_table_read";
 	size_t block_table_data_offset = 0;
 	ssize_t read_count             = 0;
+	uint32_t block_table_reference = 0;
 	int block_table_index          = 0;
 
 	if( block_table == NULL )
@@ -389,7 +390,7 @@ int libvhdi_block_table_read(
 	{
 		byte_stream_copy_to_uint32_big_endian(
 		 &( block_table_data[ block_table_data_offset ] ),
-		 ( block_table->references )[ block_table_index ] );
+		 block_table_reference );
 
 		block_table_data_offset += 4;
 
@@ -400,9 +401,10 @@ int libvhdi_block_table_read(
 			 "%s: block table reference: %03d\t\t: 0x%08" PRIx32 "\n",
 			 function,
 			 block_table_index,
-			 ( block_table->references )[ block_table_index ] );
+			 block_table_reference );
 		}
 #endif
+		 ( block_table->references )[ block_table_index ] = block_table_reference;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )

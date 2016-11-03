@@ -227,13 +227,13 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( info_handle_file_fprint(
+	if( info_handle_input_fprint(
 	     vhdiinfo_info_handle,
 	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to print file information.\n" );
+		 "Unable to print input information.\n" );
 
 		goto on_error;
 	}
