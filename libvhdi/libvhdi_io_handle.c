@@ -1474,7 +1474,7 @@ int libvhdi_io_handle_read_data_block(
 		 "%s: invalid element data file index value out of bounds.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( element_data_size > (size64_t) SSIZE_MAX )
 	{
@@ -1485,7 +1485,7 @@ int libvhdi_io_handle_read_data_block(
 		 "%s: invalid element data size value exceeds maximum.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( libvhdi_data_block_initialize(
 	     &data_block,
