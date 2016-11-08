@@ -32,7 +32,6 @@
 #include "pyvhdi_integer.h"
 #include "pyvhdi_libcerror.h"
 #include "pyvhdi_libclocale.h"
-#include "pyvhdi_libcstring.h"
 #include "pyvhdi_libvhdi.h"
 #include "pyvhdi_python.h"
 #include "pyvhdi_unused.h"

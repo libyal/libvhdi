@@ -33,7 +33,6 @@
 #include "pyvhdi_libbfio.h"
 #include "pyvhdi_libcerror.h"
 #include "pyvhdi_libclocale.h"
-#include "pyvhdi_libcstring.h"
 #include "pyvhdi_libvhdi.h"
 #include "pyvhdi_metadata.h"
 #include "pyvhdi_python.h"
@@ -549,7 +548,7 @@ PyObject *pyvhdi_file_open(
 	char *mode                   = NULL;
 	int result                   = 0;
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	const wchar_t *filename_wide = NULL;
 #else
 	PyObject *utf8_string_object = NULL;
@@ -609,7 +608,7 @@ PyObject *pyvhdi_file_open(
 	{
 		PyErr_Clear();
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		filename_wide = (wchar_t *) PyUnicode_AsUnicode(
 		                             string_object );
 		Py_BEGIN_ALLOW_THREADS

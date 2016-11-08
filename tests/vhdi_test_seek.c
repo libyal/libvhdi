@@ -21,6 +21,10 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <narrow_string.h>
+#include <system_string.h>
+#include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -28,7 +32,6 @@
 
 #include "vhdi_test_libcerror.h"
 #include "vhdi_test_libcpath.h"
-#include "vhdi_test_libcstring.h"
 #include "vhdi_test_libcsystem.h"
 #include "vhdi_test_libvhdi.h"
 #include "vhdi_test_unused.h"
@@ -452,25 +455,25 @@ int vhdi_test_seek_file(
  * Returns 1 if successful, 0 if no parent or -1 on error
  */
 int vhdi_test_seek_open_parent(
-     libcstring_system_character_t *filename,
+     system_character_t *filename,
      libvhdi_file_t *file,
      libvhdi_file_t **parent_file,
      libcerror_error_t **error )
 {
 	uint8_t guid[ 16 ];
 
-	libcstring_system_character_t *basename_end        = NULL;
-	libcstring_system_character_t *parent_basename_end = NULL;
-	libcstring_system_character_t *parent_filename     = NULL;
-	libcstring_system_character_t *parent_path         = NULL;
-	static char *function                              = "vhdi_test_seek_open_parent";
-	size_t basename_length                             = 0;
-	size_t filename_length                             = 0;
-	size_t parent_basename_length                      = 0;
-	size_t parent_filename_size                        = 0;
-	size_t parent_path_size                            = 0;
-	int entry_index                                    = 0;
-	int result                                         = 0;
+	system_character_t *basename_end        = NULL;
+	system_character_t *parent_basename_end = NULL;
+	system_character_t *parent_filename     = NULL;
+	system_character_t *parent_path         = NULL;
+	static char *function                   = "vhdi_test_seek_open_parent";
+	size_t basename_length                  = 0;
+	size_t filename_length                  = 0;
+	size_t parent_basename_length           = 0;
+	size_t parent_filename_size             = 0;
+	size_t parent_path_size                 = 0;
+	int entry_index                         = 0;
+	int result                              = 0;
 
 	if( parent_file == NULL )
 	{
@@ -504,19 +507,19 @@ int vhdi_test_seek_open_parent(
 	{
 		return( 0 );
 	}
-	filename_length = libcstring_system_string_length(
+	filename_length = system_string_length(
 	                   filename );
 
-	basename_end = libcstring_system_string_search_character_reverse(
+	basename_end = system_string_search_character_reverse(
 	                filename,
-	                (libcstring_system_character_t) LIBCPATH_SEPARATOR,
+	                (system_character_t) LIBCPATH_SEPARATOR,
 	                filename_length + 1 );
 
 	if( basename_end != NULL )
 	{
 		basename_length = (size_t) ( basename_end - filename );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libvhdi_file_get_utf16_parent_filename_size(
 		  file,
 		  &parent_filename_size,
@@ -550,7 +553,7 @@ int vhdi_test_seek_open_parent(
 		goto on_error;
 	}
 	if( ( parent_filename_size > (size_t) SSIZE_MAX )
-	 || ( ( sizeof( libcstring_system_character_t ) * parent_filename_size ) > (size_t) SSIZE_MAX ) )
+	 || ( ( sizeof( system_character_t ) * parent_filename_size ) > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -561,7 +564,7 @@ int vhdi_test_seek_open_parent(
 
 		goto on_error;
 	}
-	parent_filename = libcstring_system_string_allocate(
+	parent_filename = system_string_allocate(
 			   parent_filename_size );
 
 	if( parent_filename == NULL )
@@ -575,7 +578,7 @@ int vhdi_test_seek_open_parent(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libvhdi_file_get_utf16_parent_filename(
 		  file,
 		  (uint16_t *) parent_filename,
@@ -599,9 +602,9 @@ int vhdi_test_seek_open_parent(
 
 		goto on_error;
 	}
-	parent_basename_end = libcstring_system_string_search_character_reverse(
+	parent_basename_end = system_string_search_character_reverse(
 	                       parent_filename,
-	                       (libcstring_system_character_t) '\\',
+	                       (system_character_t) '\\',
 	                       parent_filename_size );
 
 	if( parent_basename_end != NULL )
@@ -615,7 +618,7 @@ int vhdi_test_seek_open_parent(
 	}
 	else
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libcpath_path_join_wide(
 		     &parent_path,
 		     &parent_path_size,
@@ -658,7 +661,7 @@ int vhdi_test_seek_open_parent(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libvhdi_file_open_wide(
 	     *parent_file,
 	     parent_path,
@@ -676,7 +679,7 @@ int vhdi_test_seek_open_parent(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open parent input file: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to open parent input file: %" PRIs_SYSTEM ".",
 		 function,
 		 parent_path );
 
@@ -738,7 +741,7 @@ on_error:
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int vhdi_test_seek(
-     libcstring_system_character_t *source,
+     system_character_t *source,
      libcerror_error_t **error )
 {
 	libvhdi_file_t *file        = NULL;
@@ -756,7 +759,7 @@ int vhdi_test_seek(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libvhdi_file_open_wide(
 	     file,
 	     source,
@@ -882,7 +885,7 @@ on_error:
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int vhdi_test_seek_no_open(
-     libcstring_system_character_t *source VHDI_TEST_ATTRIBUTE_UNUSED,
+     system_character_t *source VHDI_TEST_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
 	libvhdi_file_t *file  = NULL;
@@ -967,29 +970,29 @@ on_error:
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcerror_error_t *error              = NULL;
-	libcstring_system_character_t *source = NULL;
-	libcstring_system_integer_t option    = 0;
-	int result                            = 0;
+	libcerror_error_t *error   = NULL;
+	system_character_t *source = NULL;
+	system_integer_t option    = 0;
+	int result                 = 0;
 
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _SYSTEM_STRING( "" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (libcstring_system_integer_t) '?':
+			case (system_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+				 "Invalid argument: %" PRIs_SYSTEM ".\n",
 				 argv[ optind - 1 ] );
 
 				return( EXIT_FAILURE );

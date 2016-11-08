@@ -2,7 +2,6 @@ AM_CPPFLAGS = \
 	-DLOCALEDIR=\"$(datadir)/locale\" \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCTHREADS_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
@@ -36,7 +35,6 @@ libvhdi_la_SOURCES = \
 	libvhdi_libcerror.h \
 	libvhdi_libclocale.h \
 	libvhdi_libcnotify.h \
-	libvhdi_libcstring.h \
 	libvhdi_libcthreads.h \
 	libvhdi_libfcache.h \
 	libvhdi_libfdata.h \
@@ -51,7 +49,6 @@ libvhdi_la_SOURCES = \
 	vhdi_file_footer.h
 
 libvhdi_la_LIBADD = \
-	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCTHREADS_LIBADD@ \
 	@LIBCDATA_LIBADD@ \

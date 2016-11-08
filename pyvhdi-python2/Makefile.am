@@ -8,7 +8,6 @@ if HAVE_PYTHON2
 AM_CFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
@@ -32,7 +31,6 @@ BUILT_SOURCES = \
 	pyvhdi_libbfio.h \
 	pyvhdi_libcerror.h \
 	pyvhdi_libclocale.h \
-	pyvhdi_libcstring.h \
 	pyvhdi_libfguid.h \
 	pyvhdi_libvhdi.h \
 	pyvhdi_metadata.c pyvhdi_metadata.h \
@@ -44,7 +42,6 @@ pyexec_LTLIBRARIES = pyvhdi.la
 nodist_pyvhdi_la_SOURCES = $(BUILT_SOURCES)
 
 pyvhdi_la_LIBADD = \
-	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	../libvhdi/libvhdi.la \
 	@LIBCDATA_LIBADD@ \

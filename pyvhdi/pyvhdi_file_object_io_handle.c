@@ -28,7 +28,6 @@
 #include "pyvhdi_integer.h"
 #include "pyvhdi_libbfio.h"
 #include "pyvhdi_libcerror.h"
-#include "pyvhdi_libcstring.h"
 #include "pyvhdi_python.h"
 
 /* Creates a file object IO handle

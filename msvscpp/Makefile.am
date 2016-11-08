@@ -8,7 +8,6 @@ MSVSCPP_FILES = \
 	libcnotify/libcnotify.vcproj \
 	libcpath/libcpath.vcproj \
 	libcsplit/libcsplit.vcproj \
-	libcstring/libcstring.vcproj \
 	libcsystem/libcsystem.vcproj \
 	libcthreads/libcthreads.vcproj \
 	libfcache/libfcache.vcproj \
@@ -18,6 +17,7 @@ MSVSCPP_FILES = \
 	libvhdi/libvhdi.vcproj \
 	pyvhdi/pyvhdi.vcproj \
 	vhdi_test_error/vhdi_test_error.vcproj \
+	vhdi_test_file/vhdi_test_file.vcproj \
 	vhdi_test_notify/vhdi_test_notify.vcproj \
 	vhdi_test_open_close/vhdi_test_open_close.vcproj \
 	vhdi_test_read/vhdi_test_read.vcproj \

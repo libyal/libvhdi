@@ -21,7 +21,9 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libvhdi_block_table.h"
 #include "libvhdi_data_block.h"
@@ -33,7 +35,6 @@
 #include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcnotify.h"
-#include "libvhdi_libcstring.h"
 #include "libvhdi_libcthreads.h"
 #include "libvhdi_libfcache.h"
 #include "libvhdi_libfdata.h"
@@ -369,7 +370,7 @@ int libvhdi_file_open(
 		goto on_error;
 	}
 #endif
-	filename_length = libcstring_narrow_string_length(
+	filename_length = narrow_string_length(
 	                   filename );
 
 	if( libbfio_file_set_name(
@@ -539,7 +540,7 @@ int libvhdi_file_open_wide(
 		goto on_error;
 	}
 #endif
-	filename_length = libcstring_wide_string_length(
+	filename_length = wide_string_length(
 	                   filename );
 
 	if( libbfio_file_set_name_wide(

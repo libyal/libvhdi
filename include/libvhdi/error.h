@@ -39,7 +39,7 @@ enum LIBVHDI_ERROR_DOMAINS
 	LIBVHDI_ERROR_DOMAIN_INPUT			= (int) 'i',
 	LIBVHDI_ERROR_DOMAIN_MEMORY			= (int) 'm',
 	LIBVHDI_ERROR_DOMAIN_OUTPUT			= (int) 'o',
-	LIBVHDI_ERROR_DOMAIN_RUNTIME			= (int) 'r',
+	LIBVHDI_ERROR_DOMAIN_RUNTIME			= (int) 'r'
 };
 
 /* The argument error codes
@@ -208,6 +208,17 @@ enum LIBVHDI_MEMORY_ERROR
 	LIBVHDI_MEMORY_ERROR_SET_FAILED			= 3
 };
 
+/* The output error codes
+ */
+enum LIBVHDI_OUTPUT_ERROR
+{
+	LIBVHDI_OUTPUT_ERROR_GENERIC			= 0,
+
+	/* There is insuficient space to write the output
+	 */
+	LIBVHDI_OUTPUT_ERROR_INSUFFICIENT_SPACE		= 1
+};
+
 /* The runtime error codes
  * to signify errors regarding runtime processing
  */
@@ -274,17 +285,6 @@ enum LIBVHDI_RUNTIME_ERROR
 	/* An abort was requested
 	 */
 	LIBVHDI_RUNTIME_ERROR_ABORT_REQUESTED		= 15
-};
-
-/* The output error codes
- */
-enum LIBVHDI_OUTPUT_ERROR
-{
-	LIBVHDI_OUTPUT_ERROR_GENERIC			= 0,
-
-	/* There is insuficient space to write the output
-	 */
-	LIBVHDI_OUTPUT_ERROR_INSUFFICIENT_SPACE		= 1
 };
 
 #endif /* !defined( _LIBVHDI_ERROR_H ) */

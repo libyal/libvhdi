@@ -1,7 +1,6 @@
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
@@ -34,7 +33,6 @@ vhdiinfo_SOURCES = \
 	vhditools_libcerror.h \
 	vhditools_libclocale.h \
 	vhditools_libcnotify.h \
-	vhditools_libcstring.h \
 	vhditools_libcsystem.h \
 	vhditools_libfguid.h \
 	vhditools_libvhdi.h \
@@ -47,7 +45,6 @@ vhdiinfo_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
 	@LIBINTL@
 
 vhdimount_SOURCES = \
@@ -60,7 +57,6 @@ vhdimount_SOURCES = \
 	vhditools_libclocale.h \
 	vhditools_libcnotify.h \
 	vhditools_libcpath.h \
-	vhditools_libcstring.h \
 	vhditools_libcsystem.h \
 	vhditools_libvhdi.h \
 	vhditools_libuna.h
@@ -75,7 +71,6 @@ vhdimount_LDADD = \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
 	@LIBINTL@
 
 MAINTAINERCLEANFILES = \

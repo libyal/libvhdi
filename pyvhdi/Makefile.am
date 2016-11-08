@@ -2,7 +2,6 @@ if HAVE_PYTHON
 AM_CFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
@@ -26,7 +25,6 @@ pyvhdi_la_SOURCES = \
 	pyvhdi_libbfio.h \
 	pyvhdi_libcerror.h \
 	pyvhdi_libclocale.h \
-	pyvhdi_libcstring.h \
 	pyvhdi_libfguid.h \
 	pyvhdi_libvhdi.h \
 	pyvhdi_metadata.c pyvhdi_metadata.h \
@@ -34,7 +32,6 @@ pyvhdi_la_SOURCES = \
 	pyvhdi_unused.h
 
 pyvhdi_la_LIBADD = \
-	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	../libvhdi/libvhdi.la \
 	@LIBCDATA_LIBADD@ \

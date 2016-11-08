@@ -21,7 +21,10 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "mount_handle.h"
 #include "vhditools_libcdata.h"
@@ -247,15 +250,15 @@ int mount_handle_signal_abort(
  */
 int mount_handle_open_input(
      mount_handle_t *mount_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t *basename_end = NULL;
-	libvhdi_file_t *input_file                  = NULL;
-	static char *function                       = "mount_handle_open_input";
-	size_t basename_length                      = 0;
-	size_t filename_length                      = 0;
-	int entry_index                             = 0;
+	libvhdi_file_t *input_file       = NULL;
+	system_character_t *basename_end = NULL;
+	static char *function            = "mount_handle_open_input";
+	size_t basename_length           = 0;
+	size_t filename_length           = 0;
+	int entry_index                  = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -279,12 +282,12 @@ int mount_handle_open_input(
 
 		return( -1 );
 	}
-	filename_length = libcstring_system_string_length(
+	filename_length = system_string_length(
 	                   filename );
 
-	basename_end = libcstring_system_string_search_character_reverse(
+	basename_end = system_string_search_character_reverse(
 	                filename,
-	                (libcstring_system_character_t) LIBCPATH_SEPARATOR,
+	                (system_character_t) LIBCPATH_SEPARATOR,
 	                filename_length + 1 );
 
 	if( basename_end != NULL )
@@ -322,7 +325,7 @@ int mount_handle_open_input(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libvhdi_file_open_wide(
 	     input_file,
 	     filename,
@@ -401,16 +404,16 @@ int mount_handle_open_input_parent_file(
 {
 	uint8_t guid[ 16 ];
 
-	libcstring_system_character_t *parent_basename_end = NULL;
-	libcstring_system_character_t *parent_filename     = NULL;
-	libcstring_system_character_t *parent_path         = NULL;
-	libvhdi_file_t *parent_input_file                  = NULL;
-	static char *function                              = "mount_handle_open_input_parent_file";
-	size_t parent_basename_length                      = 0;
-	size_t parent_filename_size                        = 0;
-	size_t parent_path_size                            = 0;
-	int entry_index                                    = 0;
-	int result                                         = 0;
+	libvhdi_file_t *parent_input_file       = NULL;
+	system_character_t *parent_basename_end = NULL;
+	system_character_t *parent_filename     = NULL;
+	system_character_t *parent_path         = NULL;
+	static char *function                   = "mount_handle_open_input_parent_file";
+	size_t parent_basename_length           = 0;
+	size_t parent_filename_size             = 0;
+	size_t parent_path_size                 = 0;
+	int entry_index                         = 0;
+	int result                              = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -444,7 +447,7 @@ int mount_handle_open_input_parent_file(
 	{
 		return( 0 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libvhdi_file_get_utf16_parent_filename_size(
 		  input_file,
 		  &parent_filename_size,
@@ -478,7 +481,7 @@ int mount_handle_open_input_parent_file(
 		goto on_error;
 	}
 	if( ( parent_filename_size > (size_t) SSIZE_MAX )
-	 || ( ( sizeof( libcstring_system_character_t ) * parent_filename_size ) > (size_t) SSIZE_MAX ) )
+	 || ( ( sizeof( system_character_t ) * parent_filename_size ) > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -489,7 +492,7 @@ int mount_handle_open_input_parent_file(
 
 		goto on_error;
 	}
-	parent_filename = libcstring_system_string_allocate(
+	parent_filename = system_string_allocate(
 			   parent_filename_size );
 
 	if( parent_filename == NULL )
@@ -503,7 +506,7 @@ int mount_handle_open_input_parent_file(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libvhdi_file_get_utf16_parent_filename(
 		  input_file,
 		  (uint16_t *) parent_filename,
@@ -527,9 +530,9 @@ int mount_handle_open_input_parent_file(
 
 		goto on_error;
 	}
-	parent_basename_end = libcstring_system_string_search_character_reverse(
+	parent_basename_end = system_string_search_character_reverse(
 	                       parent_filename,
-	                       (libcstring_system_character_t) '\\',
+	                       (system_character_t) '\\',
 	                       parent_filename_size );
 
 	if( parent_basename_end != NULL )
@@ -543,7 +546,7 @@ int mount_handle_open_input_parent_file(
 	}
 	else
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libcpath_path_join_wide(
 		     &parent_path,
 		     &parent_path_size,
@@ -586,7 +589,7 @@ int mount_handle_open_input_parent_file(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libvhdi_file_open_wide(
 	     parent_input_file,
 	     parent_path,
@@ -604,7 +607,7 @@ int mount_handle_open_input_parent_file(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open parent input file: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to open parent input file: %" PRIs_SYSTEM ".",
 		 function,
 		 parent_path );
 
@@ -990,7 +993,7 @@ int mount_handle_get_number_of_inputs(
  */
 int mount_handle_set_basename(
      mount_handle_t *mount_handle,
-     const libcstring_system_character_t *basename,
+     const system_character_t *basename,
      size_t basename_size,
      libcerror_error_t **error )
 {
@@ -1030,7 +1033,7 @@ int mount_handle_set_basename(
 		goto on_error;
 	}
 	if( ( basename_size > (size_t) SSIZE_MAX )
-	 || ( ( sizeof( libcstring_system_character_t ) * basename_size ) > (size_t) SSIZE_MAX ) )
+	 || ( ( sizeof( system_character_t ) * basename_size ) > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -1049,7 +1052,7 @@ int mount_handle_set_basename(
 		mount_handle->basename      = NULL;
 		mount_handle->basename_size = 0;
 	}
-	mount_handle->basename = libcstring_system_string_allocate(
+	mount_handle->basename = system_string_allocate(
 	                          basename_size );
 
 	if( mount_handle->basename == NULL )
@@ -1063,7 +1066,7 @@ int mount_handle_set_basename(
 
 		goto on_error;
 	}
-	if( libcstring_system_string_copy(
+	if( system_string_copy(
 	     mount_handle->basename,
 	     basename,
 	     basename_size ) == NULL )

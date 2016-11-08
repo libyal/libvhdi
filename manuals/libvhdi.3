@@ -1,4 +1,4 @@
-.Dd April 23, 2016
+.Dd November  8, 2016
 .Dt libvhdi 3
 .Os libvhdi
 .Sh NAME
@@ -73,7 +73,7 @@ File functions
 .Ft ssize_t
 .Fn libvhdi_file_write_buffer "libvhdi_file_t *file, const void *buffer, size_t buffer_size, libvhdi_error_t **error"
 .Ft ssize_t
-.Fn libvhdi_file_write_buffer_add_offset "libvhdi_file_t *file, const void *buffer, size_t buffer_size, off64_t offset, libvhdi_error_t **error"
+.Fn libvhdi_file_write_buffer_at_offset "libvhdi_file_t *file, const void *buffer, size_t buffer_size, off64_t offset, libvhdi_error_t **error"
 .Ft off64_t
 .Fn libvhdi_file_seek_offset "libvhdi_file_t *file, off64_t offset, int whence, libvhdi_error_t **error"
 .Ft int

@@ -22,13 +22,15 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "byte_size_string.h"
 #include "info_handle.h"
 #include "vhditools_libcerror.h"
 #include "vhditools_libcnotify.h"
-#include "vhditools_libcstring.h"
 #include "vhditools_libfguid.h"
 #include "vhditools_libvhdi.h"
 
@@ -204,7 +206,7 @@ int info_handle_signal_abort(
  */
 int info_handle_open_input(
      info_handle_t *info_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      libcerror_error_t **error )
 {
 	static char *function = "info_handle_open_input";
@@ -220,7 +222,7 @@ int info_handle_open_input(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libvhdi_file_open_wide(
 	     info_handle->input,
 	     filename,
@@ -300,19 +302,19 @@ int info_handle_input_fprint(
      info_handle_t *info_handle,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t byte_size_string[ 16 ];
-	libcstring_system_character_t guid_string[ 48 ];
+	system_character_t byte_size_string[ 16 ];
+	system_character_t guid_string[ 48 ];
 	uint8_t guid_data[ 16 ];
 
-	libfguid_identifier_t *guid                 = NULL;
-	libcstring_system_character_t *value_string = NULL;
-	static char *function                       = "info_handle_input_fprint";
-	size_t value_string_size                    = 0;
-	size64_t media_size                         = 0;
-	uint32_t disk_type                          = 0;
-	uint16_t major_version                      = 0;
-	uint16_t minor_version                      = 0;
-	int result                                  = 0;
+	libfguid_identifier_t *guid      = NULL;
+	system_character_t *value_string = NULL;
+	static char *function            = "info_handle_input_fprint";
+	size64_t media_size              = 0;
+	size_t value_string_size         = 0;
+	uint32_t disk_type               = 0;
+	uint16_t major_version           = 0;
+	uint16_t minor_version           = 0;
+	int result                       = 0;
 
 	if( info_handle == NULL )
 	{
@@ -423,7 +425,7 @@ int info_handle_input_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tMedia size:\t\t%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)\n",
+		 "\tMedia size:\t\t%" PRIs_SYSTEM " (%" PRIu64 " bytes)\n",
 		 byte_size_string,
 		 media_size );
 	}
@@ -478,7 +480,7 @@ int info_handle_input_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfguid_identifier_copy_to_utf16_string(
 		  guid,
 		  (uint16_t *) guid_string,
@@ -506,7 +508,7 @@ int info_handle_input_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tIdentifier:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+	 "\tIdentifier:\t\t%" PRIs_SYSTEM "\n",
 	 guid_string );
 
 	result = libvhdi_file_get_parent_identifier(
@@ -544,7 +546,7 @@ int info_handle_input_fprint(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfguid_identifier_copy_to_utf16_string(
 		          guid,
 		          (uint16_t *) guid_string,
@@ -572,7 +574,7 @@ int info_handle_input_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tParent identifier:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "\tParent identifier:\t%" PRIs_SYSTEM "\n",
 		 guid_string );
 	}
 	if( libfguid_identifier_free(
@@ -588,7 +590,7 @@ int info_handle_input_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libvhdi_file_get_utf16_parent_filename_size(
 		  info_handle->input,
 		  &value_string_size,
@@ -613,7 +615,7 @@ int info_handle_input_fprint(
 	else if( result != 0 )
 	{
 		if( ( value_string_size > (size_t) SSIZE_MAX )
-		 || ( ( sizeof( libcstring_system_character_t ) * value_string_size )  > (size_t) SSIZE_MAX ) )
+		 || ( ( sizeof( system_character_t ) * value_string_size )  > (size_t) SSIZE_MAX ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -624,7 +626,7 @@ int info_handle_input_fprint(
 
 			goto on_error;
 		}
-		value_string = libcstring_system_string_allocate(
+		value_string = system_string_allocate(
 				value_string_size );
 
 		if( value_string == NULL )
@@ -638,7 +640,7 @@ int info_handle_input_fprint(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libvhdi_file_get_utf16_parent_filename(
 			  info_handle->input,
 			  (uint16_t *) value_string,

@@ -22,7 +22,10 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libvhdi_data_block.h"
 #include "libvhdi_definitions.h"
@@ -209,7 +212,7 @@ int libvhdi_io_handle_read_file_footer(
 	ssize_t read_count          = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libcstring_system_character_t guid_string[ 48 ];
+	system_character_t guid_string[ 48 ];
 
 	libfguid_identifier_t *guid = NULL;
 	uint64_t value_64bit        = 0;
@@ -479,7 +482,7 @@ int libvhdi_io_handle_read_file_footer(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfguid_identifier_copy_to_utf16_string(
 			  guid,
 			  (uint16_t *) guid_string,
@@ -519,7 +522,7 @@ int libvhdi_io_handle_read_file_footer(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: identifier\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "%s: identifier\t\t\t\t: %" PRIs_SYSTEM "\n",
 		 function,
 		 guid_string );
 
@@ -597,21 +600,21 @@ int libvhdi_io_handle_read_dynamic_disk_header(
      off64_t *next_offset,
      libcerror_error_t **error )
 {
-	uint8_t *dynamic_disk_header_data           = NULL;
-	static char *function                       = "libvhdi_io_handle_read_dynamic_disk_header";
-	size_t parent_filename_size                 = 0;
-	ssize_t read_count                          = 0;
-	uint32_t format_version                     = 0;
+	uint8_t *dynamic_disk_header_data = NULL;
+	static char *function             = "libvhdi_io_handle_read_dynamic_disk_header";
+	size_t parent_filename_size       = 0;
+	ssize_t read_count                = 0;
+	uint32_t format_version           = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libcstring_system_character_t guid_string[ 48 ];
+	system_character_t guid_string[ 48 ];
 
-	libcstring_system_character_t *value_string = NULL;
-	libfguid_identifier_t *guid                 = NULL;
-	size_t value_string_size                    = 0;
-	uint64_t value_64bit                        = 0;
-	uint32_t value_32bit                        = 0;
-	int result                                  = 0;
+	libfguid_identifier_t *guid       = NULL;
+	system_character_t *value_string  = NULL;
+	size_t value_string_size          = 0;
+	uint64_t value_64bit              = 0;
+	uint32_t value_32bit              = 0;
+	int result                        = 0;
 #endif
 
 	if( io_handle == NULL )
@@ -888,7 +891,7 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfguid_identifier_copy_to_utf16_string(
 			  guid,
 			  (uint16_t *) guid_string,
@@ -928,7 +931,7 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: parent identifier\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "%s: parent identifier\t\t: %" PRIs_SYSTEM "\n",
 		 function,
 		 guid_string );
 
@@ -950,7 +953,7 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 
 		if( io_handle->parent_filename_size > 0 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_size_from_utf16_stream(
 				  io_handle->parent_filename,
 				  io_handle->parent_filename_size,
@@ -977,7 +980,7 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 				goto on_error;
 			}
 			if( ( value_string_size > (size_t) SSIZE_MAX )
-			 || ( ( sizeof( libcstring_system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
+			 || ( ( sizeof( system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
 			{
 				libcerror_error_set(
 				 error,
@@ -988,7 +991,7 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 
 				goto on_error;
 			}
-			value_string = libcstring_system_string_allocate(
+			value_string = system_string_allocate(
 			                value_string_size );
 
 			if( value_string == NULL )
@@ -1002,7 +1005,7 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_copy_from_utf16_stream(
 				  (libuna_utf16_character_t *) value_string,
 				  value_string_size,
@@ -1031,7 +1034,7 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: parent filename\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "%s: parent filename\t\t: %" PRIs_SYSTEM "\n",
 			 function,
 			 value_string );
 
