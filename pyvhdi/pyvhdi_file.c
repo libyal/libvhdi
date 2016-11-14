@@ -1277,31 +1277,6 @@ PyObject *pyvhdi_file_read_buffer_at_offset(
 			return( NULL );
 		}
 	}
-	else if( integer_object == Py_None )
-	{
-		Py_BEGIN_ALLOW_THREADS
-
-		result = libvhdi_file_get_media_size(
-			  pyvhdi_file->file,
-			  &read_size,
-			  &error );
-
-		Py_END_ALLOW_THREADS
-
-		if( result != 1 )
-		{
-			pyvhdi_error_raise(
-			 error,
-			 PyExc_IOError,
-			 "%s: unable to retrieve media size.",
-			 function );
-
-			libcerror_error_free(
-			 &error );
-
-			return( NULL );
-		}
-	}
 	else
 	{
 		PyErr_Format(
