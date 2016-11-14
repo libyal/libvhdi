@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="vhdi_test_support"
-	ProjectGUID="{9DC4A261-1054-4CE0-ADBD-97CFA189509A}"
-	RootNamespace="vhdi_test_support"
+	Name="vhdi_test_data_block"
+	ProjectGUID="{731321DF-DB46-4719-BDE9-9ADDC3192A12}"
+	RootNamespace="vhdi_test_data_block"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\vhdi_test_support.c"
+				RelativePath="..\..\tests\vhdi_test_data_block.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\vhdi_test_memory.c"
 				>
 			</File>
 		</Filter>
@@ -190,23 +194,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\vhdi_test_libclocale.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\vhdi_test_libcsystem.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\vhdi_test_libuna.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\tests\vhdi_test_libvhdi.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\tests\vhdi_test_macros.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\vhdi_test_memory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\vhdi_test_unused.h"
 				>
 			</File>
 		</Filter>

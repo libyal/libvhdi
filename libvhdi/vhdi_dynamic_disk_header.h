@@ -105,5 +105,5 @@ struct vhdi_dynamic_disk_header
 }
 #endif
 
-#endif
+#endif /* !defined( _VHDI_DYNAMIC_DISK_HEADER_H ) */
 

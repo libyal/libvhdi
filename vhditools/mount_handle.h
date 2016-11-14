@@ -122,5 +122,5 @@ int mount_handle_set_basename(
 }
 #endif
 
-#endif
+#endif /* !defined( _MOUNT_HANDLE_H ) */
 

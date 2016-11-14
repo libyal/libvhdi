@@ -44,5 +44,5 @@ int libvhdi_debug_print_read_offsets(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBVHDI_DEBUG_H ) */
 

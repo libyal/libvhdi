@@ -16,10 +16,12 @@ MSVSCPP_FILES = \
 	libuna/libuna.vcproj \
 	libvhdi/libvhdi.vcproj \
 	pyvhdi/pyvhdi.vcproj \
+	vhdi_test_block_table/vhdi_test_block_table.vcproj \
+	vhdi_test_data_block/vhdi_test_data_block.vcproj \
 	vhdi_test_error/vhdi_test_error.vcproj \
 	vhdi_test_file/vhdi_test_file.vcproj \
+	vhdi_test_io_handle/vhdi_test_io_handle.vcproj \
 	vhdi_test_notify/vhdi_test_notify.vcproj \
-	vhdi_test_open_close/vhdi_test_open_close.vcproj \
 	vhdi_test_read/vhdi_test_read.vcproj \
 	vhdi_test_seek/vhdi_test_seek.vcproj \
 	vhdi_test_support/vhdi_test_support.vcproj \

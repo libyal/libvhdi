@@ -51,5 +51,5 @@ int libvhdi_i18n_initialize(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBVHDI_I18N_H ) */
 

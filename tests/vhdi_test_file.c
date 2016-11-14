@@ -38,7 +38,7 @@
 #include "vhdi_test_macros.h"
 #include "vhdi_test_memory.h"
 
-#if SIZEOF_WCHAR_T != 2 && SIZEOF_WCHAR_T != 4
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER ) && SIZEOF_WCHAR_T != 2 && SIZEOF_WCHAR_T != 4
 #error Unsupported size of wchar_t
 #endif
 
@@ -256,8 +256,8 @@ int vhdi_test_file_get_wide_source(
      libcerror_error_t **error )
 {
 	static char *function   = "vhdi_test_file_get_wide_source";
-	size_t wide_source_size = 0;
 	size_t source_length    = 0;
+	size_t wide_source_size = 0;
 
 #if !defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	int result              = 0;
@@ -584,11 +584,17 @@ int vhdi_test_file_close_source(
 int vhdi_test_file_initialize(
      void )
 {
-	libcerror_error_t *error = NULL;
-	libvhdi_file_t *file      = NULL;
-	int result               = 0;
+	libcerror_error_t *error        = NULL;
+	libvhdi_file_t *file            = NULL;
+	int result                      = 0;
 
-	/* Test libvhdi_file_initialize
+#if defined( HAVE_VHDI_TEST_MEMORY )
+	int number_of_malloc_fail_tests = 1;
+	int number_of_memset_fail_tests = 1;
+	int test_number                 = 0;
+#endif
+
+	/* Test regular cases
 	 */
 	result = libvhdi_file_initialize(
 	          &file,
@@ -664,79 +670,89 @@ int vhdi_test_file_initialize(
 
 #if defined( HAVE_VHDI_TEST_MEMORY )
 
-	/* Test libvhdi_file_initialize with malloc failing
-	 */
-	vhdi_test_malloc_attempts_before_fail = 0;
-
-	result = libvhdi_file_initialize(
-	          &file,
-	          &error );
-
-	if( vhdi_test_malloc_attempts_before_fail != -1 )
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
 	{
-		vhdi_test_malloc_attempts_before_fail = -1;
+		/* Test libvhdi_file_initialize with malloc failing
+		 */
+		vhdi_test_malloc_attempts_before_fail = test_number;
 
-		if( file != NULL )
+		result = libvhdi_file_initialize(
+		          &file,
+		          &error );
+
+		if( vhdi_test_malloc_attempts_before_fail != -1 )
 		{
-			libvhdi_file_free(
-			 &file,
-			 NULL );
+			vhdi_test_malloc_attempts_before_fail = -1;
+
+			if( file != NULL )
+			{
+				libvhdi_file_free(
+				 &file,
+				 NULL );
+			}
+		}
+		else
+		{
+			VHDI_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			VHDI_TEST_ASSERT_IS_NULL(
+			 "file",
+			 file );
+
+			VHDI_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
 		}
 	}
-	else
+	for( test_number = 0;
+	     test_number < number_of_memset_fail_tests;
+	     test_number++ )
 	{
-		VHDI_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+		/* Test libvhdi_file_initialize with memset failing
+		 */
+		vhdi_test_memset_attempts_before_fail = test_number;
 
-		VHDI_TEST_ASSERT_IS_NULL(
-		 "file",
-		 file );
+		result = libvhdi_file_initialize(
+		          &file,
+		          &error );
 
-		VHDI_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Test libvhdi_file_initialize with memset failing
-	 */
-	vhdi_test_memset_attempts_before_fail = 0;
-
-	result = libvhdi_file_initialize(
-	          &file,
-	          &error );
-
-	if( vhdi_test_memset_attempts_before_fail != -1 )
-	{
-		vhdi_test_memset_attempts_before_fail = -1;
-
-		if( file != NULL )
+		if( vhdi_test_memset_attempts_before_fail != -1 )
 		{
-			libvhdi_file_free(
-			 &file,
-			 NULL );
+			vhdi_test_memset_attempts_before_fail = -1;
+
+			if( file != NULL )
+			{
+				libvhdi_file_free(
+				 &file,
+				 NULL );
+			}
 		}
-	}
-	else
-	{
-		VHDI_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+		else
+		{
+			VHDI_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
 
-		VHDI_TEST_ASSERT_IS_NULL(
-		 "file",
-		 file );
+			VHDI_TEST_ASSERT_IS_NULL(
+			 "file",
+			 file );
 
-		VHDI_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+			VHDI_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
 
-		libcerror_error_free(
-		 &error );
+			libcerror_error_free(
+			 &error );
+		}
 	}
 #endif /* defined( HAVE_VHDI_TEST_MEMORY ) */
 
@@ -795,7 +811,7 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libvhdi_file_open functions
+/* Tests the libvhdi_file_open function
  * Returns 1 if successful or 0 if not
  */
 int vhdi_test_file_open(
@@ -804,7 +820,7 @@ int vhdi_test_file_open(
 	char narrow_source[ 256 ];
 
 	libcerror_error_t *error = NULL;
-	libvhdi_file_t *file      = NULL;
+	libvhdi_file_t *file     = NULL;
 	int result               = 0;
 
 	/* Initialize test
@@ -858,21 +874,28 @@ int vhdi_test_file_open(
          "error",
          error );
 
-	/* Clean up
+	/* Test error cases
 	 */
-	result = libvhdi_file_close(
+	result = libvhdi_file_open(
 	          file,
+	          narrow_source,
+	          LIBVHDI_OPEN_READ,
 	          &error );
 
 	VHDI_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 0 );
+	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NULL(
+        VHDI_TEST_ASSERT_IS_NOT_NULL(
          "error",
          error );
 
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
 	result = libvhdi_file_free(
 	          &file,
 	          &error );
@@ -909,7 +932,7 @@ on_error:
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-/* Tests the libvhdi_file_open_wide functions
+/* Tests the libvhdi_file_open_wide function
  * Returns 1 if successful or 0 if not
  */
 int vhdi_test_file_open_wide(
@@ -918,7 +941,7 @@ int vhdi_test_file_open_wide(
 	wchar_t wide_source[ 256 ];
 
 	libcerror_error_t *error = NULL;
-	libvhdi_file_t *file      = NULL;
+	libvhdi_file_t *file     = NULL;
 	int result               = 0;
 
 	/* Initialize test
@@ -972,21 +995,28 @@ int vhdi_test_file_open_wide(
          "error",
          error );
 
-	/* Clean up
+	/* Test error cases
 	 */
-	result = libvhdi_file_close(
+	result = libvhdi_file_open_wide(
 	          file,
+	          wide_source,
+	          LIBVHDI_OPEN_READ,
 	          &error );
 
 	VHDI_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 0 );
+	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NULL(
+        VHDI_TEST_ASSERT_IS_NOT_NULL(
          "error",
          error );
 
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
 	result = libvhdi_file_free(
 	          &file,
 	          &error );
@@ -1023,6 +1053,185 @@ on_error:
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
+/* Tests the libvhdi_file_close function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_file_close(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test error cases
+	 */
+	result = libvhdi_file_close(
+	          NULL,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        VHDI_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libvhdi_file_open and libvhdi_file_close functions
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_file_open_close(
+     const system_character_t *source )
+{
+	libcerror_error_t *error = NULL;
+	libvhdi_file_t *file     = NULL;
+	int result               = 0;
+
+	/* Initialize test
+	 */
+	result = libvhdi_file_initialize(
+	          &file,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        VHDI_TEST_ASSERT_IS_NOT_NULL(
+         "file",
+         file );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test open and close
+	 */
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libvhdi_file_open_wide(
+	          file,
+	          source,
+	          LIBVHDI_OPEN_READ,
+	          &error );
+#else
+	result = libvhdi_file_open(
+	          file,
+	          source,
+	          LIBVHDI_OPEN_READ,
+	          &error );
+#endif
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libvhdi_file_close(
+	          file,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test open and close a second time to validate clean up on close
+	 */
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libvhdi_file_open_wide(
+	          file,
+	          source,
+	          LIBVHDI_OPEN_READ,
+	          &error );
+#else
+	result = libvhdi_file_open(
+	          file,
+	          source,
+	          LIBVHDI_OPEN_READ,
+	          &error );
+#endif
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libvhdi_file_close(
+	          file,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Clean up
+	 */
+	result = libvhdi_file_free(
+	          &file,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "file",
+         file );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( file != NULL )
+	{
+		libvhdi_file_free(
+		 &file,
+		 NULL );
+	}
+	return( 0 );
+}
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -1036,8 +1245,8 @@ int main(
 #endif
 {
 	libcerror_error_t *error   = NULL;
+	libvhdi_file_t *file       = NULL;
 	system_character_t *source = NULL;
-	libvhdi_file_t *file        = NULL;
 	system_integer_t option    = 0;
 	int result                 = 0;
 
@@ -1101,7 +1310,14 @@ int main(
 
 #endif /* defined( LIBVHDI_HAVE_BFIO ) */
 
-		/* TODO add test for libvhdi_file_close */
+		VHDI_TEST_RUN(
+		 "libvhdi_file_close",
+		 vhdi_test_file_close );
+
+		VHDI_TEST_RUN_WITH_ARGS(
+		 "libvhdi_file_open_close",
+		 vhdi_test_file_open_close,
+		 source );
 
 		/* Initialize test
 		 */
@@ -1123,10 +1339,27 @@ int main(
 	         "error",
 	         error );
 
-		VHDI_TEST_RUN_WITH_ARGS(
-		 "libvhdi_file_open",
-		 vhdi_test_file_open,
-		 file );
+		/* TODO: add tests for libvhdi_file_signal_abort */
+
+#if defined( __GNUC__ )
+
+		/* TODO: add tests for libvhdi_file_open_read */
+
+#endif /* defined( __GNUC__ ) */
+
+		/* TODO: add tests for libvhdi_file_read_buffer */
+
+		/* TODO: add tests for libvhdi_file_read_buffer_at_offset */
+
+		/* TODO: add tests for libvhdi_file_write_buffer */
+
+		/* TODO: add tests for libvhdi_file_write_buffer_at_offset */
+
+		/* TODO: add tests for libvhdi_file_seek_offset */
+
+		/* TODO: add tests for libvhdi_file_get_offset */
+
+		/* TODO: add tests for libvhdi_file_set_parent_file */
 
 		/* Clean up
 		 */

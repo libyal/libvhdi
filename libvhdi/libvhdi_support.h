@@ -84,5 +84,5 @@ int libvhdi_check_file_signature_file_io_handle(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBVHDI_SUPPORT_H ) */
 

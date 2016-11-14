@@ -808,7 +808,7 @@ int main(
 
 #if defined( LIBVHDI_HAVE_BFIO )
 
-		/* TODO add test for libvhdi_file_open_file_io_handle */
+		/* TODO add test for libvhdi_check_file_file_io_handle */
 
 #endif /* defined( LIBVHDI_HAVE_BFIO ) */
 	}

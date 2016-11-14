@@ -120,5 +120,5 @@ struct vhdi_file_footer
 }
 #endif
 
-#endif
+#endif /* !defined( _VHDI_FILE_FOOTER_H ) */
 

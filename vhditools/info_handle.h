@@ -76,5 +76,5 @@ int info_handle_input_fprint(
 }
 #endif
 
-#endif
+#endif /* !defined( _INFO_HANDLE_H ) */
 
