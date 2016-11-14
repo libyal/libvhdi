@@ -202,10 +202,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libvhdi\libvhdi_metadata.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libvhdi\libvhdi_notify.c"
 				>
 			</File>
@@ -293,10 +289,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libvhdi\libvhdi_libuna.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_metadata.h"
 				>
 			</File>
 			<File

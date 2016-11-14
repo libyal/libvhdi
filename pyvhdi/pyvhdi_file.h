@@ -1,5 +1,5 @@
 /*
- * Python object definition of the libvhdi file
+ * Python object wrapper of libvhdi_file_t
  *
  * Copyright (C) 2012-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -86,11 +86,6 @@ PyObject *pyvhdi_file_open_file_object(
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject *pyvhdi_file_set_parent(
-           pyvhdi_file_t *pyvhdi_file,
-           PyObject *arguments,
-           PyObject *keywords );
-
 PyObject *pyvhdi_file_close(
            pyvhdi_file_t *pyvhdi_file,
            PyObject *arguments );
@@ -111,6 +106,31 @@ PyObject *pyvhdi_file_seek_offset(
            PyObject *keywords );
 
 PyObject *pyvhdi_file_get_offset(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments );
+
+PyObject *pyvhdi_file_set_parent(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject *pyvhdi_file_get_media_size(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments );
+
+PyObject *pyvhdi_file_get_disk_type(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments );
+
+PyObject *pyvhdi_file_get_identifier(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments );
+
+PyObject *pyvhdi_file_get_parent_identifier(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments );
+
+PyObject *pyvhdi_file_get_parent_filename(
            pyvhdi_file_t *pyvhdi_file,
            PyObject *arguments );
 

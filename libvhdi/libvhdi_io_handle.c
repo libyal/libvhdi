@@ -22,12 +22,10 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
-#include <narrow_string.h>
-#include <system_string.h>
 #include <types.h>
-#include <wide_string.h>
 
 #include "libvhdi_data_block.h"
+#include "libvhdi_debug.h"
 #include "libvhdi_definitions.h"
 #include "libvhdi_io_handle.h"
 #include "libvhdi_libbfio.h"
@@ -207,17 +205,13 @@ int libvhdi_io_handle_read_file_footer(
      off64_t *next_offset,
      libcerror_error_t **error )
 {
-	uint8_t *file_footer_data   = NULL;
-	static char *function       = "libvhdi_io_handle_read_file_footer";
-	ssize_t read_count          = 0;
+	uint8_t *file_footer_data = NULL;
+	static char *function     = "libvhdi_io_handle_read_file_footer";
+	ssize_t read_count        = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	system_character_t guid_string[ 48 ];
-
-	libfguid_identifier_t *guid = NULL;
-	uint64_t value_64bit        = 0;
-	uint32_t value_32bit        = 0;
-	int result                  = 0;
+	uint64_t value_64bit      = 0;
+	uint32_t value_32bit      = 0;
 #endif
 
 	if( io_handle == NULL )
@@ -453,79 +447,24 @@ int libvhdi_io_handle_read_file_footer(
 		 function,
 		 value_32bit );
 
-		if( libfguid_identifier_initialize(
-		     &guid,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create GUID.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfguid_identifier_copy_from_byte_stream(
-		     guid,
+		if( libfwsi_debug_print_guid_value(
+		     function,
+		     "identifier\t\t\t\t",
 		     ( (vhdi_file_footer_t *) file_footer_data )->identifier,
 		     16,
 		     LIBFGUID_ENDIAN_BIG,
+		     LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy byte stream to GUID.",
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print GUID value.",
 			 function );
 
 			goto on_error;
 		}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfguid_identifier_copy_to_utf16_string(
-			  guid,
-			  (uint16_t *) guid_string,
-			  48,
-			  LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-			  error );
-#else
-		result = libfguid_identifier_copy_to_utf8_string(
-			  guid,
-			  (uint8_t *) guid_string,
-			  48,
-			  LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-			  error );
-#endif
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy GUID to string.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfguid_identifier_free(
-		     &guid,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free GUID.",
-			 function );
-
-			goto on_error;
-		}
-		libcnotify_printf(
-		 "%s: identifier\t\t\t\t: %" PRIs_SYSTEM "\n",
-		 function,
-		 guid_string );
-
 		libcnotify_printf(
 		 "%s: saved state\t\t\t\t: 0x%02" PRIx8 "\n",
 		 function,
@@ -574,14 +513,6 @@ int libvhdi_io_handle_read_file_footer(
 	return( 1 );
 
 on_error:
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( guid != NULL )
-	{
-		libfguid_identifier_free(
-		 &guid,
-		 NULL );
-	}
-#endif
 	if( file_footer_data != NULL )
 	{
 		memory_free(
@@ -607,14 +538,8 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 	uint32_t format_version           = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	system_character_t guid_string[ 48 ];
-
-	libfguid_identifier_t *guid       = NULL;
-	system_character_t *value_string  = NULL;
-	size_t value_string_size          = 0;
 	uint64_t value_64bit              = 0;
 	uint32_t value_32bit              = 0;
-	int result                        = 0;
 #endif
 
 	if( io_handle == NULL )
@@ -862,79 +787,24 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 		 function,
 		 value_32bit );
 
-		if( libfguid_identifier_initialize(
-		     &guid,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create GUID.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfguid_identifier_copy_from_byte_stream(
-		     guid,
+		if( libfwsi_debug_print_guid_value(
+		     function,
+		     "parent identifier\t\t",
 		     ( (vhdi_dynamic_disk_header_t *) dynamic_disk_header_data )->parent_identifier,
 		     16,
 		     LIBFGUID_ENDIAN_BIG,
+		     LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy byte stream to GUID.",
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print GUID value.",
 			 function );
 
 			goto on_error;
 		}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfguid_identifier_copy_to_utf16_string(
-			  guid,
-			  (uint16_t *) guid_string,
-			  48,
-			  LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-			  error );
-#else
-		result = libfguid_identifier_copy_to_utf8_string(
-			  guid,
-			  (uint8_t *) guid_string,
-			  48,
-			  LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-			  error );
-#endif
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy GUID to string.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfguid_identifier_free(
-		     &guid,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free GUID.",
-			 function );
-
-			goto on_error;
-		}
-		libcnotify_printf(
-		 "%s: parent identifier\t\t: %" PRIs_SYSTEM "\n",
-		 function,
-		 guid_string );
-
 		byte_stream_copy_to_uint32_big_endian(
 		 ( (vhdi_dynamic_disk_header_t *) dynamic_disk_header_data )->parent_modification_time,
 		 value_32bit );
@@ -953,95 +823,23 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 
 		if( io_handle->parent_filename_size > 0 )
 		{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libuna_utf16_string_size_from_utf16_stream(
-				  io_handle->parent_filename,
-				  io_handle->parent_filename_size,
-				  LIBUNA_ENDIAN_BIG,
-				  &value_string_size,
-				  error );
-#else
-			result = libuna_utf8_string_size_from_utf16_stream(
-				  io_handle->parent_filename,
-				  io_handle->parent_filename_size,
-				  LIBUNA_ENDIAN_BIG,
-				  &value_string_size,
-				  error );
-#endif
-			if( result != 1 )
+			if( libfwsi_debug_print_utf16_string_value(
+			     function,
+			     "parent filename\t\t",
+			     io_handle->parent_filename,
+			     io_handle->parent_filename_size,
+			     LIBUNA_ENDIAN_BIG,
+			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to determine size of parent filename string.",
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print UTF-16 string value.",
 				 function );
 
 				goto on_error;
 			}
-			if( ( value_string_size > (size_t) SSIZE_MAX )
-			 || ( ( sizeof( system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-				 "%s: invalid parent filename string size value exceeds maximum.",
-				 function );
-
-				goto on_error;
-			}
-			value_string = system_string_allocate(
-			                value_string_size );
-
-			if( value_string == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create parent filename string.",
-				 function );
-
-				goto on_error;
-			}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libuna_utf16_string_copy_from_utf16_stream(
-				  (libuna_utf16_character_t *) value_string,
-				  value_string_size,
-				  io_handle->parent_filename,
-				  io_handle->parent_filename_size,
-				  LIBUNA_ENDIAN_BIG,
-				  error );
-#else
-			result = libuna_utf8_string_copy_from_utf16_stream(
-				  (libuna_utf8_character_t *) value_string,
-				  value_string_size,
-				  io_handle->parent_filename,
-				  io_handle->parent_filename_size,
-				  LIBUNA_ENDIAN_BIG,
-				  error );
-#endif
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set parent filename string.",
-				 function );
-
-				goto on_error;
-			}
-			libcnotify_printf(
-			 "%s: parent filename\t\t: %" PRIs_SYSTEM "\n",
-			 function,
-			 value_string );
-
-			memory_free(
-			 value_string );
-
-			value_string = NULL;
 		}
 		libcnotify_printf(
 		 "%s: parent locator entries data:\n",
@@ -1100,14 +898,6 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 	return( 1 );
 
 on_error:
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( guid != NULL )
-	{
-		libfguid_identifier_free(
-		 &guid,
-		 NULL );
-	}
-#endif
 	if( io_handle->parent_filename != NULL )
 	{
 		memory_free(
@@ -1129,8 +919,8 @@ on_error:
  */
 int libvhdi_io_handle_get_identifier(
      libvhdi_io_handle_t *io_handle,
-     uint8_t *guid,
-     size_t size,
+     uint8_t *guid_data,
+     size_t guid_data_size,
      libcerror_error_t **error )
 {
 	static char *function = "libvhdi_io_handle_get_identifier";
@@ -1146,30 +936,30 @@ int libvhdi_io_handle_get_identifier(
 
 		return( -1 );
 	}
-	if( guid == NULL )
+	if( guid_data == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid GUID.",
+		 "%s: invalid GUID data.",
 		 function );
 
 		return( -1 );
 	}
-	if( size < 16 )
+	if( guid_data_size < 16 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid GUID value too small.",
+		 "%s: invalid GUID data size value too small.",
 		 function );
 
 		return( -1 );
 	}
 	if( memory_copy(
-	     guid,
+	     guid_data,
 	     io_handle->identifier,
 	     16 ) == NULL )
 	{
@@ -1190,8 +980,8 @@ int libvhdi_io_handle_get_identifier(
  */
 int libvhdi_io_handle_get_parent_identifier(
      libvhdi_io_handle_t *io_handle,
-     uint8_t *guid,
-     size_t size,
+     uint8_t *guid_data,
+     size_t guid_data_size,
      libcerror_error_t **error )
 {
 	static char *function = "libvhdi_io_handle_get_parent_identifier";
@@ -1207,30 +997,30 @@ int libvhdi_io_handle_get_parent_identifier(
 
 		return( -1 );
 	}
-	if( guid == NULL )
+	if( guid_data == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid GUID.",
+		 "%s: invalid GUID data.",
 		 function );
 
 		return( -1 );
 	}
-	if( size < 16 )
+	if( guid_data_size < 16 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid GUID value too small.",
+		 "%s: invalid GUID data size value too small.",
 		 function );
 
 		return( -1 );
 	}
 	if( memory_copy(
-	     guid,
+	     guid_data,
 	     io_handle->parent_identifier,
 	     16 ) == NULL )
 	{

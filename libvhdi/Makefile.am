@@ -40,7 +40,6 @@ libvhdi_la_SOURCES = \
 	libvhdi_libfdata.h \
 	libvhdi_libfguid.h \
 	libvhdi_libuna.h \
-	libvhdi_metadata.c libvhdi_metadata.h \
 	libvhdi_notify.c libvhdi_notify.h \
 	libvhdi_support.c libvhdi_support.h \
 	libvhdi_types.h \

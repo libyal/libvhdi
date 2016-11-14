@@ -59,5 +59,5 @@ void pyvhdi_disk_types_free(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYVHDI_DISK_TYPES_H ) */
 

@@ -121,14 +121,14 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 
 int libvhdi_io_handle_get_identifier(
      libvhdi_io_handle_t *io_handle,
-     uint8_t *guid,
-     size_t size,
+     uint8_t *guid_data,
+     size_t guid_data_size,
      libcerror_error_t **error );
 
 int libvhdi_io_handle_get_parent_identifier(
      libvhdi_io_handle_t *io_handle,
-     uint8_t *guid,
-     size_t size,
+     uint8_t *guid_data,
+     size_t guid_data_size,
      libcerror_error_t **error );
 
 int libvhdi_io_handle_get_utf8_parent_filename_size(

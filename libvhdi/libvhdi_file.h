@@ -34,14 +34,6 @@
 #include "libvhdi_libfcache.h"
 #include "libvhdi_libfdata.h"
 
-#if defined( _MSC_VER ) || defined( __BORLANDC__ ) || defined( __MINGW32_VERSION ) || defined( __MINGW64_VERSION_MAJOR )
-
-/* This inclusion is needed otherwise some linkers
- * mess up exporting the metadata functions
- */
-#include "libvhdi_metadata.h"
-#endif
-
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -214,6 +206,65 @@ LIBVHDI_EXTERN \
 int libvhdi_file_set_parent_file(
      libvhdi_file_t *file,
      libvhdi_file_t *parent_file,
+     libcerror_error_t **error );
+
+LIBVHDI_EXTERN \
+int libvhdi_file_get_media_size(
+     libvhdi_file_t *file,
+     size64_t *media_size,
+     libcerror_error_t **error );
+
+LIBVHDI_EXTERN \
+int libvhdi_file_get_format_version(
+     libvhdi_file_t *file,
+     uint16_t *major_version,
+     uint16_t *minor_version,
+     libcerror_error_t **error );
+
+LIBVHDI_EXTERN \
+int libvhdi_file_get_disk_type(
+     libvhdi_file_t *file,
+     uint32_t *disk_type,
+     libcerror_error_t **error );
+
+LIBVHDI_EXTERN \
+int libvhdi_file_get_identifier(
+     libvhdi_file_t *file,
+     uint8_t *guid_data,
+     size_t guid_data_size,
+     libcerror_error_t **error );
+
+LIBVHDI_EXTERN \
+int libvhdi_file_get_parent_identifier(
+     libvhdi_file_t *file,
+     uint8_t *guid_data,
+     size_t guid_data_size,
+     libcerror_error_t **error );
+
+LIBVHDI_EXTERN \
+int libvhdi_file_get_utf8_parent_filename_size(
+     libvhdi_file_t *file,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+LIBVHDI_EXTERN \
+int libvhdi_file_get_utf8_parent_filename(
+     libvhdi_file_t *file,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+LIBVHDI_EXTERN \
+int libvhdi_file_get_utf16_parent_filename_size(
+     libvhdi_file_t *file,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+LIBVHDI_EXTERN \
+int libvhdi_file_get_utf16_parent_filename(
+     libvhdi_file_t *file,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

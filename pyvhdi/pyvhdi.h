@@ -57,5 +57,5 @@ PyMODINIT_FUNC initpyvhdi(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYVHDI_H ) */
 
