@@ -132,7 +132,7 @@ PyMethodDef pyvhdi_file_object_methods[] = {
 	  METH_VARARGS | METH_KEYWORDS,
 	  "set_parent(parent_file) -> None\n"
 	  "\n"
-	  "" },
+	  "Sets the parent file." },
 
 	{ "get_media_size",
 	  (PyCFunction) pyvhdi_file_get_media_size,
@@ -140,6 +140,13 @@ PyMethodDef pyvhdi_file_object_methods[] = {
 	  "get_media_size() -> Integer or None\n"
 	  "\n"
 	  "Retrieves the media size." },
+
+	{ "get_format_version",
+	  (PyCFunction) pyvhdi_file_get_format_version,
+	  METH_NOARGS,
+	  "get_format_version() -> Unicode string or None\n"
+	  "\n"
+	  "Retrieves the format version." },
 
 	{ "get_disk_type",
 	  (PyCFunction) pyvhdi_file_get_disk_type,
@@ -179,6 +186,12 @@ PyGetSetDef pyvhdi_file_object_get_set_definitions[] = {
 	  (getter) pyvhdi_file_get_media_size,
 	  (setter) 0,
 	  "The media size.",
+	  NULL },
+
+	{ "format_version",
+	  (getter) pyvhdi_file_get_format_version,
+	  (setter) 0,
+	  "The format version.",
 	  NULL },
 
 	{ "disk_type",
@@ -1452,6 +1465,7 @@ PyObject *pyvhdi_file_get_offset(
 
 	return( integer_object );
 }
+
 /* Sets the parent file
  * Returns a Python object if successful or NULL on error
  */
@@ -1563,6 +1577,100 @@ PyObject *pyvhdi_file_get_media_size(
 	                  (uint64_t) media_size );
 
 	return( integer_object );
+}
+
+/* Retrieves the format version
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyvhdi_file_get_format_version(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments PYVHDI_ATTRIBUTE_UNUSED )
+{
+	char utf8_string[ 4 ];
+
+	PyObject *string_object  = NULL;
+	libcerror_error_t *error = NULL;
+	const char *errors       = NULL;
+	static char *function    = "pyvhdi_file_get_format_version";
+	uint16_t major_version   = 0;
+	uint16_t minor_version   = 0;
+	int result               = 0;
+
+	PYVHDI_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyvhdi_file == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libvhdi_file_get_format_version(
+	          pyvhdi_file->file,
+	          &major_version,
+	          &minor_version,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyvhdi_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve format version.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	if( major_version > 9 )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: major version out of bounds.",
+		 function );
+
+		return( NULL );
+	}
+	if( minor_version > 9 )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: minor version out of bounds.",
+		 function );
+
+		return( NULL );
+	}
+	utf8_string[ 0 ] = '0' + (char) major_version;
+	utf8_string[ 1 ] = '.';
+	utf8_string[ 2 ] = '0' + (char) minor_version;
+	utf8_string[ 3 ] = 0;
+
+	/* Pass the string length to PyUnicode_DecodeUTF8 otherwise it makes
+	 * the end of string character is part of the string
+	 */
+	string_object = PyUnicode_DecodeUTF8(
+	                 utf8_string,
+	                 (Py_ssize_t) 3,
+	                 errors );
+
+	if( string_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: unable to convert UTF-8 string into Unicode object.",
+		 function );
+
+		return( NULL );
+	}
+	return( string_object );
 }
 
 /* Retrieves the disk type

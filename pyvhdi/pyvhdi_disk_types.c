@@ -205,39 +205,39 @@ on_error:
 PyObject *pyvhdi_disk_types_new(
            void )
 {
-	pyvhdi_disk_types_t *pyvhdi_disk_types = NULL;
-	static char *function                  = "pyvhdi_disk_types_new";
+	pyvhdi_disk_types_t *definitions_object = NULL;
+	static char *function                   = "pyvhdi_disk_types_new";
 
-	pyvhdi_disk_types = PyObject_New(
-	                     struct pyvhdi_disk_types,
-	                     &pyvhdi_disk_types_type_object );
+	definitions_object = PyObject_New(
+	                      struct pyvhdi_disk_types,
+	                      &pyvhdi_disk_types_type_object );
 
-	if( pyvhdi_disk_types == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize disk types.",
+		 "%s: unable to create definitions object.",
 		 function );
 
 		goto on_error;
 	}
 	if( pyvhdi_disk_types_init(
-	     pyvhdi_disk_types ) != 0 )
+	     definitions_object ) != 0 )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize disk types.",
+		 "%s: unable to initialize definitions object.",
 		 function );
 
 		goto on_error;
 	}
-	return( (PyObject *) pyvhdi_disk_types );
+	return( (PyObject *) definitions_object );
 
 on_error:
-	if( pyvhdi_disk_types != NULL )
+	if( definitions_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyvhdi_disk_types );
+		 (PyObject *) definitions_object );
 	}
 	return( NULL );
 }
@@ -246,15 +246,15 @@ on_error:
  * Returns 0 if successful or -1 on error
  */
 int pyvhdi_disk_types_init(
-     pyvhdi_disk_types_t *pyvhdi_disk_types )
+     pyvhdi_disk_types_t *definitions_object )
 {
 	static char *function = "pyvhdi_disk_types_init";
 
-	if( pyvhdi_disk_types == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid disk types.",
+		 "%s: invalid definitions object.",
 		 function );
 
 		return( -1 );
@@ -265,22 +265,22 @@ int pyvhdi_disk_types_init(
 /* Frees a disk types object
  */
 void pyvhdi_disk_types_free(
-      pyvhdi_disk_types_t *pyvhdi_disk_types )
+      pyvhdi_disk_types_t *definitions_object )
 {
 	struct _typeobject *ob_type = NULL;
 	static char *function       = "pyvhdi_disk_types_free";
 
-	if( pyvhdi_disk_types == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid disk types.",
+		 "%s: invalid definitions object.",
 		 function );
 
 		return;
 	}
 	ob_type = Py_TYPE(
-	           pyvhdi_disk_types );
+	           definitions_object );
 
 	if( ob_type == NULL )
 	{
@@ -301,6 +301,6 @@ void pyvhdi_disk_types_free(
 		return;
 	}
 	ob_type->tp_free(
-	 (PyObject*) pyvhdi_disk_types );
+	 (PyObject*) definitions_object );
 }
 

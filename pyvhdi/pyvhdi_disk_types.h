@@ -50,10 +50,10 @@ PyObject *pyvhdi_disk_types_new(
            void );
 
 int pyvhdi_disk_types_init(
-     pyvhdi_disk_types_t *pyvhdi_disk_types );
+     pyvhdi_disk_types_t *definitions_object );
 
 void pyvhdi_disk_types_free(
-      pyvhdi_disk_types_t *pyvhdi_disk_types );
+      pyvhdi_disk_types_t *definitions_object );
 
 #if defined( __cplusplus )
 }

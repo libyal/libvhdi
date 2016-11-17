@@ -118,6 +118,10 @@ PyObject *pyvhdi_file_get_media_size(
            pyvhdi_file_t *pyvhdi_file,
            PyObject *arguments );
 
+PyObject *pyvhdi_file_get_format_version(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments );
+
 PyObject *pyvhdi_file_get_disk_type(
            pyvhdi_file_t *pyvhdi_file,
            PyObject *arguments );
