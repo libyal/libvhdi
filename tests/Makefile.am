@@ -30,10 +30,10 @@ TESTS = \
 	$(TESTS_PYVHDI)
 
 check_SCRIPTS = \
-	pyvhdi_test_get_version.py \
-	pyvhdi_test_open_close.py \
+	pyvhdi_test_file.py \
 	pyvhdi_test_read.py \
 	pyvhdi_test_seek.py \
+	pyvhdi_test_support.py \
 	test_api_functions.sh \
 	test_api_types.sh \
 	test_python_functions.sh \
@@ -89,16 +89,16 @@ vhdi_test_error_LDADD = \
 
 vhdi_test_file_SOURCES = \
 	vhdi_test_file.c \
+	vhdi_test_getopt.c vhdi_test_getopt.h \
 	vhdi_test_libcerror.h \
 	vhdi_test_libclocale.h \
-	vhdi_test_libcsystem.h \
+	vhdi_test_libcnotify.h \
 	vhdi_test_libuna.h \
 	vhdi_test_libvhdi.h \
 	vhdi_test_macros.h \
 	vhdi_test_memory.c vhdi_test_memory.h
 
 vhdi_test_file_LDADD = \
-	@LIBCSYSTEM_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
@@ -164,16 +164,16 @@ vhdi_test_seek_LDADD = \
 	@PTHREAD_LIBADD@
 
 vhdi_test_support_SOURCES = \
+	vhdi_test_getopt.c vhdi_test_getopt.h \
 	vhdi_test_libcerror.h \
 	vhdi_test_libclocale.h \
-	vhdi_test_libcsystem.h \
+	vhdi_test_libcnotify.h \
 	vhdi_test_libuna.h \
 	vhdi_test_libvhdi.h \
 	vhdi_test_macros.h \
 	vhdi_test_support.c
 
 vhdi_test_support_LDADD = \
-	@LIBCSYSTEM_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \

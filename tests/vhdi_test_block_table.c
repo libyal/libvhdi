@@ -1,5 +1,5 @@
 /*
- * Library block_table type testing program
+ * Library block_table type test program
  *
  * Copyright (C) 2012-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -270,6 +270,129 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libvhdi_block_table_get_number_of_references function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_block_table_get_number_of_references(
+     void )
+{
+	libcerror_error_t *error           = NULL;
+	libvhdi_block_table_t *block_table = NULL;
+	int number_of_references           = 0;
+	int number_of_references_is_set    = 0;
+	int result                         = 0;
+
+	/* Initialize test
+	 */
+	result = libvhdi_block_table_initialize(
+	          &block_table,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "block_table",
+	 block_table );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libvhdi_block_table_get_number_of_references(
+	          block_table,
+	          &number_of_references,
+	          &error );
+
+	VHDI_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	number_of_references_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libvhdi_block_table_get_number_of_references(
+	          NULL,
+	          &number_of_references,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( number_of_references_is_set != 0 )
+	{
+		result = libvhdi_block_table_get_number_of_references(
+		          block_table,
+		          NULL,
+		          &error );
+
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		VHDI_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Clean up
+	 */
+	result = libvhdi_block_table_free(
+	          &block_table,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "block_table",
+	 block_table );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( block_table != NULL )
+	{
+		libvhdi_block_table_free(
+		 &block_table,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) */
 
 /* The main program
@@ -297,7 +420,9 @@ int main(
 	 "libvhdi_block_table_free",
 	 vhdi_test_block_table_free );
 
-	/* TODO: add tests for libvhdi_block_table_get_number_of_references */
+	VHDI_TEST_RUN(
+	 "libvhdi_block_table_get_number_of_references",
+	 vhdi_test_block_table_get_number_of_references );
 
 	/* TODO: add tests for libvhdi_block_table_get_reference_by_index */
 

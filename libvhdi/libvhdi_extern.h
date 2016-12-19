@@ -38,9 +38,9 @@
 #include <libvhdi/extern.h>
 
 #else
-#define LIBVHDI_EXTERN	extern
+#define LIBVHDI_EXTERN	/* extern */
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBVHDI ) */
 
 #endif /* !defined( _LIBVHDI_INTERNAL_EXTERN_H ) */
 

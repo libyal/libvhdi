@@ -942,7 +942,6 @@ PyObject *pyvhdi_file_close(
 	return( Py_None );
 }
 
-
 /* Reads data at the current offset into a buffer
  * Returns a Python object if successful or NULL on error
  */
@@ -964,7 +963,7 @@ PyObject *pyvhdi_file_read_buffer(
 	if( pyvhdi_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
@@ -1181,7 +1180,7 @@ PyObject *pyvhdi_file_read_buffer_at_offset(
 	if( pyvhdi_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
@@ -1362,7 +1361,7 @@ PyObject *pyvhdi_file_seek_offset(
 	if( pyvhdi_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
@@ -1425,7 +1424,7 @@ PyObject *pyvhdi_file_get_offset(
 	if( pyvhdi_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
@@ -1545,7 +1544,7 @@ PyObject *pyvhdi_file_get_media_size(
 	if( pyvhdi_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
@@ -1601,7 +1600,7 @@ PyObject *pyvhdi_file_get_format_version(
 	if( pyvhdi_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
@@ -1691,7 +1690,7 @@ PyObject *pyvhdi_file_get_disk_type(
 	if( pyvhdi_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
@@ -1751,7 +1750,7 @@ PyObject *pyvhdi_file_get_identifier(
 	if( pyvhdi_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
@@ -1813,7 +1812,7 @@ PyObject *pyvhdi_file_get_parent_identifier(
 	if( pyvhdi_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 

@@ -1,5 +1,5 @@
 /*
- * Library io_handle type testing program
+ * Library io_handle type test program
  *
  * Copyright (C) 2012-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -270,6 +270,894 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libvhdi_io_handle_get_identifier function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_io_handle_get_identifier(
+     void )
+{
+	uint8_t guid_data[ 16 ];
+
+	libcerror_error_t *error       = NULL;
+	libvhdi_io_handle_t *io_handle = NULL;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = libvhdi_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        VHDI_TEST_ASSERT_IS_NOT_NULL(
+         "io_handle",
+         io_handle );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test regular cases
+	 */
+	result = libvhdi_io_handle_get_identifier(
+	          io_handle,
+	          guid_data,
+	          16,
+	          &error );
+
+	VHDI_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libvhdi_io_handle_get_identifier(
+	          NULL,
+	          guid_data,
+	          16,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        VHDI_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_io_handle_get_identifier(
+	          io_handle,
+	          NULL,
+	          16,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        VHDI_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_io_handle_get_identifier(
+	          io_handle,
+	          guid_data,
+	          0,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        VHDI_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_io_handle_get_identifier(
+	          io_handle,
+	          guid_data,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        VHDI_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libvhdi_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "io_handle",
+         io_handle );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( io_handle != NULL )
+	{
+		libvhdi_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libvhdi_io_handle_get_parent_identifier function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_io_handle_get_parent_identifier(
+     void )
+{
+	uint8_t guid_data[ 16 ];
+
+	libcerror_error_t *error       = NULL;
+	libvhdi_io_handle_t *io_handle = NULL;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = libvhdi_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        VHDI_TEST_ASSERT_IS_NOT_NULL(
+         "io_handle",
+         io_handle );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test regular cases
+	 */
+	result = libvhdi_io_handle_get_parent_identifier(
+	          io_handle,
+	          guid_data,
+	          16,
+	          &error );
+
+	VHDI_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libvhdi_io_handle_get_parent_identifier(
+	          NULL,
+	          guid_data,
+	          16,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        VHDI_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_io_handle_get_parent_identifier(
+	          io_handle,
+	          NULL,
+	          16,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        VHDI_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_io_handle_get_parent_identifier(
+	          io_handle,
+	          guid_data,
+	          0,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        VHDI_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_io_handle_get_parent_identifier(
+	          io_handle,
+	          guid_data,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        VHDI_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libvhdi_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "io_handle",
+         io_handle );
+
+        VHDI_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( io_handle != NULL )
+	{
+		libvhdi_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libvhdi_io_handle_get_utf8_parent_filename_size function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_io_handle_get_utf8_parent_filename_size(
+     void )
+{
+	libcerror_error_t *error             = NULL;
+	libvhdi_io_handle_t *io_handle       = NULL;
+	size_t utf8_parent_filename_size     = 0;
+	int result                           = 0;
+	int utf8_parent_filename_size_is_set = 0;
+
+	/* Initialize test
+	 */
+	result = libvhdi_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libvhdi_io_handle_get_utf8_parent_filename_size(
+	          io_handle,
+	          &utf8_parent_filename_size,
+	          &error );
+
+	VHDI_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf8_parent_filename_size_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libvhdi_io_handle_get_utf8_parent_filename_size(
+	          NULL,
+	          &utf8_parent_filename_size,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf8_parent_filename_size_is_set != 0 )
+	{
+		result = libvhdi_io_handle_get_utf8_parent_filename_size(
+		          io_handle,
+		          NULL,
+		          &error );
+
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		VHDI_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Clean up
+	 */
+	result = libvhdi_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( io_handle != NULL )
+	{
+		libvhdi_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libvhdi_io_handle_get_utf8_parent_filename function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_io_handle_get_utf8_parent_filename(
+     void )
+{
+	uint8_t utf8_parent_filename[ 512 ];
+
+	libcerror_error_t *error        = NULL;
+	libvhdi_io_handle_t *io_handle  = NULL;
+	int result                      = 0;
+	int utf8_parent_filename_is_set = 0;
+
+	/* Initialize test
+	 */
+	result = libvhdi_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libvhdi_io_handle_get_utf8_parent_filename(
+	          io_handle,
+	          utf8_parent_filename,
+	          512,
+	          &error );
+
+	VHDI_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf8_parent_filename_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libvhdi_io_handle_get_utf8_parent_filename(
+	          NULL,
+	          utf8_parent_filename,
+	          512,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf8_parent_filename_is_set != 0 )
+	{
+		result = libvhdi_io_handle_get_utf8_parent_filename(
+		          io_handle,
+		          NULL,
+		          512,
+		          &error );
+
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+	        VHDI_TEST_ASSERT_IS_NOT_NULL(
+	         "error",
+	         error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libvhdi_io_handle_get_utf8_parent_filename(
+		          io_handle,
+		          utf8_parent_filename,
+		          0,
+		          &error );
+
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+	        VHDI_TEST_ASSERT_IS_NOT_NULL(
+	         "error",
+	         error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libvhdi_io_handle_get_utf8_parent_filename(
+		          io_handle,
+		          utf8_parent_filename,
+		          (size_t) SSIZE_MAX + 1,
+		          &error );
+
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+	        VHDI_TEST_ASSERT_IS_NOT_NULL(
+	         "error",
+	         error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Clean up
+	 */
+	result = libvhdi_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( io_handle != NULL )
+	{
+		libvhdi_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libvhdi_io_handle_get_utf16_parent_filename_size function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_io_handle_get_utf16_parent_filename_size(
+     void )
+{
+	libcerror_error_t *error              = NULL;
+	libvhdi_io_handle_t *io_handle        = NULL;
+	size_t utf16_parent_filename_size     = 0;
+	int result                            = 0;
+	int utf16_parent_filename_size_is_set = 0;
+
+	/* Initialize test
+	 */
+	result = libvhdi_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libvhdi_io_handle_get_utf16_parent_filename_size(
+	          io_handle,
+	          &utf16_parent_filename_size,
+	          &error );
+
+	VHDI_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf16_parent_filename_size_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libvhdi_io_handle_get_utf16_parent_filename_size(
+	          NULL,
+	          &utf16_parent_filename_size,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf16_parent_filename_size_is_set != 0 )
+	{
+		result = libvhdi_io_handle_get_utf16_parent_filename_size(
+		          io_handle,
+		          NULL,
+		          &error );
+
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		VHDI_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Clean up
+	 */
+	result = libvhdi_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( io_handle != NULL )
+	{
+		libvhdi_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libvhdi_io_handle_get_utf16_parent_filename function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_io_handle_get_utf16_parent_filename(
+     void )
+{
+	uint16_t utf16_parent_filename[ 512 ];
+
+	libcerror_error_t *error         = NULL;
+	libvhdi_io_handle_t *io_handle   = NULL;
+	int result                       = 0;
+	int utf16_parent_filename_is_set = 0;
+
+	/* Initialize test
+	 */
+	result = libvhdi_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libvhdi_io_handle_get_utf16_parent_filename(
+	          io_handle,
+	          utf16_parent_filename,
+	          512,
+	          &error );
+
+	VHDI_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf16_parent_filename_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libvhdi_io_handle_get_utf16_parent_filename(
+	          NULL,
+	          utf16_parent_filename,
+	          512,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf16_parent_filename_is_set != 0 )
+	{
+		result = libvhdi_io_handle_get_utf16_parent_filename(
+		          io_handle,
+		          NULL,
+		          512,
+		          &error );
+
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+	        VHDI_TEST_ASSERT_IS_NOT_NULL(
+	         "error",
+	         error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libvhdi_io_handle_get_utf16_parent_filename(
+		          io_handle,
+		          utf16_parent_filename,
+		          0,
+		          &error );
+
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+	        VHDI_TEST_ASSERT_IS_NOT_NULL(
+	         "error",
+	         error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libvhdi_io_handle_get_utf16_parent_filename(
+		          io_handle,
+		          utf16_parent_filename,
+		          (size_t) SSIZE_MAX + 1,
+		          &error );
+
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+	        VHDI_TEST_ASSERT_IS_NOT_NULL(
+	         "error",
+	         error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Clean up
+	 */
+	result = libvhdi_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( io_handle != NULL )
+	{
+		libvhdi_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) */
 
 /* The main program
@@ -303,17 +1191,33 @@ int main(
 
 	/* TODO: add tests for libvhdi_io_handle_read_dynamic_disk_header */
 
-	/* TODO: add tests for libvhdi_io_handle_get_identifier */
+#ifdef TODO
 
-	/* TODO: add tests for libvhdi_io_handle_get_parent_identifier */
+	VHDI_TEST_RUN(
+	 "libvhdi_io_handle_get_identifier",
+	 vhdi_test_io_handle_get_identifier );
 
-	/* TODO: add tests for libvhdi_io_handle_get_utf8_parent_filename_size */
+	VHDI_TEST_RUN(
+	 "libvhdi_io_handle_get_parent_identifier",
+	 vhdi_test_io_handle_get_parent_identifier );
 
-	/* TODO: add tests for libvhdi_io_handle_get_utf8_parent_filename */
+	VHDI_TEST_RUN(
+	 "libvhdi_io_handle_get_utf8_parent_filename_size",
+	 vhdi_test_io_handle_get_utf8_parent_filename_size );
 
-	/* TODO: add tests for libvhdi_io_handle_get_utf16_parent_filename_size */
+	VHDI_TEST_RUN(
+	 "libvhdi_io_handle_get_utf8_parent_filename",
+	 vhdi_test_io_handle_get_utf8_parent_filename );
 
-	/* TODO: add tests for libvhdi_io_handle_get_utf16_parent_filename */
+	VHDI_TEST_RUN(
+	 "libvhdi_io_handle_get_utf16_parent_filename_size",
+	 vhdi_test_io_handle_get_utf16_parent_filename_size );
+
+	VHDI_TEST_RUN(
+	 "libvhdi_io_handle_get_utf16_parent_filename",
+	 vhdi_test_io_handle_get_utf16_parent_filename );
+
+#endif /* TODO */
 
 	/* TODO: add tests for libvhdi_io_handle_read_data_block */
 
