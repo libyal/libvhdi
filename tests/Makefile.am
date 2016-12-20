@@ -174,6 +174,9 @@ vhdi_test_support_SOURCES = \
 	vhdi_test_support.c
 
 vhdi_test_support_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
