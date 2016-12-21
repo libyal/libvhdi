@@ -32,7 +32,6 @@ TESTS = \
 check_SCRIPTS = \
 	pyvhdi_test_file.py \
 	pyvhdi_test_read.py \
-	pyvhdi_test_seek.py \
 	pyvhdi_test_support.py \
 	test_api_functions.sh \
 	test_api_types.sh \

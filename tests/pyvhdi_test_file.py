@@ -301,6 +301,12 @@ class FileTypeTests(unittest.TestCase):
       vhdi_file.seek_offset(-1, os.SEEK_SET)
 
     with self.assertRaises(IOError):
+      vhdi_file.seek_offset(-32 - file_size, os.SEEK_CUR)
+
+    with self.assertRaises(IOError):
+      vhdi_file.seek_offset(-32 - file_size, os.SEEK_END)
+
+    with self.assertRaises(IOError):
       vhdi_file.seek_offset(0, -1)
 
     vhdi_file.close()
