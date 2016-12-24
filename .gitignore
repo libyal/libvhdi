@@ -131,8 +131,6 @@ stamp-h[1-9]
 /tests/vhdi_test_file
 /tests/vhdi_test_io_handle
 /tests/vhdi_test_notify
-/tests/vhdi_test_read
-/tests/vhdi_test_seek
 /tests/vhdi_test_support
 
 # Local library dependencies specific files

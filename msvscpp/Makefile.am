@@ -22,8 +22,6 @@ MSVSCPP_FILES = \
 	vhdi_test_file/vhdi_test_file.vcproj \
 	vhdi_test_io_handle/vhdi_test_io_handle.vcproj \
 	vhdi_test_notify/vhdi_test_notify.vcproj \
-	vhdi_test_read/vhdi_test_read.vcproj \
-	vhdi_test_seek/vhdi_test_seek.vcproj \
 	vhdi_test_support/vhdi_test_support.vcproj \
 	vhdiinfo/vhdiinfo.vcproj \
 	vhdimount/vhdimount.vcproj \

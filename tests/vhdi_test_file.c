@@ -33,6 +33,7 @@
 #include "vhdi_test_getopt.h"
 #include "vhdi_test_libcerror.h"
 #include "vhdi_test_libclocale.h"
+#include "vhdi_test_libcpath.h"
 #include "vhdi_test_libuna.h"
 #include "vhdi_test_libvhdi.h"
 #include "vhdi_test_macros.h"
@@ -524,6 +525,292 @@ on_error:
 		libvhdi_file_free(
 		 file,
 		 NULL );
+	}
+	return( -1 );
+}
+
+/* Opens the parent input file
+ * Returns 1 if successful, 0 if no parent or -1 on error
+ */
+int vhdi_test_file_open_parent(
+     libvhdi_file_t **parent_file,
+     const system_character_t *source,
+     libvhdi_file_t *file,
+     libcerror_error_t **error )
+{
+	uint8_t guid[ 16 ];
+
+	system_character_t *basename_end        = NULL;
+	system_character_t *parent_basename_end = NULL;
+	system_character_t *parent_filename     = NULL;
+	system_character_t *parent_path         = NULL;
+	static char *function                   = "vhdi_test_file_open_parent";
+	size_t basename_length                  = 0;
+	size_t source_length                    = 0;
+	size_t parent_basename_length           = 0;
+	size_t parent_filename_size             = 0;
+	size_t parent_path_size                 = 0;
+	int entry_index                         = 0;
+	int result                              = 0;
+
+	if( parent_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid parent file.",
+		 function );
+
+		return( -1 );
+	}
+	result = libvhdi_file_get_parent_identifier(
+	          file,
+	          guid,
+	          16,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent content identifier.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 1 )
+	{
+		return( 0 );
+	}
+	source_length = system_string_length(
+	                 source );
+
+	basename_end = system_string_search_character_reverse(
+	                source,
+	                (system_character_t) LIBCPATH_SEPARATOR,
+	                source_length + 1 );
+
+	if( basename_end != NULL )
+	{
+		basename_length = (size_t) ( basename_end - source );
+	}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libvhdi_file_get_utf16_parent_filename_size(
+		  file,
+		  &parent_filename_size,
+		  error );
+#else
+	result = libvhdi_file_get_utf8_parent_filename_size(
+		  file,
+		  &parent_filename_size,
+		  error );
+#endif
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent filename size.",
+		 function );
+
+		goto on_error;
+	}
+	if( parent_filename_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing parent filename.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( parent_filename_size > (size_t) SSIZE_MAX )
+	 || ( ( sizeof( system_character_t ) * parent_filename_size ) > (size_t) SSIZE_MAX ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid parent filename size value exceeds maximum.",
+		 function );
+
+		goto on_error;
+	}
+	parent_filename = system_string_allocate(
+			   parent_filename_size );
+
+	if( parent_filename == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create parent filename string.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libvhdi_file_get_utf16_parent_filename(
+		  file,
+		  (uint16_t *) parent_filename,
+		  parent_filename_size,
+		  error );
+#else
+	result = libvhdi_file_get_utf8_parent_filename(
+		  file,
+		  (uint8_t *) parent_filename,
+		  parent_filename_size,
+		  error );
+#endif
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent filename.",
+		 function );
+
+		goto on_error;
+	}
+	parent_basename_end = system_string_search_character_reverse(
+	                       parent_filename,
+	                       (system_character_t) '\\',
+	                       parent_filename_size );
+
+	if( parent_basename_end != NULL )
+	{
+		parent_basename_length = (size_t) ( parent_basename_end - parent_filename ) + 1;
+	}
+	if( basename_length == 0 )
+	{
+		parent_path      = &( parent_filename[ parent_basename_length ] );
+		parent_path_size = parent_filename_size - ( parent_basename_length + 1 );
+	}
+	else
+	{
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libcpath_path_join_wide(
+		     &parent_path,
+		     &parent_path_size,
+		     source,
+		     basename_length,
+		     &( parent_filename[ parent_basename_length ] ),
+		     parent_filename_size - ( parent_basename_length + 1 ),
+		     error ) != 1 )
+#else
+		if( libcpath_path_join(
+		     &parent_path,
+		     &parent_path_size,
+		     source,
+		     basename_length,
+		     &( parent_filename[ parent_basename_length ] ),
+		     parent_filename_size - ( parent_basename_length + 1 ),
+		     error ) != 1 )
+#endif
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create parent path.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( libvhdi_file_initialize(
+	     parent_file,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize parent input file.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libvhdi_file_open_wide(
+	     *parent_file,
+	     parent_path,
+	     LIBVHDI_OPEN_READ,
+	     error ) != 1 )
+#else
+	if( libvhdi_file_open(
+	     *parent_file,
+	     parent_path,
+	     LIBVHDI_OPEN_READ,
+	     error ) != 1 )
+#endif
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open parent input file: %" PRIs_SYSTEM ".",
+		 function,
+		 parent_path );
+
+		goto on_error;
+	}
+	if( libvhdi_file_set_parent_file(
+	     file,
+	     *parent_file,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set parent input file.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( basename_length != 0 )
+	 && ( parent_path != NULL ) )
+	{
+		memory_free(
+		 parent_path );
+
+		parent_path = NULL;
+	}
+	if( parent_filename != NULL )
+	{
+		memory_free(
+		 parent_filename );
+
+		parent_filename = NULL;
+	}
+	return( 1 );
+
+on_error:
+	if( *parent_file != NULL )
+	{
+		libvhdi_file_free(
+		 parent_file,
+		 NULL );
+	}
+	if( ( basename_length != 0 )
+	 && ( parent_path != NULL ) )
+	{
+		memory_free(
+		 parent_path );
+	}
+	if( parent_filename != NULL )
+	{
+		memory_free(
+		 parent_filename );
 	}
 	return( -1 );
 }
@@ -1270,6 +1557,334 @@ int vhdi_test_file_signal_abort(
         VHDI_TEST_ASSERT_IS_NOT_NULL(
          "error",
          error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libvhdi_file_read_buffer function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_file_read_buffer(
+     libvhdi_file_t *file )
+{
+	uint8_t buffer[ 16 ];
+
+	libcerror_error_t *error = NULL;
+	size64_t size            = 0;
+	ssize_t read_count       = 0;
+	off64_t offset           = 0;
+
+	/* Determine size
+	 */
+	offset = libvhdi_file_seek_offset(
+	          file,
+	          0,
+	          SEEK_END,
+	          &error );
+
+	VHDI_TEST_ASSERT_NOT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	size = (size64_t) offset;
+
+	/* Reset offset to 0
+	 */
+	offset = libvhdi_file_seek_offset(
+	          file,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 0 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	if( size > 16 )
+	{
+		read_count = libvhdi_file_read_buffer(
+		              file,
+		              buffer,
+		              16,
+		              &error );
+
+		VHDI_TEST_ASSERT_EQUAL_SSIZE(
+		 "read_count",
+		 read_count,
+		 (ssize_t) 16 );
+
+		VHDI_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
+/* TODO read on size boundary */
+/* TODO read beyond size boundary */
+
+	/* Reset offset to 0
+	 */
+	offset = libvhdi_file_seek_offset(
+	          file,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 0 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	read_count = libvhdi_file_read_buffer(
+	              NULL,
+	              buffer,
+	              16,
+	              &error );
+
+	VHDI_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libvhdi_file_read_buffer(
+	              file,
+	              NULL,
+	              16,
+	              &error );
+
+	VHDI_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libvhdi_file_read_buffer(
+	              file,
+	              buffer,
+	              (size_t) SSIZE_MAX + 1,
+	              &error );
+
+	VHDI_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libvhdi_file_seek_offset function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_file_seek_offset(
+     libvhdi_file_t *file )
+{
+	libcerror_error_t *error = NULL;
+	size64_t size            = 0;
+	off64_t offset           = 0;
+
+	/* Test regular cases
+	 */
+	offset = libvhdi_file_seek_offset(
+	          file,
+	          0,
+	          SEEK_END,
+	          &error );
+
+	VHDI_TEST_ASSERT_NOT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	size = (size64_t) offset;
+
+	offset = libvhdi_file_seek_offset(
+	          file,
+	          1024,
+	          SEEK_SET,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 1024 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	offset = libvhdi_file_seek_offset(
+	          file,
+	          -512,
+	          SEEK_CUR,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 512 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	offset = libvhdi_file_seek_offset(
+	          file,
+	          (off64_t) ( size + 512 ),
+	          SEEK_SET,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) ( size + 512 ) );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Reset offset to 0
+	 */
+	offset = libvhdi_file_seek_offset(
+	          file,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 0 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	offset = libvhdi_file_seek_offset(
+	          NULL,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	offset = libvhdi_file_seek_offset(
+	          file,
+	          -1,
+	          SEEK_SET,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	offset = libvhdi_file_seek_offset(
+	          file,
+	          -1,
+	          SEEK_CUR,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	offset = libvhdi_file_seek_offset(
+	          file,
+	          (off64_t) ( -1 * ( size + 1 ) ),
+	          SEEK_END,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -2153,11 +2768,12 @@ int main(
      char * const argv[] )
 #endif
 {
-	libcerror_error_t *error   = NULL;
-	libvhdi_file_t *file       = NULL;
-	system_character_t *source = NULL;
-	system_integer_t option    = 0;
-	int result                 = 0;
+	libcerror_error_t *error    = NULL;
+	libvhdi_file_t *file        = NULL;
+	libvhdi_file_t *parent_file = NULL;
+	system_character_t *source  = NULL;
+	system_integer_t option     = 0;
+	int result                  = 0;
 
 	while( ( option = vhdi_test_getopt(
 	                   argc,
@@ -2248,6 +2864,21 @@ int main(
 	         "error",
 	         error );
 
+		result = vhdi_test_file_open_parent(
+		          &parent_file,
+		          source,
+		          file,
+		          &error );
+
+		VHDI_TEST_ASSERT_NOT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+	        VHDI_TEST_ASSERT_IS_NULL(
+	         "error",
+	         error );
+
 		VHDI_TEST_RUN_WITH_ARGS(
 		 "libvhdi_file_signal_abort",
 		 vhdi_test_file_signal_abort,
@@ -2259,7 +2890,10 @@ int main(
 
 #endif /* defined( __GNUC__ ) */
 
-		/* TODO: add tests for libvhdi_file_read_buffer */
+		VHDI_TEST_RUN_WITH_ARGS(
+		 "libvhdi_file_read_buffer",
+		 vhdi_test_file_read_buffer,
+		 file );
 
 		/* TODO: add tests for libvhdi_file_read_buffer_at_offset */
 
@@ -2267,7 +2901,10 @@ int main(
 
 		/* TODO: add tests for libvhdi_file_write_buffer_at_offset */
 
-		/* TODO: add tests for libvhdi_file_seek_offset */
+		VHDI_TEST_RUN_WITH_ARGS(
+		 "libvhdi_file_seek_offset",
+		 vhdi_test_file_seek_offset,
+		 file );
 
 		VHDI_TEST_RUN_WITH_ARGS(
 		 "libvhdi_file_get_offset",
@@ -2336,6 +2973,22 @@ int main(
 	        VHDI_TEST_ASSERT_IS_NULL(
 	         "error",
 	         error );
+
+		if( parent_file != NULL )
+		{
+			result = vhdi_test_file_close_source(
+			          &parent_file,
+			          &error );
+
+			VHDI_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 0 );
+
+		        VHDI_TEST_ASSERT_IS_NULL(
+		         "error",
+		         error );
+		}
 	}
 #endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 
@@ -2351,6 +3004,12 @@ on_error:
 	{
 		vhdi_test_file_close_source(
 		 &file,
+		 NULL );
+	}
+	if( parent_file != NULL )
+	{
+		vhdi_test_file_close_source(
+		 &parent_file,
 		 NULL );
 	}
 	return( EXIT_FAILURE );
