@@ -13,7 +13,6 @@ AM_CPPFLAGS = \
 	@LIBFCACHE_CPPFLAGS@ \
 	@LIBFDATA_CPPFLAGS@ \
 	@LIBFGUID_CPPFLAGS@ \
-	@LIBCSYSTEM_CPPFLAGS@ \
 	@LIBFUSE_CPPFLAGS@ \
 	@LIBVHDI_DLL_IMPORT@
 
@@ -27,49 +26,53 @@ vhdiinfo_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	info_handle.c info_handle.h \
 	vhdiinfo.c \
-	vhdioutput.c vhdioutput.h \
+	vhditools_getopt.c vhditools_getopt.h \
+	vhditools_i18n.h \
 	vhditools_libbfio.h \
 	vhditools_libcdata.h \
 	vhditools_libcerror.h \
 	vhditools_libclocale.h \
 	vhditools_libcnotify.h \
-	vhditools_libcsystem.h \
 	vhditools_libfguid.h \
 	vhditools_libvhdi.h \
-	vhditools_libuna.h
+	vhditools_libuna.h \
+	vhditools_output.c vhditools_output.h \
+	vhditools_signal.c vhditools_signal.h \
+	vhditools_unused.h
 
 vhdiinfo_LDADD = \
-	@LIBCSYSTEM_LIBADD@ \
 	@LIBFGUID_LIBADD@ \
-	../libvhdi/libvhdi.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBINTL@
 
 vhdimount_SOURCES = \
 	mount_handle.c mount_handle.h \
 	vhdimount.c \
-	vhdioutput.c vhdioutput.h \
+	vhditools_getopt.c vhditools_getopt.h \
+	vhditools_i18n.h \
 	vhditools_libbfio.h \
 	vhditools_libcdata.h \
 	vhditools_libcerror.h \
 	vhditools_libclocale.h \
 	vhditools_libcnotify.h \
 	vhditools_libcpath.h \
-	vhditools_libcsystem.h \
 	vhditools_libvhdi.h \
-	vhditools_libuna.h
+	vhditools_libuna.h \
+	vhditools_output.c vhditools_output.h \
+	vhditools_signal.c vhditools_signal.h \
+	vhditools_unused.h
 
 vhdimount_LDADD = \
 	@LIBFUSE_LIBADD@ \
-	@LIBCSYSTEM_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
-	../libvhdi/libvhdi.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
+	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBINTL@
 

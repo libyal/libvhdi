@@ -34,12 +34,14 @@
 #endif
 
 #include "info_handle.h"
-#include "vhdioutput.h"
+#include "vhditools_getopt.h"
 #include "vhditools_libcerror.h"
 #include "vhditools_libclocale.h"
 #include "vhditools_libcnotify.h"
-#include "vhditools_libcsystem.h"
 #include "vhditools_libvhdi.h"
+#include "vhditools_output.h"
+#include "vhditools_signal.h"
+#include "vhditools_unused.h"
 
 info_handle_t *vhdiinfo_info_handle = NULL;
 int vhdiinfo_abort                  = 0;
@@ -68,12 +70,12 @@ void usage_fprint(
 /* Signal handler for vhdiinfo
  */
 void vhdiinfo_signal_handler(
-      libcsystem_signal_t signal LIBCSYSTEM_ATTRIBUTE_UNUSED )
+      vhditools_signal_t signal VHDITOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	static char *function   = "vhdiinfo_signal_handler";
 
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( signal )
+	VHDITOOLS_UNREFERENCED_PARAMETER( signal )
 
 	vhdiinfo_abort = 1;
 
@@ -95,8 +97,13 @@ void vhdiinfo_signal_handler(
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( libcsystem_file_io_close(
+#if defined( WINAPI ) && !defined( __CYGWIN__ )
+	if( _close(
 	     0 ) != 0 )
+#else
+	if( close(
+	     0 ) != 0 )
+#endif
 	{
 		libcnotify_printf(
 		 "%s: unable to close stdin.\n",
@@ -134,13 +141,13 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-        if( libcsystem_initialize(
+        if( vhditools_output_initialize(
              _IONBF,
              &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to initialize system values.\n" );
+		 "Unable to initialize output settings.\n" );
 
 		goto on_error;
 	}
@@ -148,7 +155,7 @@ int main( int argc, char * const argv[] )
 	 stdout,
 	 program );
 
-	while( ( option = libcsystem_getopt(
+	while( ( option = vhditools_getopt(
 	                   argc,
 	                   argv,
 	                   _SYSTEM_STRING( "hvV" ) ) ) != (system_integer_t) -1 )

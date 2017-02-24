@@ -17,7 +17,6 @@ SUBDIRS = \
 	libfdata \
 	libfguid \
 	libvhdi \
-	libcsystem \
 	vhditools \
 	pyvhdi \
 	pyvhdi-python2 \
@@ -122,7 +121,6 @@ splint:
 	(cd $(srcdir)/libfdata && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfguid && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libvhdi && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libcsystem && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/vhditools && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/pyvhdi && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/po && $(MAKE) $(AM_MAKEFLAGS))

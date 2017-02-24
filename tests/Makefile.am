@@ -19,12 +19,11 @@ AM_CPPFLAGS = \
 
 if HAVE_PYTHON_TESTS
 TESTS_PYVHDI = \
-	test_python_functions.sh
+	test_python_module.sh
 endif
 
 TESTS = \
-	test_api_functions.sh \
-	test_api_types.sh \
+	test_library.sh \
 	test_vhdiinfo.sh \
 	$(TESTS_PYVHDI)
 
@@ -32,9 +31,8 @@ check_SCRIPTS = \
 	pyvhdi_test_file.py \
 	pyvhdi_test_read.py \
 	pyvhdi_test_support.py \
-	test_api_functions.sh \
-	test_api_types.sh \
-	test_python_functions.sh \
+	test_library.sh \
+	test_python_module.sh \
 	test_runner.sh \
 	test_vhdiinfo.sh
 

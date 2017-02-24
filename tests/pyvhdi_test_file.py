@@ -61,8 +61,7 @@ class FileTypeTests(unittest.TestCase):
 
     vhdi_file.open_file_object(file_object)
 
-    # TODO: change MemoryError into IOError
-    with self.assertRaises(MemoryError):
+    with self.assertRaises(IOError):
       vhdi_file.open_file_object(file_object)
 
     vhdi_file.close()

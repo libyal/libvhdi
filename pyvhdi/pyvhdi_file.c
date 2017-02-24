@@ -815,6 +815,16 @@ PyObject *pyvhdi_file_open_file_object(
 
 		return( NULL );
 	}
+	if( pyvhdi_file->file_io_handle != NULL )
+	{
+		pyvhdi_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: invalid file - file IO handle already set.",
+		 function );
+
+		goto on_error;
+	}
 	if( pyvhdi_file_object_initialize(
 	     &( pyvhdi_file->file_io_handle ),
 	     file_object,

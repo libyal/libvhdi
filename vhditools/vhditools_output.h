@@ -1,5 +1,5 @@
 /*
- * Memory allocation functions for testing
+ * Common output functions for the vhditools
  *
  * Copyright (C) 2012-2017, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,34 +19,37 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _VHDI_TEST_MEMORY_H )
-#define _VHDI_TEST_MEMORY_H
+#if !defined( _VHDITOOLS_OUTPUT_H )
+#define _VHDITOOLS_OUTPUT_H
 
 #include <common.h>
+#include <file_stream.h>
+#include <types.h>
+
+#include "vhditools_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __arm__ ) && !defined( __mips__ ) && !defined( __hppa__ ) && !defined( __sparc__ )
-#define HAVE_VHDI_TEST_MEMORY		1
-#endif
+int vhditools_output_initialize(
+     int stdio_mode,
+     libcerror_error_t **error );
 
-#if defined( HAVE_VHDI_TEST_MEMORY )
+void vhdioutput_copyright_fprint(
+      FILE *stream );
 
-extern int vhdi_test_malloc_attempts_before_fail;
+void vhdioutput_version_fprint(
+      FILE *stream,
+      const char *program );
 
-extern int vhdi_test_memcpy_attempts_before_fail;
-
-extern int vhdi_test_memset_attempts_before_fail;
-
-extern int vhdi_test_realloc_attempts_before_fail;
-
-#endif /* defined( HAVE_VHDI_TEST_MEMORY ) */
+void vhdioutput_version_detailed_fprint(
+      FILE *stream,
+      const char *program );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _VHDI_TEST_MEMORY_H ) */
+#endif /* !defined( _VHDITOOLS_OUTPUT_H ) */
 
