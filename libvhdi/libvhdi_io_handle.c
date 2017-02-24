@@ -447,7 +447,7 @@ int libvhdi_io_handle_read_file_footer(
 		 function,
 		 value_32bit );
 
-		if( libfwsi_debug_print_guid_value(
+		if( libvhdi_debug_print_guid_value(
 		     function,
 		     "identifier\t\t\t\t",
 		     ( (vhdi_file_footer_t *) file_footer_data )->identifier,
@@ -787,7 +787,7 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 		 function,
 		 value_32bit );
 
-		if( libfwsi_debug_print_guid_value(
+		if( libvhdi_debug_print_guid_value(
 		     function,
 		     "parent identifier\t\t",
 		     ( (vhdi_dynamic_disk_header_t *) dynamic_disk_header_data )->parent_identifier,
@@ -823,7 +823,7 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 
 		if( io_handle->parent_filename_size > 0 )
 		{
-			if( libfwsi_debug_print_utf16_string_value(
+			if( libvhdi_debug_print_utf16_string_value(
 			     function,
 			     "parent filename\t\t",
 			     io_handle->parent_filename,
