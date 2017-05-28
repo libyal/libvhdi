@@ -1,10 +1,10 @@
 Source: libvhdi
-Section: libs
 Priority: extra
 Maintainer: Joachim Metz <joachim.metz@gmail.com>
-Build-Depends: debhelper (>= 7), autotools-dev, libfuse-dev, python-all-dev, python3-all-dev
+Build-Depends: debhelper (>= 9), dh-autoreconf, pkg-config, libfuse-dev, python-dev, python3-dev
 Standards-Version: 3.9.5
-Homepage: https://github.com/libyal/libvhdi/
+Section: libs
+Homepage: https://github.com/libyal/libvhdi
 
 Package: libvhdi
 Architecture: any
@@ -33,6 +33,13 @@ Architecture: any
 Depends: libvhdi (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Several tools for reading Virtual Hard Disk (VHD) image files
  Several tools for reading Virtual Hard Disk (VHD) image files.
+
+Package: libvhdi-tools-dbg
+Section: debug
+Architecture: any
+Depends: libvhdi-tools (= ${binary:Version}), ${misc:Depends}
+Description: Debugging symbols for libvhdi-tools
+ Debugging symbols for libvhdi-tools.
 
 Package: libvhdi-python
 Section: python
