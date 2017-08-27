@@ -35,7 +35,7 @@
 
 #include "../libvhdi/libvhdi_block_table.h"
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT )
 
 /* Tests the libvhdi_block_table_initialize function
  * Returns 1 if successful or 0 if not
@@ -393,7 +393,7 @@ on_error:
 	return( 0 );
 }
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT ) */
 
 /* The main program
  */
@@ -410,7 +410,7 @@ int main(
 	VHDI_TEST_UNREFERENCED_PARAMETER( argc )
 	VHDI_TEST_UNREFERENCED_PARAMETER( argv )
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT )
 
 	VHDI_TEST_RUN(
 	 "libvhdi_block_table_initialize",
@@ -428,7 +428,7 @@ int main(
 
 	/* TODO: add tests for libvhdi_block_table_read */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 

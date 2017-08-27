@@ -2884,11 +2884,11 @@ int main(
 		 vhdi_test_file_signal_abort,
 		 file );
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT )
 
 		/* TODO: add tests for libvhdi_file_open_read */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT ) */
 
 		VHDI_TEST_RUN_WITH_ARGS(
 		 "libvhdi_file_read_buffer",
