@@ -64,13 +64,13 @@ int vhdi_test_block_table_initialize(
 	 result,
 	 1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "block_table",
-         block_table );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "block_table",
+	 block_table );
 
-        VHDI_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libvhdi_block_table_free(
 	          &block_table,
@@ -81,13 +81,13 @@ int vhdi_test_block_table_initialize(
 	 result,
 	 1 );
 
-        VHDI_TEST_ASSERT_IS_NULL(
-         "block_table",
-         block_table );
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "block_table",
+	 block_table );
 
-        VHDI_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -100,9 +100,9 @@ int vhdi_test_block_table_initialize(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -118,9 +118,9 @@ int vhdi_test_block_table_initialize(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -252,9 +252,9 @@ int vhdi_test_block_table_free(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );

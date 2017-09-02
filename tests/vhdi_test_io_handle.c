@@ -64,13 +64,13 @@ int vhdi_test_io_handle_initialize(
 	 result,
 	 1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "io_handle",
-         io_handle );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
 
-        VHDI_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libvhdi_io_handle_free(
 	          &io_handle,
@@ -81,13 +81,13 @@ int vhdi_test_io_handle_initialize(
 	 result,
 	 1 );
 
-        VHDI_TEST_ASSERT_IS_NULL(
-         "io_handle",
-         io_handle );
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
 
-        VHDI_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -100,9 +100,9 @@ int vhdi_test_io_handle_initialize(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -118,9 +118,9 @@ int vhdi_test_io_handle_initialize(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -252,9 +252,9 @@ int vhdi_test_io_handle_free(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -293,13 +293,13 @@ int vhdi_test_io_handle_get_identifier(
 	 result,
 	 1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "io_handle",
-         io_handle );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
 
-        VHDI_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test regular cases
 	 */
@@ -314,9 +314,9 @@ int vhdi_test_io_handle_get_identifier(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -331,9 +331,9 @@ int vhdi_test_io_handle_get_identifier(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -349,9 +349,9 @@ int vhdi_test_io_handle_get_identifier(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -367,9 +367,9 @@ int vhdi_test_io_handle_get_identifier(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -385,9 +385,9 @@ int vhdi_test_io_handle_get_identifier(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -403,13 +403,13 @@ int vhdi_test_io_handle_get_identifier(
 	 result,
 	 1 );
 
-        VHDI_TEST_ASSERT_IS_NULL(
-         "io_handle",
-         io_handle );
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
 
-        VHDI_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 
@@ -451,13 +451,13 @@ int vhdi_test_io_handle_get_parent_identifier(
 	 result,
 	 1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "io_handle",
-         io_handle );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
 
-        VHDI_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test regular cases
 	 */
@@ -472,9 +472,9 @@ int vhdi_test_io_handle_get_parent_identifier(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -489,9 +489,9 @@ int vhdi_test_io_handle_get_parent_identifier(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -507,9 +507,9 @@ int vhdi_test_io_handle_get_parent_identifier(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -525,9 +525,9 @@ int vhdi_test_io_handle_get_parent_identifier(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -543,9 +543,9 @@ int vhdi_test_io_handle_get_parent_identifier(
 	 result,
 	 -1 );
 
-        VHDI_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -561,13 +561,13 @@ int vhdi_test_io_handle_get_parent_identifier(
 	 result,
 	 1 );
 
-        VHDI_TEST_ASSERT_IS_NULL(
-         "io_handle",
-         io_handle );
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
 
-        VHDI_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 
