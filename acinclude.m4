@@ -1,3 +1,7 @@
+dnl Checks for required headers and functions
+dnl
+dnl Version: 20170920
+
 dnl Function to detect if libvhdi dependencies are available
 AC_DEFUN([AX_LIBVHDI_CHECK_LOCAL],
   [dnl Check for internationalization functions in libvhdi/libvhdi_i18n.c
@@ -37,6 +41,17 @@ AC_DEFUN([AX_VHDITOOLS_CHECK_LOCAL],
    [AC_MSG_FAILURE(
      [Missing function: close],
      [1])
+  ])
+
+  dnl Headers included in vhditools/vhdimount.c
+  AC_CHECK_HEADERS([errno.h])
+
+  AC_HEADER_TIME
+
+  dnl Functions included in vhditools/vhdimount.c
+  AS_IF(
+    [test "x$ac_cv_enable_winapi" = xno],
+    [AC_CHECK_FUNCS([getegid geteuid time])
   ])
 
   dnl Check if tools should be build as static executables
