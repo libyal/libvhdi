@@ -2122,7 +2122,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	vhdioutput_version_fprint(
+	vhditools_output_version_fprint(
 	 stdout,
 	 program );
 
@@ -2157,7 +2157,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'V':
-				vhdioutput_copyright_fprint(
+				vhditools_output_copyright_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
