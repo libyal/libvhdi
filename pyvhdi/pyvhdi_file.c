@@ -1,7 +1,7 @@
 /*
  * Python object wrapper of libvhdi_file_t
  *
- * Copyright (C) 2012-2017, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2018, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1054,7 +1054,7 @@ PyObject *pyvhdi_file_read_buffer(
 
 		result = libvhdi_file_get_media_size(
 		          pyvhdi_file->file,
-		          &read_size,
+		          (size64_t *) &read_size,
 		          &error );
 
 		Py_END_ALLOW_THREADS
