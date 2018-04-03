@@ -30,419 +30,23 @@
 #include <stdlib.h>
 #endif
 
+#include "vhdi_test_functions.h"
 #include "vhdi_test_getopt.h"
 #include "vhdi_test_libbfio.h"
 #include "vhdi_test_libcerror.h"
-#include "vhdi_test_libclocale.h"
-#include "vhdi_test_libuna.h"
 #include "vhdi_test_libvhdi.h"
 #include "vhdi_test_macros.h"
+#include "vhdi_test_memory.h"
 #include "vhdi_test_unused.h"
+
+#if !defined( LIBVHDI_HAVE_BFIO )
 
 LIBVHDI_EXTERN \
 int libvhdi_check_file_signature_file_io_handle(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );
 
-/* Retrieves source as a narrow string
- * Returns 1 if successful or -1 on error
- */
-int vhdi_test_support_get_narrow_source(
-     const system_character_t *source,
-     char *narrow_string,
-     size_t narrow_string_size,
-     libcerror_error_t **error )
-{
-	static char *function     = "vhdi_test_support_get_narrow_source";
-	size_t narrow_source_size = 0;
-	size_t source_length      = 0;
-
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	int result                = 0;
-#endif
-
-	if( source == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid source.",
-		 function );
-
-		return( -1 );
-	}
-	if( narrow_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid narrow string.",
-		 function );
-
-		return( -1 );
-	}
-	if( narrow_string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid narrow string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	source_length = system_string_length(
-	                 source );
-
-	if( source_length > (size_t) ( SSIZE_MAX - 1 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid source length value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf8_string_size_from_utf32(
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          &narrow_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf8_string_size_from_utf16(
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          &narrow_source_size,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_byte_stream_size_from_utf32(
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &narrow_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_byte_stream_size_from_utf16(
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &narrow_source_size,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine narrow string size.",
-		 function );
-
-		return( -1 );
-	}
-#else
-	narrow_source_size = source_length + 1;
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	if( narrow_string_size < narrow_source_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: narrow string too small.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf8_string_copy_from_utf32(
-		          (libuna_utf8_character_t *) narrow_string,
-		          narrow_string_size,
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf8_string_copy_from_utf16(
-		          (libuna_utf8_character_t *) narrow_string,
-		          narrow_string_size,
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_byte_stream_copy_from_utf32(
-		          (uint8_t *) narrow_string,
-		          narrow_string_size,
-		          libclocale_codepage,
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_byte_stream_copy_from_utf16(
-		          (uint8_t *) narrow_string,
-		          narrow_string_size,
-		          libclocale_codepage,
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set narrow string.",
-		 function );
-
-		return( -1 );
-	}
-#else
-	if( system_string_copy(
-	     narrow_string,
-	     source,
-	     source_length ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set narrow string.",
-		 function );
-
-		return( -1 );
-	}
-	narrow_string[ source_length ] = 0;
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	return( 1 );
-}
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-/* Retrieves source as a wide string
- * Returns 1 if successful or -1 on error
- */
-int vhdi_test_support_get_wide_source(
-     const system_character_t *source,
-     wchar_t *wide_string,
-     size_t wide_string_size,
-     libcerror_error_t **error )
-{
-	static char *function   = "vhdi_test_support_get_wide_source";
-	size_t wide_source_size = 0;
-	size_t source_length    = 0;
-
-#if !defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	int result              = 0;
-#endif
-
-	if( source == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid source.",
-		 function );
-
-		return( -1 );
-	}
-	if( wide_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid wide string.",
-		 function );
-
-		return( -1 );
-	}
-	if( wide_string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid wide string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	source_length = system_string_length(
-	                 source );
-
-	if( source_length > (size_t) ( SSIZE_MAX - 1 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid source length value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	wide_source_size = source_length + 1;
-#else
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_size_from_utf8(
-		          (libuna_utf8_character_t *) source,
-		          source_length + 1,
-		          &wide_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_size_from_utf8(
-		          (libuna_utf8_character_t *) source,
-		          source_length + 1,
-		          &wide_source_size,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_size_from_byte_stream(
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &wide_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_size_from_byte_stream(
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &wide_source_size,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine wide string size.",
-		 function );
-
-		return( -1 );
-	}
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	if( wide_string_size < wide_source_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: wide string too small.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( system_string_copy(
-	     wide_string,
-	     source,
-	     source_length ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set wide string.",
-		 function );
-
-		return( -1 );
-	}
-	wide_string[ source_length ] = 0;
-#else
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_copy_from_utf8(
-		          (libuna_utf32_character_t *) wide_string,
-		          wide_string_size,
-		          (uint8_t *) source,
-		          source_length + 1,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_copy_from_utf8(
-		          (libuna_utf16_character_t *) wide_string,
-		          wide_string_size,
-		          (uint8_t *) source,
-		          source_length + 1,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_copy_from_byte_stream(
-		          (libuna_utf32_character_t *) wide_string,
-		          wide_string_size,
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_copy_from_byte_stream(
-		          (libuna_utf16_character_t *) wide_string,
-		          wide_string_size,
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set wide string.",
-		 function );
-
-		return( -1 );
-	}
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	return( 1 );
-}
-
-#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+#endif /* !defined( LIBVHDI_HAVE_BFIO ) */
 
 /* Tests the libvhdi_get_version function
  * Returns 1 if successful or 0 if not
@@ -606,38 +210,40 @@ int vhdi_test_check_file_signature(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
-	/* Initialize test
-	 */
-	result = vhdi_test_support_get_narrow_source(
-	          source,
-	          narrow_source,
-	          256,
-	          &error );
+	if( source != NULL )
+	{
+		/* Initialize test
+		 */
+		result = vhdi_test_get_narrow_source(
+		          source,
+		          narrow_source,
+		          256,
+		          &error );
 
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
 
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+		VHDI_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
 
-	/* Test check file signature
-	 */
-	result = libvhdi_check_file_signature(
-	          narrow_source,
-	          &error );
+		/* Test check file signature
+		 */
+		result = libvhdi_check_file_signature(
+		          narrow_source,
+		          &error );
 
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
 
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
+		VHDI_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
 	/* Test error cases
 	 */
 	result = libvhdi_check_file_signature(
@@ -656,6 +262,54 @@ int vhdi_test_check_file_signature(
 	libcerror_error_free(
 	 &error );
 
+	result = libvhdi_check_file_signature(
+	          "",
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( source != NULL )
+	{
+#if defined( HAVE_VHDI_TEST_MEMORY )
+
+		/* Test libvhdi_check_file_signature with malloc failing in libbfio_file_initialize
+		 */
+		vhdi_test_malloc_attempts_before_fail = 0;
+
+		result = libvhdi_check_file_signature(
+		          narrow_source,
+		          &error );
+
+		if( vhdi_test_malloc_attempts_before_fail != -1 )
+		{
+			vhdi_test_malloc_attempts_before_fail = -1;
+		}
+		else
+		{
+			VHDI_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			VHDI_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+#endif /* defined( HAVE_VHDI_TEST_MEMORY ) */
+	}
 	return( 1 );
 
 on_error:
@@ -680,38 +334,40 @@ int vhdi_test_check_file_signature_wide(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
-	/* Initialize test
-	 */
-	result = vhdi_test_support_get_wide_source(
-	          source,
-	          wide_source,
-	          256,
-	          &error );
+	if( source != NULL )
+	{
+		/* Initialize test
+		 */
+		result = vhdi_test_get_wide_source(
+		          source,
+		          wide_source,
+		          256,
+		          &error );
 
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
 
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+		VHDI_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
 
-	/* Test check file signature
-	 */
-	result = libvhdi_check_file_signature_wide(
-	          wide_source,
-	          &error );
+		/* Test check file signature
+		 */
+		result = libvhdi_check_file_signature_wide(
+		          wide_source,
+		          &error );
 
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
 
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
+		VHDI_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
 	/* Test error cases
 	 */
 	result = libvhdi_check_file_signature_wide(
@@ -730,6 +386,54 @@ int vhdi_test_check_file_signature_wide(
 	libcerror_error_free(
 	 &error );
 
+	result = libvhdi_check_file_signature_wide(
+	          L"",
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( source != NULL )
+	{
+#if defined( HAVE_VHDI_TEST_MEMORY )
+
+		/* Test libvhdi_check_file_signature_wide with malloc failing in libbfio_file_initialize
+		 */
+		vhdi_test_malloc_attempts_before_fail = 0;
+
+		result = libvhdi_check_file_signature_wide(
+		          wide_source,
+		          &error );
+
+		if( vhdi_test_malloc_attempts_before_fail != -1 )
+		{
+			vhdi_test_malloc_attempts_before_fail = -1;
+		}
+		else
+		{
+			VHDI_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			VHDI_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+#endif /* defined( HAVE_VHDI_TEST_MEMORY ) */
+	}
 	return( 1 );
 
 on_error:
@@ -749,7 +453,7 @@ on_error:
 int vhdi_test_check_file_signature_file_io_handle(
      const system_character_t *source )
 {
-	uint8_t empty_block[ 512 ];
+	uint8_t empty_block[ 8192 ];
 
 	libbfio_handle_t *file_io_handle = NULL;
 	libcerror_error_t *error         = NULL;
@@ -759,77 +463,90 @@ int vhdi_test_check_file_signature_file_io_handle(
 
 	/* Initialize test
 	 */
-	result = libbfio_file_initialize(
-	          &file_io_handle,
-	          &error );
-
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+	memset_result = memory_set(
+	                 empty_block,
+	                 0,
+	                 sizeof( uint8_t ) * 8192 );
 
 	VHDI_TEST_ASSERT_IS_NOT_NULL(
-	 "file_io_handle",
-	 file_io_handle );
+	 "memset_result",
+	 memset_result );
 
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+	if( source != NULL )
+	{
+		/* Initialize test
+		 */
+		result = libbfio_file_initialize(
+		          &file_io_handle,
+		          &error );
 
-	source_length = system_string_length(
-	                 source );
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		VHDI_TEST_ASSERT_IS_NOT_NULL(
+		 "file_io_handle",
+		 file_io_handle );
+
+		VHDI_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		source_length = system_string_length(
+		                 source );
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	result = libbfio_file_set_name_wide(
-	          file_io_handle,
-	          source,
-	          source_length,
-	          &error );
+		result = libbfio_file_set_name_wide(
+		          file_io_handle,
+		          source,
+		          source_length,
+		          &error );
 #else
-	result = libbfio_file_set_name(
-	          file_io_handle,
-	          source,
-	          source_length,
-	          &error );
+		result = libbfio_file_set_name(
+		          file_io_handle,
+		          source,
+		          source_length,
+		          &error );
 #endif
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
 
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+		VHDI_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
 
-	result = libbfio_handle_open(
-	          file_io_handle,
-	          LIBBFIO_OPEN_READ,
-	          &error );
+		result = libbfio_handle_open(
+		          file_io_handle,
+		          LIBBFIO_OPEN_READ,
+		          &error );
 
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
 
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+		VHDI_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
 
-	/* Test check file signature
-	 */
-	result = libvhdi_check_file_signature_file_io_handle(
-	          file_io_handle,
-	          &error );
+		/* Test check file signature
+		 */
+		result = libvhdi_check_file_signature_file_io_handle(
+		          file_io_handle,
+		          &error );
 
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
 
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
+		VHDI_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
 	/* Test error cases
 	 */
 	result = libvhdi_check_file_signature_file_io_handle(
@@ -850,68 +567,44 @@ int vhdi_test_check_file_signature_file_io_handle(
 
 	/* Clean up
 	 */
-	result = libbfio_handle_close(
-	          file_io_handle,
-	          &error );
+	if( source != NULL )
+	{
+		result = libbfio_handle_close(
+		          file_io_handle,
+		          &error );
 
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 0 );
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 0 );
 
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+		VHDI_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
 
-	result = libbfio_handle_free(
-	          &file_io_handle,
-	          &error );
+		result = libbfio_handle_free(
+		          &file_io_handle,
+		          &error );
 
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
 
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "file_io_handle",
-	 file_io_handle );
+		VHDI_TEST_ASSERT_IS_NULL(
+		 "file_io_handle",
+		 file_io_handle );
 
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Initialize test
+		VHDI_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
+	/* Test check file signature with data too small
 	 */
-	memset_result = memory_set(
-	                 empty_block,
-	                 0,
-	                 sizeof( uint8_t ) * 512 );
-
-	VHDI_TEST_ASSERT_IS_NOT_NULL(
-	 "memset_result",
-	 memset_result );
-
-	result = libbfio_memory_range_initialize(
+	result = vhdi_test_open_file_io_handle(
 	          &file_io_handle,
-	          &error );
-
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	VHDI_TEST_ASSERT_IS_NOT_NULL(
-	 "file_io_handle",
-	 file_io_handle );
-
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libbfio_memory_range_set(
-	          file_io_handle,
 	          empty_block,
-	          sizeof( uint8_t ) * 512,
+	          sizeof( uint8_t ) * 1,
 	          &error );
 
 	VHDI_TEST_ASSERT_EQUAL_INT(
@@ -919,26 +612,14 @@ int vhdi_test_check_file_signature_file_io_handle(
 	 result,
 	 1 );
 
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libbfio_handle_open(
-	          file_io_handle,
-	          LIBBFIO_OPEN_READ,
-	          &error );
-
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "file_io_handle",
+	 file_io_handle );
 
 	VHDI_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-	/* Test check file signature
-	 */
 	result = libvhdi_check_file_signature_file_io_handle(
 	          file_io_handle,
 	          &error );
@@ -952,9 +633,41 @@ int vhdi_test_check_file_signature_file_io_handle(
 	 "error",
 	 error );
 
-	/* Clean up
+	result = vhdi_test_close_file_io_handle(
+	          &file_io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test check file signature with empty block
 	 */
-	result = libbfio_handle_close(
+	result = vhdi_test_open_file_io_handle(
+	          &file_io_handle,
+	          empty_block,
+	          sizeof( uint8_t ) * 8192,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "file_io_handle",
+	 file_io_handle );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libvhdi_check_file_signature_file_io_handle(
 	          file_io_handle,
 	          &error );
 
@@ -967,24 +680,18 @@ int vhdi_test_check_file_signature_file_io_handle(
 	 "error",
 	 error );
 
-	result = libbfio_handle_free(
+	result = vhdi_test_close_file_io_handle(
 	          &file_io_handle,
 	          &error );
 
 	VHDI_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
-
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "file_io_handle",
-	 file_io_handle );
+	 0 );
 
 	VHDI_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	/* TODO test file too small */
 
 	return( 1 );
 
@@ -1039,7 +746,6 @@ int main(
 	{
 		source = argv[ optind ];
 	}
-
 	VHDI_TEST_RUN(
 	 "libvhdi_get_version",
 	 vhdi_test_get_version );
@@ -1057,27 +763,26 @@ int main(
 	 vhdi_test_set_codepage );
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
-	if( source != NULL )
-	{
-		VHDI_TEST_RUN_WITH_ARGS(
-		 "libvhdi_check_file_signature",
-		 vhdi_test_check_file_signature,
-		 source );
+
+	VHDI_TEST_RUN_WITH_ARGS(
+	 "libvhdi_check_file_signature",
+	 vhdi_test_check_file_signature,
+	 source );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-		VHDI_TEST_RUN_WITH_ARGS(
-		 "libvhdi_check_file_signature_wide",
-		 vhdi_test_check_file_signature_wide,
-		 source );
+	VHDI_TEST_RUN_WITH_ARGS(
+	 "libvhdi_check_file_signature_wide",
+	 vhdi_test_check_file_signature_wide,
+	 source );
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
-		VHDI_TEST_RUN_WITH_ARGS(
-		 "libvhdi_check_file_signature_file_io_handle",
-		 vhdi_test_check_file_signature_file_io_handle,
-		 source );
-	}
+	VHDI_TEST_RUN_WITH_ARGS(
+	 "libvhdi_check_file_signature_file_io_handle",
+	 vhdi_test_check_file_signature_file_io_handle,
+	 source );
+
 #endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 
 	return( EXIT_SUCCESS );

@@ -83,7 +83,9 @@ vhdi_test_error_LDADD = \
 
 vhdi_test_file_SOURCES = \
 	vhdi_test_file.c \
+	vhdi_test_functions.c vhdi_test_functions.h \
 	vhdi_test_getopt.c vhdi_test_getopt.h \
+	vhdi_test_libbfio.h \
 	vhdi_test_libcerror.h \
 	vhdi_test_libclocale.h \
 	vhdi_test_libcnotify.h \
@@ -91,10 +93,13 @@ vhdi_test_file_SOURCES = \
 	vhdi_test_libuna.h \
 	vhdi_test_libvhdi.h \
 	vhdi_test_macros.h \
-	vhdi_test_memory.c vhdi_test_memory.h
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_unused.h
 
 vhdi_test_file_LDADD = \
+	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
@@ -118,15 +123,19 @@ vhdi_test_io_handle_LDADD = \
 	@LIBCERROR_LIBADD@
 
 vhdi_test_notify_SOURCES = \
+	vhdi_test_libbfio.h \
+	vhdi_test_libcerror.h \
 	vhdi_test_libvhdi.h \
 	vhdi_test_macros.h \
 	vhdi_test_notify.c \
 	vhdi_test_unused.h
 
 vhdi_test_notify_LDADD = \
-	../libvhdi/libvhdi.la
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
 
 vhdi_test_support_SOURCES = \
+	vhdi_test_functions.c vhdi_test_functions.h \
 	vhdi_test_getopt.c vhdi_test_getopt.h \
 	vhdi_test_libbfio.h \
 	vhdi_test_libcerror.h \
@@ -135,7 +144,9 @@ vhdi_test_support_SOURCES = \
 	vhdi_test_libuna.h \
 	vhdi_test_libvhdi.h \
 	vhdi_test_macros.h \
-	vhdi_test_support.c
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_support.c \
+	vhdi_test_unused.h
 
 vhdi_test_support_LDADD = \
 	@LIBBFIO_LIBADD@ \

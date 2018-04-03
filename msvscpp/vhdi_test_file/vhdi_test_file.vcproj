@@ -180,6 +180,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\tests\vhdi_test_functions.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\vhdi_test_getopt.c"
 				>
 			</File>
@@ -194,7 +198,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\tests\vhdi_test_functions.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\vhdi_test_getopt.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\vhdi_test_libbfio.h"
 				>
 			</File>
 			<File
@@ -227,6 +239,10 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\vhdi_test_memory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\vhdi_test_unused.h"
 				>
 			</File>
 		</Filter>

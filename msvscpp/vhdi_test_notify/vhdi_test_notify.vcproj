@@ -186,6 +186,14 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\tests\vhdi_test_libbfio.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\vhdi_test_libcerror.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\vhdi_test_libvhdi.h"
 				>
 			</File>
