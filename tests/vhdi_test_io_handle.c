@@ -113,6 +113,8 @@ int vhdi_test_io_handle_initialize(
 	          &io_handle,
 	          &error );
 
+	io_handle = NULL;
+
 	VHDI_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -124,8 +126,6 @@ int vhdi_test_io_handle_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	io_handle = NULL;
 
 #if defined( HAVE_VHDI_TEST_MEMORY )
 
@@ -266,6 +266,134 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libvhdi_io_handle_clear function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_io_handle_clear(
+     void )
+{
+	libcerror_error_t *error       = NULL;
+	libvhdi_io_handle_t *io_handle = NULL;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = libvhdi_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libvhdi_io_handle_clear(
+	          io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libvhdi_io_handle_clear(
+	          NULL,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_VHDI_TEST_MEMORY )
+
+	/* Test libvhdi_io_handle_clear with memset failing
+	 */
+	vhdi_test_memset_attempts_before_fail = 0;
+
+	result = libvhdi_io_handle_clear(
+	          io_handle,
+	          &error );
+
+	if( vhdi_test_memset_attempts_before_fail != -1 )
+	{
+		vhdi_test_memset_attempts_before_fail = -1;
+	}
+	else
+	{
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		VHDI_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_VHDI_TEST_MEMORY ) */
+
+	/* Clean up
+	 */
+	result = libvhdi_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( io_handle != NULL )
+	{
+		libvhdi_io_handle_free(
+		 &io_handle,
+		 NULL );
 	}
 	return( 0 );
 }
@@ -793,9 +921,9 @@ int vhdi_test_io_handle_get_utf8_parent_filename(
 		 result,
 		 -1 );
 
-	        VHDI_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		VHDI_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -811,9 +939,9 @@ int vhdi_test_io_handle_get_utf8_parent_filename(
 		 result,
 		 -1 );
 
-	        VHDI_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		VHDI_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -829,9 +957,9 @@ int vhdi_test_io_handle_get_utf8_parent_filename(
 		 result,
 		 -1 );
 
-	        VHDI_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		VHDI_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1079,9 +1207,9 @@ int vhdi_test_io_handle_get_utf16_parent_filename(
 		 result,
 		 -1 );
 
-	        VHDI_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		VHDI_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1097,9 +1225,9 @@ int vhdi_test_io_handle_get_utf16_parent_filename(
 		 result,
 		 -1 );
 
-	        VHDI_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		VHDI_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1115,9 +1243,9 @@ int vhdi_test_io_handle_get_utf16_parent_filename(
 		 result,
 		 -1 );
 
-	        VHDI_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		VHDI_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1185,7 +1313,9 @@ int main(
 	 "libvhdi_io_handle_free",
 	 vhdi_test_io_handle_free );
 
-	/* TODO: add tests for libvhdi_io_handle_clear */
+	VHDI_TEST_RUN(
+	 "libvhdi_io_handle_clear",
+	 vhdi_test_io_handle_clear );
 
 	/* TODO: add tests for libvhdi_io_handle_read_file_footer */
 

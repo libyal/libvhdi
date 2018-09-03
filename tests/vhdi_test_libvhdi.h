@@ -1,5 +1,5 @@
 /*
- * The internal libvhdi header
+ * The libvhdi header wrapper
  *
  * Copyright (C) 2012-2018, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -23,13 +23,6 @@
 #define _VHDI_TEST_LIBVHDI_H
 
 #include <common.h>
-
-/* If Cygwin libtool DLL support is enabled and do not want to create static
- * executables set LIBVHDI_DLL_IMPORT before including libvhdi.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT ) && !defined( HAVE_STATIC_EXECUTABLES )
-#define LIBVHDI_DLL_IMPORT
-#endif
 
 #include <libvhdi.h>
 

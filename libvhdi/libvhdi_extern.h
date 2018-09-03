@@ -28,17 +28,13 @@
  */
 #if !defined( HAVE_LOCAL_LIBVHDI )
 
-/* If libtool DLL support is enabled set LIBVHDI_DLL_EXPORT
- * before including libvhdi/extern.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBVHDI_DLL_EXPORT
-#endif
-
 #include <libvhdi/extern.h>
 
+#define LIBVHDI_EXTERN_VARIABLE	LIBVHDI_EXTERN
+
 #else
-#define LIBVHDI_EXTERN	/* extern */
+#define LIBVHDI_EXTERN		/* extern */
+#define LIBVHDI_EXTERN_VARIABLE	extern
 
 #endif /* !defined( HAVE_LOCAL_LIBVHDI ) */
 
