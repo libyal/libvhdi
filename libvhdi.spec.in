@@ -10,42 +10,44 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 @libvhdi_spec_requires@ @ax_libbfio_spec_requires@ @ax_libcdata_spec_requires@ @ax_libcerror_spec_requires@ @ax_libcfile_spec_requires@ @ax_libclocale_spec_requires@ @ax_libcnotify_spec_requires@ @ax_libcpath_spec_requires@ @ax_libcsplit_spec_requires@ @ax_libcthreads_spec_requires@ @ax_libfcache_spec_requires@ @ax_libfdata_spec_requires@ @ax_libfguid_spec_requires@ @ax_libuna_spec_requires@
 BuildRequires: gcc @ax_libbfio_spec_build_requires@ @ax_libcdata_spec_build_requires@ @ax_libcerror_spec_build_requires@ @ax_libcfile_spec_build_requires@ @ax_libclocale_spec_build_requires@ @ax_libcnotify_spec_build_requires@ @ax_libcpath_spec_build_requires@ @ax_libcsplit_spec_build_requires@ @ax_libcthreads_spec_build_requires@ @ax_libfcache_spec_build_requires@ @ax_libfdata_spec_build_requires@ @ax_libfguid_spec_build_requires@ @ax_libuna_spec_build_requires@
 
-%description
+%description -n libvhdi
 Library to access the Virtual Hard Disk (VHD) image format
 
-%package devel
+%package -n libvhdi-devel
 Summary: Header files and libraries for developing applications for libvhdi
 Group: Development/Libraries
 Requires: libvhdi = %{version}-%{release}
 
-%description devel
+%description -n libvhdi-devel
 Header files and libraries for developing applications for libvhdi.
 
-%package python
+%package -n libvhdi-python2
+Obsoletes: libvhdi-python < %{version}
+Provides: libvhdi-python = %{version}
 Summary: Python 2 bindings for libvhdi
 Group: System Environment/Libraries
-Requires: libvhdi = %{version}-%{release} python
-BuildRequires: python-devel
+Requires: libvhdi = %{version}-%{release} python2
+BuildRequires: python2-devel
 
-%description python
+%description -n libvhdi-python2
 Python 2 bindings for libvhdi
 
-%package python3
+%package -n libvhdi-python3
 Summary: Python 3 bindings for libvhdi
 Group: System Environment/Libraries
 Requires: libvhdi = %{version}-%{release} python3
 BuildRequires: python3-devel
 
-%description python3
+%description -n libvhdi-python3
 Python 3 bindings for libvhdi
 
-%package tools
+%package -n libvhdi-tools
 Summary: Several tools for reading Virtual Hard Disk (VHD) image files
 Group: Applications/System
 Requires: libvhdi = %{version}-%{release} @ax_libfuse_spec_requires@
 @libvhdi_spec_tools_build_requires@ @ax_libfuse_spec_build_requires@
 
-%description tools
+%description -n libvhdi-tools
 Several tools for reading Virtual Hard Disk (VHD) image files
 
 %prep
@@ -66,13 +68,13 @@ rm -rf %{buildroot}
 
 %postun -p /sbin/ldconfig
 
-%files
+%files -n libvhdi
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README
 %attr(755,root,root) %{_libdir}/*.so.*
 
-%files devel
+%files -n libvhdi-devel
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README ChangeLog
@@ -83,7 +85,7 @@ rm -rf %{buildroot}
 %{_includedir}/*
 %{_mandir}/man3/*
 
-%files python
+%files -n libvhdi-python2
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README
@@ -91,7 +93,7 @@ rm -rf %{buildroot}
 %{_libdir}/python2*/site-packages/*.la
 %{_libdir}/python2*/site-packages/*.so
 
-%files python3
+%files -n libvhdi-python3
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README
@@ -99,7 +101,7 @@ rm -rf %{buildroot}
 %{_libdir}/python3*/site-packages/*.la
 %{_libdir}/python3*/site-packages/*.so
 
-%files tools
+%files -n libvhdi-tools
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README
