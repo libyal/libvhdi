@@ -27,7 +27,6 @@
 
 #include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
-#include "libvhdi_libfcache.h"
 #include "libvhdi_libfdata.h"
 #include "libvhdi_types.h"
 
@@ -157,7 +156,7 @@ int libvhdi_io_handle_read_data_block(
      libvhdi_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *vector,
-     libfcache_cache_t *cache,
+     libfdata_cache_t *cache,
      int element_index,
      int element_data_file_index,
      off64_t element_data_offset,

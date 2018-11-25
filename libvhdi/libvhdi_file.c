@@ -1180,7 +1180,7 @@ int libvhdi_file_open_read(
 	     (intptr_t *) internal_file->io_handle,
 	     NULL,
 	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfcache_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libvhdi_io_handle_read_data_block,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfdata_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libvhdi_io_handle_read_data_block,
 	     NULL,
 	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 	     error ) != 1 )
@@ -1498,7 +1498,7 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 			if( libfdata_vector_get_element_value_at_offset(
 			     internal_file->data_block_vector,
 			     (intptr_t *) file_io_handle,
-			     internal_file->data_block_cache,
+			     (libfdata_cache_t *) internal_file->data_block_cache,
 			     block_file_offset,
 			     &element_data_offset,
 			     (intptr_t **) &data_block,
