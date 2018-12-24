@@ -26,10 +26,10 @@
 #include <types.h>
 #include <wide_string.h>
 
+#include "mount_file_entry.h"
+#include "mount_file_system.h"
 #include "mount_handle.h"
-#include "vhditools_libcdata.h"
 #include "vhditools_libcerror.h"
-#include "vhditools_libcnotify.h"
 #include "vhditools_libcpath.h"
 #include "vhditools_libvhdi.h"
 
@@ -93,16 +93,15 @@ int mount_handle_initialize(
 
 		goto on_error;
 	}
-	if( libcdata_array_initialize(
-	     &( ( *mount_handle )->inputs_array ),
-	     0,
+	if( mount_file_system_initialize(
+	     &( ( *mount_handle )->file_system ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize inputs array.",
+		 "%s: unable to initialize file system.",
 		 function );
 
 		goto on_error;
@@ -148,16 +147,15 @@ int mount_handle_free(
 			memory_free(
 			 ( *mount_handle )->basename );
 		}
-		if( libcdata_array_free(
-		     &( ( *mount_handle )->inputs_array ),
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libvhdi_file_free,
+		if( mount_file_system_free(
+		     &( ( *mount_handle )->file_system ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free inputs array.",
+			 "%s: unable to free file system.",
 			 function );
 
 			result = -1;
@@ -177,10 +175,7 @@ int mount_handle_signal_abort(
      mount_handle_t *mount_handle,
      libcerror_error_t **error )
 {
-	libvhdi_file_t *input_file = NULL;
-	static char *function      = "mount_handle_signal_abort";	
-	int input_file_index       = 0;
-	int number_of_inputs       = 0;
+	static char *function = "mount_handle_signal_abort";
 
 	if( mount_handle == NULL )
 	{
@@ -193,72 +188,188 @@ int mount_handle_signal_abort(
 
 		return( -1 );
 	}
-	if( libcdata_array_get_number_of_entries(
-	     mount_handle->inputs_array,
-	     &number_of_inputs,
+	if( mount_file_system_signal_abort(
+	     mount_handle->file_system,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of inputs.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to signal file system abort.",
 		 function );
 
 		return( -1 );
 	}
-	for( input_file_index = number_of_inputs - 1;
-	     input_file_index > 0;
-	     input_file_index-- )
+	return( 1 );
+}
+
+/* Sets the basename
+ * Returns 1 if successful or -1 on error
+ */
+int mount_handle_set_basename(
+     mount_handle_t *mount_handle,
+     const system_character_t *basename,
+     size_t basename_size,
+     libcerror_error_t **error )
+{
+	static char *function = "mount_handle_set_basename";
+
+	if( mount_handle == NULL )
 	{
-		if( libcdata_array_get_entry_by_index(
-		     mount_handle->inputs_array,
-		     input_file_index,
-		     (intptr_t **) &input_file,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve input file: %d.",
-			 function,
-			 input_file_index );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid mount handle.",
+		 function );
 
-			return( -1 );
-		}
-		if( libvhdi_file_signal_abort(
-		     input_file,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to signal input file: %d to abort.",
-			 function,
-			 input_file_index );
+		return( -1 );
+	}
+	if( mount_handle->basename != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid mount handle - basename value already set.",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
+	}
+	if( basename == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid basename.",
+		 function );
+
+		return( -1 );
+	}
+	if( basename_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing basename.",
+		 function );
+
+		goto on_error;
+	}
+	if( basename_size > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid basename size value exceeds maximum.",
+		 function );
+
+		goto on_error;
+	}
+	mount_handle->basename = system_string_allocate(
+	                          basename_size );
+
+	if( mount_handle->basename == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create basename string.",
+		 function );
+
+		goto on_error;
+	}
+	if( system_string_copy(
+	     mount_handle->basename,
+	     basename,
+	     basename_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy basename.",
+		 function );
+
+		goto on_error;
+	}
+	mount_handle->basename[ basename_size - 1 ] = 0;
+
+	mount_handle->basename_size = basename_size;
+
+	return( 1 );
+
+on_error:
+	if( mount_handle->basename != NULL )
+	{
+		memory_free(
+		 mount_handle->basename );
+
+		mount_handle->basename = NULL;
+	}
+	mount_handle->basename_size = 0;
+
+	return( -1 );
+}
+
+/* Sets the path prefix
+ * Returns 1 if successful or -1 on error
+ */
+int mount_handle_set_path_prefix(
+     mount_handle_t *mount_handle,
+     const system_character_t *path_prefix,
+     size_t path_prefix_size,
+     libcerror_error_t **error )
+{
+	static char *function = "mount_handle_set_path_prefix";
+
+	if( mount_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid mount handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( mount_file_system_set_path_prefix(
+	     mount_handle->file_system,
+	     path_prefix,
+	     path_prefix_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set path prefix.",
+		 function );
+
+		return( -1 );
 	}
 	return( 1 );
 }
 
-/* Opens the input of the mount handle
- * Returns 1 if successful, 0 if the keys could not be read or -1 on error
+/* Opens a mount handle
+ * Returns 1 if successful, 0 if not or -1 on error
  */
-int mount_handle_open_input(
+int mount_handle_open(
      mount_handle_t *mount_handle,
      const system_character_t *filename,
      libcerror_error_t **error )
 {
-	libvhdi_file_t *input_file       = NULL;
+	libvhdi_file_t *image            = NULL;
 	system_character_t *basename_end = NULL;
-	static char *function            = "mount_handle_open_input";
+	static char *function            = "mount_handle_open";
 	size_t basename_length           = 0;
 	size_t filename_length           = 0;
-	int entry_index                  = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -313,27 +424,27 @@ int mount_handle_open_input(
 		}
 	}
 	if( libvhdi_file_initialize(
-	     &input_file,
+	     &image,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize input file.",
+		 "%s: unable to initialize image.",
 		 function );
 
 		goto on_error;
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libvhdi_file_open_wide(
-	     input_file,
+	     image,
 	     filename,
 	     LIBVHDI_OPEN_READ,
 	     error ) != 1 )
 #else
 	if( libvhdi_file_open(
-	     input_file,
+	     image,
 	     filename,
 	     LIBVHDI_OPEN_READ,
 	     error ) != 1 )
@@ -343,36 +454,35 @@ int mount_handle_open_input(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open input file.",
+		 "%s: unable to open image.",
 		 function );
 
 		goto on_error;
 	}
-	if( mount_handle_open_input_parent_file(
+	if( mount_handle_open_parent(
 	     mount_handle,
-	     input_file,
+	     image,
 	     error ) == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open parent input file.",
+		 "%s: unable to open parent image.",
 		 function );
 
 		goto on_error;
 	}
-	if( libcdata_array_append_entry(
-	     mount_handle->inputs_array,
-	     &entry_index,
-	     (intptr_t *) input_file,
+	if( mount_file_system_append_image(
+	     mount_handle->file_system,
+	     image,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append input file to array.",
+		 "%s: unable to append image to file system.",
 		 function );
 
 		goto on_error;
@@ -380,39 +490,33 @@ int mount_handle_open_input(
 	return( 1 );
 
 on_error:
-	if( input_file != NULL )
+	if( image != NULL )
 	{
 		libvhdi_file_free(
-		 &input_file,
+		 &image,
 		 NULL );
 	}
-	libcdata_array_empty(
-	 mount_handle->inputs_array,
-	 (int (*)(intptr_t **, libcerror_error_t **)) &libvhdi_file_free,
-	 NULL );
-
 	return( -1 );
 }
 
-/* Opens the parent input file
+/* Opens a parent image
  * Returns 1 if successful, 0 if no parent or -1 on error
  */
-int mount_handle_open_input_parent_file(
+int mount_handle_open_parent(
      mount_handle_t *mount_handle,
-     libvhdi_file_t *input_file,
+     libvhdi_file_t *image,
      libcerror_error_t **error )
 {
 	uint8_t guid[ 16 ];
 
-	libvhdi_file_t *parent_input_file       = NULL;
+	libvhdi_file_t *parent_image            = NULL;
 	system_character_t *parent_basename_end = NULL;
 	system_character_t *parent_filename     = NULL;
 	system_character_t *parent_path         = NULL;
-	static char *function                   = "mount_handle_open_input_parent_file";
+	static char *function                   = "mount_handle_open_parent";
 	size_t parent_basename_length           = 0;
 	size_t parent_filename_size             = 0;
 	size_t parent_path_size                 = 0;
-	int entry_index                         = 0;
 	int result                              = 0;
 
 	if( mount_handle == NULL )
@@ -427,7 +531,7 @@ int mount_handle_open_input_parent_file(
 		return( -1 );
 	}
 	result = libvhdi_file_get_parent_identifier(
-	          input_file,
+	          image,
 	          guid,
 	          16,
 	          error );
@@ -449,12 +553,12 @@ int mount_handle_open_input_parent_file(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libvhdi_file_get_utf16_parent_filename_size(
-		  input_file,
+		  image,
 		  &parent_filename_size,
 		  error );
 #else
 	result = libvhdi_file_get_utf8_parent_filename_size(
-		  input_file,
+		  image,
 		  &parent_filename_size,
 		  error );
 #endif
@@ -508,13 +612,13 @@ int mount_handle_open_input_parent_file(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libvhdi_file_get_utf16_parent_filename(
-		  input_file,
+		  image,
 		  (uint16_t *) parent_filename,
 		  parent_filename_size,
 		  error );
 #else
 	result = libvhdi_file_get_utf8_parent_filename(
-		  input_file,
+		  image,
 		  (uint8_t *) parent_filename,
 		  parent_filename_size,
 		  error );
@@ -577,27 +681,27 @@ int mount_handle_open_input_parent_file(
 		}
 	}
 	if( libvhdi_file_initialize(
-	     &parent_input_file,
+	     &parent_image,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize parent input file.",
+		 "%s: unable to initialize parent image.",
 		 function );
 
 		goto on_error;
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libvhdi_file_open_wide(
-	     parent_input_file,
+	     parent_image,
 	     parent_path,
 	     LIBVHDI_OPEN_READ,
 	     error ) != 1 )
 #else
 	if( libvhdi_file_open(
-	     parent_input_file,
+	     parent_image,
 	     parent_path,
 	     LIBVHDI_OPEN_READ,
 	     error ) != 1 )
@@ -607,51 +711,51 @@ int mount_handle_open_input_parent_file(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open parent input file: %" PRIs_SYSTEM ".",
+		 "%s: unable to open parent image: %" PRIs_SYSTEM ".",
 		 function,
 		 parent_path );
 
 		goto on_error;
 	}
-	if( mount_handle_open_input_parent_file(
+	if( mount_handle_open_parent(
 	     mount_handle,
-	     parent_input_file,
+	     parent_image,
 	     error ) == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open parent input file.",
-		 function );
+		 "%s: unable to open parent image: %" PRIs_SYSTEM ".",
+		 function,
+		 parent_path );
 
 		return( -1 );
 	}
 	if( libvhdi_file_set_parent_file(
-	     input_file,
-	     parent_input_file,
+	     image,
+	     parent_image,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set parent input file.",
+		 "%s: unable to set parent image.",
 		 function );
 
 		goto on_error;
 	}
-	if( libcdata_array_append_entry(
-	     mount_handle->inputs_array,
-	     &entry_index,
-	     (intptr_t *) parent_input_file,
+	if( mount_file_system_append_image(
+	     mount_handle->file_system,
+	     image,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append parent input file to array.",
+		 "%s: unable to append parent image to file system.",
 		 function );
 
 		goto on_error;
@@ -675,10 +779,10 @@ int mount_handle_open_input_parent_file(
 	return( 1 );
 
 on_error:
-	if( parent_input_file != NULL )
+	if( parent_image != NULL )
 	{
 		libvhdi_file_free(
-		 &parent_input_file,
+		 &parent_image,
 		 NULL );
 	}
 	if( ( parent_path != NULL )
@@ -702,10 +806,10 @@ int mount_handle_close(
      mount_handle_t *mount_handle,
      libcerror_error_t **error )
 {
-	libvhdi_file_t *input_file = NULL;
-	static char *function      = "mount_handle_close";
-	int input_file_index       = 0;
-	int number_of_inputs       = 0;
+	libvhdi_file_t *image = NULL;
+	static char *function = "mount_handle_close";
+	int image_index       = 0;
+	int number_of_images  = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -718,51 +822,51 @@ int mount_handle_close(
 
 		return( -1 );
 	}
-	if( libcdata_array_get_number_of_entries(
-	     mount_handle->inputs_array,
-	     &number_of_inputs,
+	if( mount_file_system_get_number_of_images(
+	     mount_handle->file_system,
+	     &number_of_images,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of inputs.",
+		 "%s: unable to retrieve number of images.",
 		 function );
 
 		return( -1 );
 	}
-	for( input_file_index = number_of_inputs - 1;
-	     input_file_index > 0;
-	     input_file_index-- )
+	for( image_index = number_of_images - 1;
+	     image_index > 0;
+	     image_index-- )
 	{
-		if( libcdata_array_get_entry_by_index(
-		     mount_handle->inputs_array,
-		     input_file_index,
-		     (intptr_t **) &input_file,
+		if( mount_file_system_get_image_by_index(
+		     mount_handle->file_system,
+		     image_index,
+		     &image,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve input file: %d.",
+			 "%s: unable to retrieve image: %d.",
 			 function,
-			 input_file_index );
+			 image_index );
 
 			return( -1 );
 		}
 		if( libvhdi_file_close(
-		     input_file,
+		     image,
 		     error ) != 0 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close input file: %d.",
+			 "%s: unable to close image: %d.",
 			 function,
-			 input_file_index );
+			 image_index );
 
 			return( -1 );
 		}
@@ -770,19 +874,21 @@ int mount_handle_close(
 	return( 0 );
 }
 
-/* Read a buffer from a specific input file
- * Returns the number of bytes read if successful or -1 on error
+/* Retrieves a file entry for a specific path
+ * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
-ssize_t mount_handle_read_buffer(
-         mount_handle_t *mount_handle,
-         int input_file_index,
-         uint8_t *buffer,
-         size_t size,
-         libcerror_error_t **error )
+int mount_handle_get_file_entry_by_path(
+     mount_handle_t *mount_handle,
+     const system_character_t *path,
+     mount_file_entry_t **file_entry,
+     libcerror_error_t **error )
 {
-	libvhdi_file_t *input_file = NULL;
-	static char *function      = "mount_handle_read_buffer";
-	ssize_t read_count         = 0;
+	libvhdi_file_t *image              = NULL;
+	const system_character_t *filename = NULL;
+	static char *function              = "mount_handle_get_file_entry_by_path";
+	size_t path_length                 = 0;
+	int image_index                    = 0;
+	int result                         = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -795,307 +901,102 @@ ssize_t mount_handle_read_buffer(
 
 		return( -1 );
 	}
-	if( libcdata_array_get_entry_by_index(
-	     mount_handle->inputs_array,
-	     input_file_index,
-	     (intptr_t **) &input_file,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve input file: %d.",
-		 function,
-		 input_file_index );
-
-		return( -1 );
-	}
-	read_count = libvhdi_file_read_buffer(
-	              input_file,
-	              buffer,
-	              size,
-	              error );
-
-	if( read_count == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read buffer from input file: %d.",
-		 function,
-		 input_file_index );
-
-		return( -1 );
-	}
-	return( read_count );
-}
-
-/* Seeks a specific offset in a specific input file
- * Returns the offset if successful or -1 on error
- */
-off64_t mount_handle_seek_offset(
-         mount_handle_t *mount_handle,
-         int input_file_index,
-         off64_t offset,
-         int whence,
-         libcerror_error_t **error )
-{
-	libvhdi_file_t *input_file = NULL;
-	static char *function      = "mount_handle_seek_offset";
-
-	if( mount_handle == NULL )
+	if( path == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mount handle.",
+		 "%s: invalid path.",
 		 function );
 
 		return( -1 );
 	}
-	if( libcdata_array_get_entry_by_index(
-	     mount_handle->inputs_array,
-	     input_file_index,
-	     (intptr_t **) &input_file,
-	     error ) != 1 )
+	path_length = system_string_length(
+	               path );
+
+	if( path_length == 0 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve input file: %d.",
-		 function,
-		 input_file_index );
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid path length value out of bounds.",
+		 function );
 
 		return( -1 );
 	}
-	offset = libvhdi_file_seek_offset(
-	          input_file,
-	          offset,
-	          whence,
+	result = mount_file_system_get_image_index_from_path(
+	          mount_handle->file_system,
+	          path,
+	          path_length,
+	          &image_index,
 	          error );
 
-	if( offset == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset in input file: %d.",
-		 function,
-		 input_file_index );
-
-		return( -1 );
-	}
-	return( offset );
-}
-
-/* Retrieves the media size of a specific input file
- * Returns 1 if successful or -1 on error
- */
-int mount_handle_get_media_size(
-     mount_handle_t *mount_handle,
-     int input_file_index,
-     size64_t *size,
-     libcerror_error_t **error )
-{
-	libvhdi_file_t *input_file = NULL;
-	static char *function      = "mount_handle_get_media_size";
-
-	if( mount_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mount handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( libcdata_array_get_entry_by_index(
-	     mount_handle->inputs_array,
-	     input_file_index,
-	     (intptr_t **) &input_file,
-	     error ) != 1 )
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve input file: %d.",
-		 function,
-		 input_file_index );
+		 "%s: unable to retrieve image index.",
+		 function );
 
 		return( -1 );
 	}
-	if( libvhdi_file_get_media_size(
-	     input_file,
-	     size,
+	else if( result == 0 )
+	{
+		return( 0 );
+	}
+	if( image_index != -1 )
+	{
+		if( mount_file_system_get_image_by_index(
+		     mount_handle->file_system,
+		     image_index,
+		     &image,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve image: %d.",
+			 function,
+			 image_index );
+
+			return( -1 );
+		}
+		if( image == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing image: %d.",
+			 function,
+			 image_index );
+
+			return( -1 );
+		}
+		filename = &( path[ 0 ] );
+	}
+	if( mount_file_entry_initialize(
+	     file_entry,
+	     mount_handle->file_system,
+	     image_index,
+	     filename,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve media size from input file: %d.",
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize file entry for image: %d.",
 		 function,
-		 input_file_index );
+		 image_index );
 
 		return( -1 );
 	}
 	return( 1 );
-}
-
-/* Retrieves the number of inputs
- * Returns 1 if successful or -1 on error
- */
-int mount_handle_get_number_of_inputs(
-     mount_handle_t *mount_handle,
-     int *number_of_inputs,
-     libcerror_error_t **error )
-{
-	static char *function = "mount_handle_get_number_of_inputs";
-
-	if( mount_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mount handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( libcdata_array_get_number_of_entries(
-	     mount_handle->inputs_array,
-	     number_of_inputs,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of inputs.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Sets the basename
- * Returns 1 if successful or -1 on error
- */
-int mount_handle_set_basename(
-     mount_handle_t *mount_handle,
-     const system_character_t *basename,
-     size_t basename_size,
-     libcerror_error_t **error )
-{
-	static char *function = "mount_handle_set_basename";
-
-	if( mount_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mount handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( basename == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid basename.",
-		 function );
-
-		return( -1 );
-	}
-	if( basename_size == 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing basename.",
-		 function );
-
-		goto on_error;
-	}
-	if( ( basename_size > (size_t) SSIZE_MAX )
-	 || ( ( sizeof( system_character_t ) * basename_size ) > (size_t) SSIZE_MAX ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid basename size value exceeds maximum.",
-		 function );
-
-		goto on_error;
-	}
-	if( mount_handle->basename != NULL )
-	{
-		memory_free(
-		 mount_handle->basename );
-
-		mount_handle->basename      = NULL;
-		mount_handle->basename_size = 0;
-	}
-	mount_handle->basename = system_string_allocate(
-	                          basename_size );
-
-	if( mount_handle->basename == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create basename string.",
-		 function );
-
-		goto on_error;
-	}
-	if( system_string_copy(
-	     mount_handle->basename,
-	     basename,
-	     basename_size ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-		 "%s: unable to copy basename.",
-		 function );
-
-		goto on_error;
-	}
-	mount_handle->basename[ basename_size - 1 ] = 0;
-
-	mount_handle->basename_size = basename_size;
-
-	return( 1 );
-
-on_error:
-	if( mount_handle->basename != NULL )
-	{
-		memory_free(
-		 mount_handle->basename );
-
-		mount_handle->basename = NULL;
-	}
-	mount_handle->basename_size = 0;
-
-	return( -1 );
 }
 

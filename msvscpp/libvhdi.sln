@@ -164,7 +164,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vhdiinfo", "vhdiinfo\vhdiin
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vhdimount", "vhdimount\vhdimount.vcproj", "{91A40238-86E3-44BA-8CFE-8410F4EE492C}"
 	ProjectSection(ProjectDependencies) = postProject
-		{A7B295F1-6749-4CB8-AB60-4F46BA5933C0} = {A7B295F1-6749-4CB8-AB60-4F46BA5933C0}
 		{3FFB9C05-1145-45A7-9ADE-5C8D70FBD7CA} = {3FFB9C05-1145-45A7-9ADE-5C8D70FBD7CA}
 		{B86FB73A-4ACC-42DE-9545-586D93955B06} = {B86FB73A-4ACC-42DE-9545-586D93955B06}
 		{5304AD69-D449-4589-B2C9-E4607E56A51D} = {5304AD69-D449-4589-B2C9-E4607E56A51D}
@@ -193,8 +192,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcsplit", "libcsplit\libc
 	ProjectSection(ProjectDependencies) = postProject
 		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
 	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dokan", "dokan\dokan.vcproj", "{A7B295F1-6749-4CB8-AB60-4F46BA5933C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -298,10 +295,6 @@ Global
 		{B86FB73A-4ACC-42DE-9545-586D93955B06}.Release|Win32.Build.0 = Release|Win32
 		{B86FB73A-4ACC-42DE-9545-586D93955B06}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
 		{B86FB73A-4ACC-42DE-9545-586D93955B06}.VSDebug|Win32.Build.0 = VSDebug|Win32
-		{A7B295F1-6749-4CB8-AB60-4F46BA5933C0}.Release|Win32.ActiveCfg = Release|Win32
-		{A7B295F1-6749-4CB8-AB60-4F46BA5933C0}.Release|Win32.Build.0 = Release|Win32
-		{A7B295F1-6749-4CB8-AB60-4F46BA5933C0}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
-		{A7B295F1-6749-4CB8-AB60-4F46BA5933C0}.VSDebug|Win32.Build.0 = VSDebug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

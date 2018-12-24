@@ -49,6 +49,10 @@ vhdiinfo_LDADD = \
 	@LIBINTL@
 
 vhdimount_SOURCES = \
+	mount_dokan.c mount_dokan.h \
+	mount_file_entry.c mount_file_entry.h \
+	mount_file_system.c mount_file_system.h \
+	mount_fuse.c mount_fuse.h \
 	mount_handle.c mount_handle.h \
 	vhdimount.c \
 	vhditools_getopt.c vhditools_getopt.h \

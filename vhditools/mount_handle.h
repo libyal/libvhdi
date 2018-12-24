@@ -26,9 +26,9 @@
 #include <file_stream.h>
 #include <types.h>
 
-#include "vhditools_libcdata.h"
+#include "mount_file_entry.h"
+#include "mount_file_system.h"
 #include "vhditools_libcerror.h"
-#include "vhditools_libcnotify.h"
 #include "vhditools_libvhdi.h"
 
 #if defined( __cplusplus )
@@ -47,9 +47,9 @@ struct mount_handle
 	 */
 	size_t basename_size;
 
-	/* The inputs array
+	/* The file system
 	 */
-	libcdata_array_t *inputs_array;
+	mount_file_system_t *file_system;
 
 	/* The notification output stream
 	 */
@@ -68,54 +68,36 @@ int mount_handle_signal_abort(
      mount_handle_t *mount_handle,
      libcerror_error_t **error );
 
-int mount_handle_set_format(
+int mount_handle_set_basename(
      mount_handle_t *mount_handle,
-     const system_character_t *string,
+     const system_character_t *basename,
+     size_t basename_size,
      libcerror_error_t **error );
 
-int mount_handle_open_input(
+int mount_handle_set_path_prefix(
+     mount_handle_t *mount_handle,
+     const system_character_t *path_prefix,
+     size_t path_prefix_size,
+     libcerror_error_t **error );
+
+int mount_handle_open(
      mount_handle_t *mount_handle,
      const system_character_t *filename,
      libcerror_error_t **error );
 
-int mount_handle_open_input_parent_file(
+int mount_handle_open_parent(
      mount_handle_t *mount_handle,
-     libvhdi_file_t *input_file,
+     libvhdi_file_t *image,
      libcerror_error_t **error );
 
 int mount_handle_close(
      mount_handle_t *mount_handle,
      libcerror_error_t **error );
 
-ssize_t mount_handle_read_buffer(
-         mount_handle_t *mount_handle,
-         int input_file_index,
-         uint8_t *buffer,
-         size_t size,
-         libcerror_error_t **error );
-
-off64_t mount_handle_seek_offset(
-         mount_handle_t *mount_handle,
-         int input_file_index,
-         off64_t offset,
-         int whence,
-         libcerror_error_t **error );
-
-int mount_handle_get_media_size(
+int mount_handle_get_file_entry_by_path(
      mount_handle_t *mount_handle,
-     int input_file_index,
-     size64_t *size,
-     libcerror_error_t **error );
-
-int mount_handle_get_number_of_inputs(
-     mount_handle_t *mount_handle,
-     int *number_of_inputs,
-     libcerror_error_t **error );
-
-int mount_handle_set_basename(
-     mount_handle_t *mount_handle,
-     const system_character_t *basename,
-     size_t basename_size,
+     const system_character_t *path,
+     mount_file_entry_t **file_entry,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
