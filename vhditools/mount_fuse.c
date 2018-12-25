@@ -110,13 +110,13 @@ int mount_fuse_set_stat_info(
 #endif
 
 	stat_info->st_atime = access_time / 1000000000;
-	stat_info->st_mtime = modification_time / 1000000000;
 	stat_info->st_ctime = inode_change_time / 1000000000;
+	stat_info->st_mtime = modification_time / 1000000000;
 
 #if defined( STAT_HAVE_NSEC )
 	stat_info->st_atime_nsec = access_time % 1000000000;
-	stat_info->st_mtime_nsec = modification_time % 1000000000;
 	stat_info->st_ctime_nsec = inode_change_time % 1000000000;
+	stat_info->st_mtime_nsec = modification_time % 1000000000;
 #endif
 	return( 1 );
 }
@@ -132,12 +132,12 @@ int mount_fuse_filldir(
      mount_file_entry_t *file_entry,
      libcerror_error_t **error )
 {
-	static char *function     = "mount_fuse_filldir";
-	size64_t file_size        = 0;
-	int64_t access_time       = 0;
-	int64_t inode_change_time = 0;
-	int64_t modification_time = 0;
-	uint16_t file_mode        = 0;
+	static char *function      = "mount_fuse_filldir";
+	size64_t file_size         = 0;
+	uint64_t access_time       = 0;
+	uint64_t inode_change_time = 0;
+	uint64_t modification_time = 0;
+	uint16_t file_mode         = 0;
 
 	if( filler == NULL )
 	{
@@ -241,9 +241,9 @@ int mount_fuse_filldir(
 	     stat_info,
 	     file_size,
 	     file_mode,
-	     access_time,
-	     modification_time,
-	     inode_change_time,
+	     (int64_t) access_time,
+	     (int64_t) inode_change_time,
+	     (int64_t) modification_time,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1052,9 +1052,9 @@ int mount_fuse_getattr(
 	mount_file_entry_t *file_entry = NULL;
 	static char *function          = "mount_fuse_getattr";
 	size64_t file_size             = 0;
-	int64_t access_time            = 0;
-	int64_t inode_change_time      = 0;
-	int64_t modification_time      = 0;
+	uint64_t access_time           = 0;
+	uint64_t inode_change_time     = 0;
+	uint64_t modification_time     = 0;
 	uint16_t file_mode             = 0;
 	int result                     = 0;
 
@@ -1217,9 +1217,9 @@ int mount_fuse_getattr(
 	     stat_info,
 	     file_size,
 	     file_mode,
-	     access_time,
-	     modification_time,
-	     inode_change_time,
+	     (int64_t) access_time,
+	     (int64_t) inode_change_time,
+	     (int64_t) modification_time,
 	     &error ) != 1 )
 	{
 		libcerror_error_set(

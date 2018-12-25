@@ -49,15 +49,15 @@ struct mount_file_entry
 	 */
 	size_t name_size;
 
-	/* The image index
+	/* The file index
 	 */
-	int image_index;
+	int file_index;
 };
 
 int mount_file_entry_initialize(
      mount_file_entry_t **file_entry,
      mount_file_system_t *file_system,
-     int image_index,
+     int file_index,
      const system_character_t *name,
      libcerror_error_t **error );
 
@@ -72,22 +72,22 @@ int mount_file_entry_get_parent_file_entry(
 
 int mount_file_entry_get_creation_time(
      mount_file_entry_t *file_entry,
-     int64_t *posix_time,
+     uint64_t *creation_time,
      libcerror_error_t **error );
 
 int mount_file_entry_get_access_time(
      mount_file_entry_t *file_entry,
-     int64_t *posix_time,
+     uint64_t *access_time,
      libcerror_error_t **error );
 
 int mount_file_entry_get_modification_time(
      mount_file_entry_t *file_entry,
-     int64_t *posix_time,
+     uint64_t *modification_time,
      libcerror_error_t **error );
 
 int mount_file_entry_get_inode_change_time(
      mount_file_entry_t *file_entry,
-     int64_t *posix_time,
+     uint64_t *inode_change_time,
      libcerror_error_t **error );
 
 int mount_file_entry_get_file_mode(

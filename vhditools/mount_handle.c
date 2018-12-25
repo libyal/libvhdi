@@ -175,7 +175,10 @@ int mount_handle_signal_abort(
      mount_handle_t *mount_handle,
      libcerror_error_t **error )
 {
+	libvhdi_file_t *file  = NULL;
 	static char *function = "mount_handle_signal_abort";
+	int file_index        = 0;
+	int number_of_files   = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -188,22 +191,57 @@ int mount_handle_signal_abort(
 
 		return( -1 );
 	}
-	if( mount_file_system_signal_abort(
+	if( mount_file_system_get_number_of_files(
 	     mount_handle->file_system,
+	     &number_of_files,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to signal file system abort.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of files.",
 		 function );
 
 		return( -1 );
 	}
+	for( file_index = number_of_files - 1;
+	     file_index > 0;
+	     file_index-- )
+	{
+		if( mount_file_system_get_file_by_index(
+		     mount_handle->file_system,
+		     file_index,
+		     &file,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve file: %d.",
+			 function,
+			 file_index );
+
+			return( -1 );
+		}
+		if( libvhdi_file_signal_abort(
+		     file,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to signal file: %d to abort.",
+			 function,
+			 file_index );
+
+			return( -1 );
+		}
+	}
 	return( 1 );
 }
-
 /* Sets the basename
  * Returns 1 if successful or -1 on error
  */
@@ -365,11 +403,12 @@ int mount_handle_open(
      const system_character_t *filename,
      libcerror_error_t **error )
 {
-	libvhdi_file_t *image            = NULL;
+	libvhdi_file_t *file             = NULL;
 	system_character_t *basename_end = NULL;
 	static char *function            = "mount_handle_open";
 	size_t basename_length           = 0;
 	size_t filename_length           = 0;
+	int result                       = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -424,65 +463,67 @@ int mount_handle_open(
 		}
 	}
 	if( libvhdi_file_initialize(
-	     &image,
+	     &file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize image.",
+		 "%s: unable to initialize file.",
 		 function );
 
 		goto on_error;
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libvhdi_file_open_wide(
-	     image,
-	     filename,
-	     LIBVHDI_OPEN_READ,
-	     error ) != 1 )
+	result = libvhdi_file_open_wide(
+	          file,
+	          filename,
+	          LIBVHDI_OPEN_READ,
+	          error );
 #else
-	if( libvhdi_file_open(
-	     image,
-	     filename,
-	     LIBVHDI_OPEN_READ,
-	     error ) != 1 )
+	result = libvhdi_file_open(
+	          file,
+	          filename,
+	          LIBVHDI_OPEN_READ,
+	          error );
 #endif
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open image.",
+		 "%s: unable to open file.",
 		 function );
 
 		goto on_error;
 	}
 	if( mount_handle_open_parent(
 	     mount_handle,
-	     image,
+	     file,
 	     error ) == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open parent image.",
+		 "%s: unable to open parent file.",
 		 function );
 
 		goto on_error;
 	}
-	if( mount_file_system_append_image(
+	if( mount_file_system_append_file(
 	     mount_handle->file_system,
-	     image,
+	     file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append image to file system.",
+		 "%s: unable to append file to file system.",
 		 function );
 
 		goto on_error;
@@ -490,26 +531,26 @@ int mount_handle_open(
 	return( 1 );
 
 on_error:
-	if( image != NULL )
+	if( file != NULL )
 	{
 		libvhdi_file_free(
-		 &image,
+		 &file,
 		 NULL );
 	}
 	return( -1 );
 }
 
-/* Opens a parent image
+/* Opens a parent file
  * Returns 1 if successful, 0 if no parent or -1 on error
  */
 int mount_handle_open_parent(
      mount_handle_t *mount_handle,
-     libvhdi_file_t *image,
+     libvhdi_file_t *file,
      libcerror_error_t **error )
 {
 	uint8_t guid[ 16 ];
 
-	libvhdi_file_t *parent_image            = NULL;
+	libvhdi_file_t *parent_file             = NULL;
 	system_character_t *parent_basename_end = NULL;
 	system_character_t *parent_filename     = NULL;
 	system_character_t *parent_path         = NULL;
@@ -531,7 +572,7 @@ int mount_handle_open_parent(
 		return( -1 );
 	}
 	result = libvhdi_file_get_parent_identifier(
-	          image,
+	          file,
 	          guid,
 	          16,
 	          error );
@@ -553,12 +594,12 @@ int mount_handle_open_parent(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libvhdi_file_get_utf16_parent_filename_size(
-		  image,
+		  file,
 		  &parent_filename_size,
 		  error );
 #else
 	result = libvhdi_file_get_utf8_parent_filename_size(
-		  image,
+		  file,
 		  &parent_filename_size,
 		  error );
 #endif
@@ -612,13 +653,13 @@ int mount_handle_open_parent(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libvhdi_file_get_utf16_parent_filename(
-		  image,
+		  file,
 		  (uint16_t *) parent_filename,
 		  parent_filename_size,
 		  error );
 #else
 	result = libvhdi_file_get_utf8_parent_filename(
-		  image,
+		  file,
 		  (uint8_t *) parent_filename,
 		  parent_filename_size,
 		  error );
@@ -681,27 +722,27 @@ int mount_handle_open_parent(
 		}
 	}
 	if( libvhdi_file_initialize(
-	     &parent_image,
+	     &parent_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize parent image.",
+		 "%s: unable to initialize parent file.",
 		 function );
 
 		goto on_error;
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libvhdi_file_open_wide(
-	     parent_image,
+	     parent_file,
 	     parent_path,
 	     LIBVHDI_OPEN_READ,
 	     error ) != 1 )
 #else
 	if( libvhdi_file_open(
-	     parent_image,
+	     parent_file,
 	     parent_path,
 	     LIBVHDI_OPEN_READ,
 	     error ) != 1 )
@@ -711,7 +752,7 @@ int mount_handle_open_parent(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open parent image: %" PRIs_SYSTEM ".",
+		 "%s: unable to open parent file: %" PRIs_SYSTEM ".",
 		 function,
 		 parent_path );
 
@@ -719,43 +760,43 @@ int mount_handle_open_parent(
 	}
 	if( mount_handle_open_parent(
 	     mount_handle,
-	     parent_image,
+	     parent_file,
 	     error ) == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open parent image: %" PRIs_SYSTEM ".",
+		 "%s: unable to open parent file: %" PRIs_SYSTEM ".",
 		 function,
 		 parent_path );
 
 		return( -1 );
 	}
 	if( libvhdi_file_set_parent_file(
-	     image,
-	     parent_image,
+	     file,
+	     parent_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set parent image.",
+		 "%s: unable to set parent file.",
 		 function );
 
 		goto on_error;
 	}
-	if( mount_file_system_append_image(
+	if( mount_file_system_append_file(
 	     mount_handle->file_system,
-	     image,
+	     file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append parent image to file system.",
+		 "%s: unable to append parent file to file system.",
 		 function );
 
 		goto on_error;
@@ -779,10 +820,10 @@ int mount_handle_open_parent(
 	return( 1 );
 
 on_error:
-	if( parent_image != NULL )
+	if( parent_file != NULL )
 	{
 		libvhdi_file_free(
-		 &parent_image,
+		 &parent_file,
 		 NULL );
 	}
 	if( ( parent_path != NULL )
@@ -806,10 +847,10 @@ int mount_handle_close(
      mount_handle_t *mount_handle,
      libcerror_error_t **error )
 {
-	libvhdi_file_t *image = NULL;
+	libvhdi_file_t *file  = NULL;
 	static char *function = "mount_handle_close";
-	int image_index       = 0;
-	int number_of_images  = 0;
+	int file_index        = 0;
+	int number_of_files   = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -822,51 +863,65 @@ int mount_handle_close(
 
 		return( -1 );
 	}
-	if( mount_file_system_get_number_of_images(
+	if( mount_file_system_get_number_of_files(
 	     mount_handle->file_system,
-	     &number_of_images,
+	     &number_of_files,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of images.",
+		 "%s: unable to retrieve number of files.",
 		 function );
 
 		return( -1 );
 	}
-	for( image_index = number_of_images - 1;
-	     image_index > 0;
-	     image_index-- )
+	for( file_index = number_of_files - 1;
+	     file_index > 0;
+	     file_index-- )
 	{
-		if( mount_file_system_get_image_by_index(
+		if( mount_file_system_get_file_by_index(
 		     mount_handle->file_system,
-		     image_index,
-		     &image,
+		     file_index,
+		     &file,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve image: %d.",
+			 "%s: unable to retrieve file: %d.",
 			 function,
-			 image_index );
+			 file_index );
 
 			return( -1 );
 		}
 		if( libvhdi_file_close(
-		     image,
+		     file,
 		     error ) != 0 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close image: %d.",
+			 "%s: unable to close file: %d.",
 			 function,
-			 image_index );
+			 file_index );
+
+			return( -1 );
+		}
+		if( libvhdi_file_free(
+		     &file,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free file: %d.",
+			 function,
+			 file_index );
 
 			return( -1 );
 		}
@@ -883,11 +938,11 @@ int mount_handle_get_file_entry_by_path(
      mount_file_entry_t **file_entry,
      libcerror_error_t **error )
 {
-	libvhdi_file_t *image              = NULL;
+	libvhdi_file_t *file               = NULL;
 	const system_character_t *filename = NULL;
 	static char *function              = "mount_handle_get_file_entry_by_path";
 	size_t path_length                 = 0;
-	int image_index                    = 0;
+	int file_index                     = 0;
 	int result                         = 0;
 
 	if( mount_handle == NULL )
@@ -926,11 +981,11 @@ int mount_handle_get_file_entry_by_path(
 
 		return( -1 );
 	}
-	result = mount_file_system_get_image_index_from_path(
+	result = mount_file_system_get_file_index_from_path(
 	          mount_handle->file_system,
 	          path,
 	          path_length,
-	          &image_index,
+	          &file_index,
 	          error );
 
 	if( result == -1 )
@@ -939,7 +994,7 @@ int mount_handle_get_file_entry_by_path(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve image index.",
+		 "%s: unable to retrieve file index.",
 		 function );
 
 		return( -1 );
@@ -948,33 +1003,33 @@ int mount_handle_get_file_entry_by_path(
 	{
 		return( 0 );
 	}
-	if( image_index != -1 )
+	if( file_index != -1 )
 	{
-		if( mount_file_system_get_image_by_index(
+		if( mount_file_system_get_file_by_index(
 		     mount_handle->file_system,
-		     image_index,
-		     &image,
+		     file_index,
+		     &file,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve image: %d.",
+			 "%s: unable to retrieve file: %d.",
 			 function,
-			 image_index );
+			 file_index );
 
 			return( -1 );
 		}
-		if( image == NULL )
+		if( file == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing image: %d.",
+			 "%s: missing file: %d.",
 			 function,
-			 image_index );
+			 file_index );
 
 			return( -1 );
 		}
@@ -983,7 +1038,7 @@ int mount_handle_get_file_entry_by_path(
 	if( mount_file_entry_initialize(
 	     file_entry,
 	     mount_handle->file_system,
-	     image_index,
+	     file_index,
 	     filename,
 	     error ) != 1 )
 	{
@@ -991,9 +1046,9 @@ int mount_handle_get_file_entry_by_path(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize file entry for image: %d.",
+		 "%s: unable to initialize file entry for file: %d.",
 		 function,
-		 image_index );
+		 file_index );
 
 		return( -1 );
 	}

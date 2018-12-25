@@ -50,7 +50,7 @@
 int mount_file_entry_initialize(
      mount_file_entry_t **file_entry,
      mount_file_system_t *file_system,
-     int image_index,
+     int file_index,
      const system_character_t *name,
      libcerror_error_t **error )
 {
@@ -166,7 +166,8 @@ int mount_file_entry_initialize(
 		( *file_entry )->name_size = name_length + 1;
 	}
 	( *file_entry )->file_system = file_system;
-	( *file_entry )->image_index = image_index;
+
+	( *file_entry )->file_index = file_index;
 
 	return( 1 );
 
@@ -264,7 +265,7 @@ int mount_file_entry_get_parent_file_entry(
 
 		return( -1 );
 	}
-	if( file_entry->image_index != -1 )
+	if( file_entry->file_index != -1 )
 	{
 		if( mount_file_entry_initialize(
 		     parent_file_entry,
@@ -288,12 +289,13 @@ int mount_file_entry_get_parent_file_entry(
 }
 
 /* Retrieves the creation date and time
- * The timestamp is a signed 64-bit POSIX date and time value in number of nanoseconds
+ * On Windows the timestamp is an unsigned 64-bit FILETIME timestamp
+ * otherwise the timestamp is a signed 64-bit POSIX date and time value in number of nanoseconds
  * Returns 1 if successful or -1 on error
  */
 int mount_file_entry_get_creation_time(
      mount_file_entry_t *file_entry,
-     int64_t *posix_time,
+     uint64_t *creation_time,
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_entry_get_creation_time";
@@ -311,7 +313,7 @@ int mount_file_entry_get_creation_time(
 	}
 	if( mount_file_system_get_mounted_timestamp(
 	     file_entry->file_system,
-	     posix_time,
+	     creation_time,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -327,12 +329,13 @@ int mount_file_entry_get_creation_time(
 }
 
 /* Retrieves the access date and time
- * The timestamp is a signed 64-bit POSIX date and time value in number of nanoseconds
+ * On Windows the timestamp is an unsigned 64-bit FILETIME timestamp
+ * otherwise the timestamp is a signed 64-bit POSIX date and time value in number of nanoseconds
  * Returns 1 if successful or -1 on error
  */
 int mount_file_entry_get_access_time(
      mount_file_entry_t *file_entry,
-     int64_t *posix_time,
+     uint64_t *access_time,
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_entry_get_access_time";
@@ -350,7 +353,7 @@ int mount_file_entry_get_access_time(
 	}
 	if( mount_file_system_get_mounted_timestamp(
 	     file_entry->file_system,
-	     posix_time,
+	     access_time,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -366,12 +369,13 @@ int mount_file_entry_get_access_time(
 }
 
 /* Retrieves the modification date and time
- * The timestamp is a signed 64-bit POSIX date and time value in number of nanoseconds
+ * On Windows the timestamp is an unsigned 64-bit FILETIME timestamp
+ * otherwise the timestamp is a signed 64-bit POSIX date and time value in number of nanoseconds
  * Returns 1 if successful or -1 on error
  */
 int mount_file_entry_get_modification_time(
      mount_file_entry_t *file_entry,
-     int64_t *posix_time,
+     uint64_t *modification_time,
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_entry_get_modification_time";
@@ -389,7 +393,7 @@ int mount_file_entry_get_modification_time(
 	}
 	if( mount_file_system_get_mounted_timestamp(
 	     file_entry->file_system,
-	     posix_time,
+	     modification_time,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -405,12 +409,13 @@ int mount_file_entry_get_modification_time(
 }
 
 /* Retrieves the inode change date and time
- * The timestamp is a signed 64-bit POSIX date and time value in number of nanoseconds
+ * On Windows the timestamp is an unsigned 64-bit FILETIME timestamp
+ * otherwise the timestamp is a signed 64-bit POSIX date and time value in number of nanoseconds
  * Returns 1 if successful or -1 on error
  */
 int mount_file_entry_get_inode_change_time(
      mount_file_entry_t *file_entry,
-     int64_t *posix_time,
+     uint64_t *inode_change_time,
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_entry_get_inode_change_time";
@@ -428,7 +433,7 @@ int mount_file_entry_get_inode_change_time(
 	}
 	if( mount_file_system_get_mounted_timestamp(
 	     file_entry->file_system,
-	     posix_time,
+	     inode_change_time,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -475,7 +480,7 @@ int mount_file_entry_get_file_mode(
 
 		return( -1 );
 	}
-	if( file_entry->image_index == -1 )
+	if( file_entry->file_index == -1 )
 	{
 		*file_mode = S_IFDIR | 0555;
 	}
@@ -619,7 +624,7 @@ int mount_file_entry_get_number_of_sub_file_entries(
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_entry_get_number_of_sub_file_entries";
-	int number_of_images  = 0;
+	int number_of_files   = 0;
 
 	if( file_entry == NULL )
 	{
@@ -643,36 +648,36 @@ int mount_file_entry_get_number_of_sub_file_entries(
 
 		return( -1 );
 	}
-	if( file_entry->image_index == -1 )
+	if( file_entry->file_index == -1 )
 	{
-		if( mount_file_system_get_number_of_images(
+		if( mount_file_system_get_number_of_files(
 		     file_entry->file_system,
-		     &number_of_images,
+		     &number_of_files,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of images.",
+			 "%s: unable to retrieve number of files.",
 			 function );
 
 			return( -1 );
 		}
-		if( ( number_of_images < 0 )
-		 || ( number_of_images > 99 ) )
+		if( ( number_of_files < 0 )
+		 || ( number_of_files > 99 ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported number of images.",
+			 "%s: unsupported number of files.",
 			 function );
 
 			return( -1 );
 		}
 	}
-	*number_of_sub_file_entries = number_of_images;
+	*number_of_sub_file_entries = number_of_files;
 
 	return( 1 );
 }
@@ -750,7 +755,7 @@ int mount_file_entry_get_sub_file_entry_by_index(
 
 		return( -1 );
 	}
-	if( mount_file_system_get_path_from_image_index(
+	if( mount_file_system_get_path_from_file_index(
 	     file_entry->file_system,
 	     sub_file_entry_index,
 	     path,
@@ -797,7 +802,7 @@ ssize_t mount_file_entry_read_buffer_at_offset(
          off64_t offset,
          libcerror_error_t **error )
 {
-	libvhdi_file_t *image = NULL;
+	libvhdi_file_t *file  = NULL;
 	static char *function = "mount_file_entry_read_buffer_at_offset";
 	ssize_t read_count    = 0;
 
@@ -812,24 +817,24 @@ ssize_t mount_file_entry_read_buffer_at_offset(
 
 		return( -1 );
 	}
-	if( mount_file_system_get_image_by_index(
+	if( mount_file_system_get_file_by_index(
 	     file_entry->file_system,
-	     file_entry->image_index,
-	     &image,
+	     file_entry->file_index,
+	     &file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve image: %d from file system.",
+		 "%s: unable to retrieve file: %d from file system.",
 		 function,
-		 file_entry->image_index );
+		 file_entry->file_index );
 
 		return( -1 );
 	}
 	read_count = libvhdi_file_read_buffer_at_offset(
-	              image,
+	              file,
 	              buffer,
 	              buffer_size,
 	              offset,
@@ -841,11 +846,11 @@ ssize_t mount_file_entry_read_buffer_at_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read buffer at offset: %" PRIi64 " (0x%08" PRIx64 ") from image: %d.",
+		 "%s: unable to read buffer at offset: %" PRIi64 " (0x%08" PRIx64 ") from file: %d.",
 		 function,
 		 offset,
 		 offset,
-		 file_entry->image_index );
+		 file_entry->file_index );
 
 		return( -1 );
 	}
@@ -860,7 +865,7 @@ int mount_file_entry_get_size(
      size64_t *size,
      libcerror_error_t **error )
 {
-	libvhdi_file_t *image = NULL;
+	libvhdi_file_t *file  = NULL;
 	static char *function = "mount_file_entry_get_size";
 
 	if( file_entry == NULL )
@@ -874,7 +879,7 @@ int mount_file_entry_get_size(
 
 		return( -1 );
 	}
-	if( file_entry->image_index == -1 )
+	if( file_entry->file_index == -1 )
 	{
 		if( size == NULL )
 		{
@@ -891,24 +896,24 @@ int mount_file_entry_get_size(
 	}
 	else
 	{
-		if( mount_file_system_get_image_by_index(
+		if( mount_file_system_get_file_by_index(
 		     file_entry->file_system,
-		     file_entry->image_index,
-		     &image,
+		     file_entry->file_index,
+		     &file,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve image: %d from file system.",
+			 "%s: unable to retrieve file: %d from file system.",
 			 function,
-			 file_entry->image_index );
+			 file_entry->file_index );
 
 			return( -1 );
 		}
 		if( libvhdi_file_get_media_size(
-		     image,
+		     file,
 		     size,
 		     error ) != 1 )
 		{
@@ -916,9 +921,9 @@ int mount_file_entry_get_size(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve media size from image: %d.",
+			 "%s: unable to retrieve media size from file: %d.",
 			 function,
-			 file_entry->image_index );
+			 file_entry->file_index );
 
 			return( -1 );
 		}

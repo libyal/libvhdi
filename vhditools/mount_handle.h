@@ -87,7 +87,7 @@ int mount_handle_open(
 
 int mount_handle_open_parent(
      mount_handle_t *mount_handle,
-     libvhdi_file_t *image,
+     libvhdi_file_t *file,
      libcerror_error_t **error );
 
 int mount_handle_close(

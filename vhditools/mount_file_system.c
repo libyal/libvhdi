@@ -52,11 +52,20 @@ int mount_file_system_initialize(
      mount_file_system_t **file_system,
      libcerror_error_t **error )
 {
-#if defined( HAVE_CLOCK_GETTIME )
+#if defined( WINAPI )
+	SYSTEMTIME systemtime;
+#elif defined( HAVE_CLOCK_GETTIME )
 	struct timespec time_structure;
 #endif
 
 	static char *function = "mount_file_system_initialize";
+
+#if defined( WINAPI )
+	DWORD error_code      = 0;
+	uint64_t timestamp    = 0;
+#else
+	int64_t timestamp     = 0;
+#endif
 
 	if( file_system == NULL )
 	{
@@ -114,7 +123,7 @@ int mount_file_system_initialize(
 		return( -1 );
 	}
 	if( libcdata_array_initialize(
-	     &( ( *file_system )->images_array ),
+	     &( ( *file_system )->files_array ),
 	     0,
 	     error ) != 1 )
 	{
@@ -122,12 +131,46 @@ int mount_file_system_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize images array.",
+		 "%s: unable to initialize files array.",
 		 function );
 
 		goto on_error;
 	}
-#if defined( HAVE_CLOCK_GETTIME )
+#if defined( WINAPI )
+	if( memory_set(
+	     &systemtime,
+	     0,
+	     sizeof( SYSTEMTIME ) ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear systemtime.",
+		 function );
+
+		goto on_error;
+	}
+	GetSystemTime(
+	 &systemtime );
+
+	if( SystemTimeToFileTime(
+	     &systemtime,
+	     &timestamp ) == 0 )
+	{
+		error_code = GetLastError();
+
+		libcerror_system_set_error(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 error_code,
+		 "%s: unable to retrieve FILETIME of current time.",
+		 function );
+
+		goto on_error;
+	}
+#elif defined( HAVE_CLOCK_GETTIME )
 	if( clock_gettime(
 	     CLOCK_REALTIME,
 	     &time_structure ) != 0 )
@@ -141,12 +184,12 @@ int mount_file_system_initialize(
 
 		goto on_error;
 	}
-	( *file_system )->mounted_timestamp = ( (int64_t) time_structure.tv_sec * 1000000000 ) + time_structure.tv_nsec;
+	timestamp = ( (int64_t) time_structure.tv_sec * 1000000000 ) + time_structure.tv_nsec;
 
 #else
-	( *file_system )->mounted_timestamp = (int64_t) time( NULL );
+	timestamp = (int64_t) time( NULL );
 
-	if( ( *file_system )->mounted_timestamp == (time_t) -1 )
+	if( timestamp == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -157,9 +200,11 @@ int mount_file_system_initialize(
 
 		goto on_error;
 	}
-	( *file_system )->mounted_timestamp *= 1000000000;
+	timestamp *= 1000000000;
 
 #endif /* defined( HAVE_CLOCK_GETTIME ) */
+
+	( *file_system )->mounted_timestamp = (uint64_t) timestamp;
 
 	return( 1 );
 
@@ -203,15 +248,15 @@ int mount_file_system_free(
 			 ( *file_system )->path_prefix );
 		}
 		if( libcdata_array_free(
-		     &( ( *file_system )->images_array ),
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libvhdi_file_free,
+		     &( ( *file_system )->files_array ),
+		     NULL,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free images array.",
+			 "%s: unable to free files array.",
 			 function );
 
 			result = -1;
@@ -222,81 +267,6 @@ int mount_file_system_free(
 		*file_system = NULL;
 	}
 	return( result );
-}
-
-/* Signals the file system to abort
- * Returns 1 if successful or -1 on error
- */
-int mount_file_system_signal_abort(
-     mount_file_system_t *file_system,
-     libcerror_error_t **error )
-{
-	libvhdi_file_t *image = NULL;
-	static char *function = "mount_file_system_signal_abort";
-	int image_index       = 0;
-	int number_of_images  = 0;
-
-	if( file_system == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file system.",
-		 function );
-
-		return( -1 );
-	}
-	if( libcdata_array_get_number_of_entries(
-	     file_system->images_array,
-	     &number_of_images,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of images.",
-		 function );
-
-		return( -1 );
-	}
-	for( image_index = number_of_images - 1;
-	     image_index > 0;
-	     image_index-- )
-	{
-		if( libcdata_array_get_entry_by_index(
-		     file_system->images_array,
-		     image_index,
-		     (intptr_t **) &image,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve image: %d.",
-			 function,
-			 image_index );
-
-			return( -1 );
-		}
-		if( libvhdi_file_signal_abort(
-		     image,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to signal image: %d to abort.",
-			 function,
-			 image_index );
-
-			return( -1 );
-		}
-	}
-	return( 1 );
 }
 
 /* Sets the path prefix
@@ -412,15 +382,15 @@ on_error:
 	return( -1 );
 }
 
-/* Retrieves the number of images
+/* Retrieves the number of files
  * Returns 1 if successful or -1 on error
  */
-int mount_file_system_get_number_of_images(
+int mount_file_system_get_number_of_files(
      mount_file_system_t *file_system,
-     int *number_of_images,
+     int *number_of_files,
      libcerror_error_t **error )
 {
-	static char *function = "mount_file_system_get_number_of_images";
+	static char *function = "mount_file_system_get_number_of_files";
 
 	if( file_system == NULL )
 	{
@@ -434,15 +404,15 @@ int mount_file_system_get_number_of_images(
 		return( -1 );
 	}
 	if( libcdata_array_get_number_of_entries(
-	     file_system->images_array,
-	     number_of_images,
+	     file_system->files_array,
+	     number_of_files,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of images.",
+		 "%s: unable to retrieve number of files.",
 		 function );
 
 		return( -1 );
@@ -451,12 +421,13 @@ int mount_file_system_get_number_of_images(
 }
 
 /* Retrieves the mounted timestamp
- * The timestamp is a signed 64-bit POSIX date and time value in number of nanoseconds
+ * On Windows the timestamp is an unsigned 64-bit FILETIME timestamp
+ * otherwise the timestamp is a signed 64-bit POSIX date and time value in number of nanoseconds
  * Returns 1 if successful or -1 on error
  */
 int mount_file_system_get_mounted_timestamp(
      mount_file_system_t *file_system,
-     int64_t *mounted_timestamp,
+     uint64_t *mounted_timestamp,
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_system_get_mounted_timestamp";
@@ -488,16 +459,16 @@ int mount_file_system_get_mounted_timestamp(
 	return( 1 );
 }
 
-/* Retrieves a specific image
+/* Retrieves a specific file
  * Returns 1 if successful or -1 on error
  */
-int mount_file_system_get_image_by_index(
+int mount_file_system_get_file_by_index(
      mount_file_system_t *file_system,
-     int image_index,
-     libvhdi_file_t **image,
+     int file_index,
+     libvhdi_file_t **file,
      libcerror_error_t **error )
 {
-	static char *function = "mount_file_system_get_image_by_index";
+	static char *function = "mount_file_system_get_file_by_index";
 
 	if( file_system == NULL )
 	{
@@ -511,33 +482,33 @@ int mount_file_system_get_image_by_index(
 		return( -1 );
 	}
 	if( libcdata_array_get_entry_by_index(
-	     file_system->images_array,
-	     image_index,
-	     (intptr_t **) image,
+	     file_system->files_array,
+	     file_index,
+	     (intptr_t **) file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve image: %d.",
+		 "%s: unable to retrieve file: %d.",
 		 function,
-		 image_index );
+		 file_index );
 
 		return( -1 );
 	}
 	return( 1 );
 }
 
-/* Append an image to the file system
+/* Appends a file to the file system
  * Returns 1 if successful or -1 on error
  */
-int mount_file_system_append_image(
+int mount_file_system_append_file(
      mount_file_system_t *file_system,
-     libvhdi_file_t *image,
+     libvhdi_file_t *file,
      libcerror_error_t **error )
 {
-	static char *function = "mount_file_system_append_image";
+	static char *function = "mount_file_system_append_file";
 	int entry_index       = 0;
 
 	if( file_system == NULL )
@@ -552,16 +523,16 @@ int mount_file_system_append_image(
 		return( -1 );
 	}
 	if( libcdata_array_append_entry(
-	     file_system->images_array,
+	     file_system->files_array,
 	     &entry_index,
-	     (intptr_t *) image,
+	     (intptr_t *) file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append image to array.",
+		 "%s: unable to append file to array.",
 		 function );
 
 		return( -1 );
@@ -569,20 +540,20 @@ int mount_file_system_append_image(
 	return( 1 );
 }
 
-/* Retrieves the image index from a path
- * Returns 1 if successful, 0 if no such image index or -1 on error
+/* Retrieves the file index from a path
+ * Returns 1 if successful, 0 if no such file index or -1 on error
  */
-int mount_file_system_get_image_index_from_path(
+int mount_file_system_get_file_index_from_path(
      mount_file_system_t *file_system,
      const system_character_t *path,
      size_t path_length,
-     int *image_index,
+     int *file_index,
      libcerror_error_t **error )
 {
-	static char *function        = "mount_file_system_get_image_index_from_path";
+	static char *function        = "mount_file_system_get_file_index_from_path";
 	system_character_t character = 0;
 	size_t path_index            = 0;
-	int image_number             = 0;
+	int file_number              = 0;
 	int result                   = 0;
 
 	if( file_system == NULL )
@@ -629,13 +600,13 @@ int mount_file_system_get_image_index_from_path(
 
 		return( -1 );
 	}
-	if( image_index == NULL )
+	if( file_index == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid image index.",
+		 "%s: invalid file index.",
 		 function );
 
 		return( -1 );
@@ -646,7 +617,7 @@ int mount_file_system_get_image_index_from_path(
 	if( ( path_length == 1 )
 	 && ( path[ 0 ] == file_system->path_prefix[ 0 ] ) )
 	{
-		*image_index = -1;
+		*file_index = -1;
 
 		return( 1 );
 	}
@@ -670,8 +641,9 @@ int mount_file_system_get_image_index_from_path(
 	{
 		return( 0 );
 	}
-	image_number = 0;
-	path_index   = file_system->path_prefix_size - 1;
+	file_number = 0;
+
+	path_index = file_system->path_prefix_size - 1;
 
 	while( path_index < path_length )
 	{
@@ -682,28 +654,28 @@ int mount_file_system_get_image_index_from_path(
 		{
 			return( 0 );
 		}
-		image_number *= 10;
-		image_number += character - (system_character_t) '0';
+		file_number *= 10;
+		file_number += character - (system_character_t) '0';
 	}
-	*image_index = image_number - 1;
+	*file_index = file_number - 1;
 
 	return( 1 );
 }
 
-/* Retrieves the path rrom an image index.
+/* Retrieves the path from a file index.
  * Returns 1 if successful or -1 on error
  */
-int mount_file_system_get_path_from_image_index(
+int mount_file_system_get_path_from_file_index(
      mount_file_system_t *file_system,
-     int image_index,
+     int file_index,
      system_character_t *path,
      size_t path_size,
      libcerror_error_t **error )
 {
-	static char *function     = "mount_file_system_get_path_from_image_index";
+	static char *function     = "mount_file_system_get_path_from_file_index";
 	size_t path_index         = 0;
 	size_t required_path_size = 0;
-	int image_number          = 0;
+	int file_number           = 0;
 
 	if( file_system == NULL )
 	{
@@ -750,13 +722,14 @@ int mount_file_system_get_path_from_image_index(
 		return( -1 );
 	}
         required_path_size = file_system->path_prefix_size;
-	image_number       = image_index + 1;
 
-	while( image_number > 0 )
+	file_number = file_index + 1;
+
+	while( file_number > 0 )
 	{
 		required_path_size++;
 
-		image_number /= 10;
+		file_number /= 10;
 	}
 	if( path_size <= required_path_size )
 	{
@@ -783,16 +756,17 @@ int mount_file_system_get_path_from_image_index(
 
 		return( -1 );
 	}
-	path_index   = required_path_size - 1;
-	image_number = image_index + 1;
+	path_index = required_path_size - 1;
+
+	file_number = file_index + 1;
 
 	path[ path_index-- ] = 0;
 
-	while( image_number > 0 )
+	while( file_number > 0 )
 	{
-		path[ path_index-- ] = (system_character_t) '0' + ( image_number % 10 );
+		path[ path_index-- ] = (system_character_t) '0' + ( file_number % 10 );
 
-		image_number /= 10;
+		file_number /= 10;
 	}
 	return( 1 );
 }

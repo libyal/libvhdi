@@ -46,11 +46,11 @@ struct mount_file_system
 
 	/* The mounted timestamp
 	 */
-	int64_t mounted_timestamp;
+	uint64_t mounted_timestamp;
 
-	/* The images array
+	/* The files array
 	 */
-	libcdata_array_t *images_array;
+	libcdata_array_t *files_array;
 };
 
 int mount_file_system_initialize(
@@ -61,10 +61,6 @@ int mount_file_system_free(
      mount_file_system_t **file_system,
      libcerror_error_t **error );
 
-int mount_file_system_signal_abort(
-     mount_file_system_t *file_system,
-     libcerror_error_t **error );
-
 int mount_file_system_set_path_prefix(
      mount_file_system_t *file_system,
      const system_character_t *path_prefix,
@@ -73,35 +69,35 @@ int mount_file_system_set_path_prefix(
 
 int mount_file_system_get_mounted_timestamp(
      mount_file_system_t *file_system,
-     int64_t *mounted_timestamp,
+     uint64_t *mounted_timestamp,
      libcerror_error_t **error );
 
-int mount_file_system_get_number_of_images(
+int mount_file_system_get_number_of_files(
      mount_file_system_t *file_system,
-     int *number_of_images,
+     int *number_of_files,
      libcerror_error_t **error );
 
-int mount_file_system_get_image_by_index(
+int mount_file_system_get_file_by_index(
      mount_file_system_t *file_system,
-     int image_index,
-     libvhdi_file_t **image,
+     int file_index,
+     libvhdi_file_t **file,
      libcerror_error_t **error );
 
-int mount_file_system_append_image(
+int mount_file_system_append_file(
      mount_file_system_t *file_system,
-     libvhdi_file_t *image,
+     libvhdi_file_t *file,
      libcerror_error_t **error );
 
-int mount_file_system_get_image_index_from_path(
+int mount_file_system_get_file_index_from_path(
      mount_file_system_t *file_system,
      const system_character_t *path,
      size_t path_length,
-     int *image_index,
+     int *file_index,
      libcerror_error_t **error );
 
-int mount_file_system_get_path_from_image_index(
+int mount_file_system_get_path_from_file_index(
      mount_file_system_t *file_system,
-     int image_index,
+     int file_index,
      system_character_t *path,
      size_t path_size,
      libcerror_error_t **error );

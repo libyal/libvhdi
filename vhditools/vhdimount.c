@@ -43,6 +43,7 @@
 #include "mount_fuse.h"
 #include "mount_handle.h"
 #include "vhditools_getopt.h"
+#include "vhditools_i18n.h"
 #include "vhditools_libcerror.h"
 #include "vhditools_libclocale.h"
 #include "vhditools_libcnotify.h"
@@ -143,9 +144,9 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
 	struct fuse_operations vhdimount_fuse_operations;
 
-	struct fuse_args vhdimount_fuse_arguments = FUSE_ARGS_INIT(0, NULL);
-	struct fuse_chan *vhdimount_fuse_channel  = NULL;
-	struct fuse *vhdimount_fuse_handle        = NULL;
+	struct fuse_args vhdimount_fuse_arguments   = FUSE_ARGS_INIT(0, NULL);
+	struct fuse_chan *vhdimount_fuse_channel    = NULL;
+	struct fuse *vhdimount_fuse_handle          = NULL;
 
 #elif defined( HAVE_LIBDOKAN )
 	DOKAN_OPERATIONS vhdimount_dokan_operations;
@@ -295,7 +296,8 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to open source image.\n" );
+		 "Unable to open: %" PRIs_SYSTEM "\n",
+		 source );
 
 		goto on_error;
 	}
@@ -436,7 +438,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	vhdimount_dokan_options.Version     = 600;
+	vhdimount_dokan_options.Version     = DOKAN_VERSION;
 	vhdimount_dokan_options.ThreadCount = 0;
 	vhdimount_dokan_options.MountPoint  = mount_point;
 
