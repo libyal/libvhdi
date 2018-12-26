@@ -242,6 +242,7 @@ int mount_handle_signal_abort(
 	}
 	return( 1 );
 }
+
 /* Sets the basename
  * Returns 1 if successful or -1 on error
  */
@@ -488,7 +489,6 @@ int mount_handle_open(
 	          LIBVHDI_OPEN_READ,
 	          error );
 #endif
-
 	if( result == -1 )
 	{
 		libcerror_error_set(
