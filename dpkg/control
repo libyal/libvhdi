@@ -9,6 +9,8 @@ Homepage: https://github.com/libyal/libvhdi
 Package: libvhdi
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libvhdi1
+Replaces: libvhdi1
 Suggests: libvhdi-dbg
 Description: Library to access the Virtual Hard Disk (VHD) image format
  libvhdi is a library to access the Virtual Hard Disk (VHD) image format.
@@ -31,6 +33,8 @@ Package: libvhdi-tools
 Section: utils
 Architecture: any
 Depends: libvhdi (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libvhdi-utils
+Replaces: libvhdi-utils
 Description: Several tools for reading Virtual Hard Disk (VHD) image files
  Several tools for reading Virtual Hard Disk (VHD) image files.
 
@@ -45,6 +49,8 @@ Package: libvhdi-python
 Section: python
 Architecture: any
 Depends: libvhdi (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: python-libvhdi
+Replaces: python-libvhdi
 Suggests: libvhdi-python-dbg
 Description: Python 2 bindings for libvhdi
  Python 2 bindings for libvhdi.
@@ -60,6 +66,8 @@ Package: libvhdi-python3
 Section: python
 Architecture: any
 Depends: libvhdi (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: python3-libvhdi
+Replaces: python3-libvhdi
 Suggests: libvhdi-python3-dbg
 Description: Python 3 bindings for libvhdi
  Python 3 bindings for libvhdi.
