@@ -61,6 +61,10 @@ int mount_file_system_free(
      mount_file_system_t **file_system,
      libcerror_error_t **error );
 
+int mount_file_system_signal_abort(
+     mount_file_system_t *file_system,
+     libcerror_error_t **error );
+
 int mount_file_system_set_path_prefix(
      mount_file_system_t *file_system,
      const system_character_t *path_prefix,
@@ -83,16 +87,16 @@ int mount_file_system_get_file_by_index(
      libvhdi_file_t **file,
      libcerror_error_t **error );
 
-int mount_file_system_append_file(
-     mount_file_system_t *file_system,
-     libvhdi_file_t *file,
-     libcerror_error_t **error );
-
-int mount_file_system_get_file_index_from_path(
+int mount_file_system_get_file_by_path(
      mount_file_system_t *file_system,
      const system_character_t *path,
      size_t path_length,
-     int *file_index,
+     libvhdi_file_t **file,
+     libcerror_error_t **error );
+
+int mount_file_system_append_file(
+     mount_file_system_t *file_system,
+     libvhdi_file_t *file,
      libcerror_error_t **error );
 
 int mount_file_system_get_path_from_file_index(

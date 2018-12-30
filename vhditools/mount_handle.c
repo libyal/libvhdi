@@ -175,10 +175,7 @@ int mount_handle_signal_abort(
      mount_handle_t *mount_handle,
      libcerror_error_t **error )
 {
-	libvhdi_file_t *file  = NULL;
 	static char *function = "mount_handle_signal_abort";
-	int file_index        = 0;
-	int number_of_files   = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -191,54 +188,18 @@ int mount_handle_signal_abort(
 
 		return( -1 );
 	}
-	if( mount_file_system_get_number_of_files(
+	if( mount_file_system_signal_abort(
 	     mount_handle->file_system,
-	     &number_of_files,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of files.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to signal file system to abort.",
 		 function );
 
 		return( -1 );
-	}
-	for( file_index = number_of_files - 1;
-	     file_index > 0;
-	     file_index-- )
-	{
-		if( mount_file_system_get_file_by_index(
-		     mount_handle->file_system,
-		     file_index,
-		     &file,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve file: %d.",
-			 function,
-			 file_index );
-
-			return( -1 );
-		}
-		if( libvhdi_file_signal_abort(
-		     file,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to signal file: %d to abort.",
-			 function,
-			 file_index );
-
-			return( -1 );
-		}
 	}
 	return( 1 );
 }
@@ -942,7 +903,6 @@ int mount_handle_get_file_entry_by_path(
 	const system_character_t *filename = NULL;
 	static char *function              = "mount_handle_get_file_entry_by_path";
 	size_t path_length                 = 0;
-	int file_index                     = 0;
 	int result                         = 0;
 
 	if( mount_handle == NULL )
@@ -981,11 +941,11 @@ int mount_handle_get_file_entry_by_path(
 
 		return( -1 );
 	}
-	result = mount_file_system_get_file_index_from_path(
+	result = mount_file_system_get_file_by_path(
 	          mount_handle->file_system,
 	          path,
 	          path_length,
-	          &file_index,
+	          &file,
 	          error );
 
 	if( result == -1 )
@@ -994,64 +954,38 @@ int mount_handle_get_file_entry_by_path(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file index.",
+		 "%s: unable to retrieve file.",
 		 function );
 
 		return( -1 );
 	}
-	else if( result == 0 )
+	else if( result != 0 )
 	{
-		return( 0 );
-	}
-	if( file_index != -1 )
-	{
-		if( mount_file_system_get_file_by_index(
+		if( file == NULL )
+		{
+			filename = "";
+		}
+		else
+		{
+			filename = &( path[ 0 ] );
+		}
+		if( mount_file_entry_initialize(
+		     file_entry,
 		     mount_handle->file_system,
-		     file_index,
-		     &file,
+		     filename,
+		     file,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve file: %d.",
-			 function,
-			 file_index );
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize file entry for file.",
+			 function );
 
 			return( -1 );
 		}
-		if( file == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing file: %d.",
-			 function,
-			 file_index );
-
-			return( -1 );
-		}
-		filename = &( path[ 0 ] );
 	}
-	if( mount_file_entry_initialize(
-	     file_entry,
-	     mount_handle->file_system,
-	     file_index,
-	     filename,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize file entry for file: %d.",
-		 function,
-		 file_index );
-
-		return( -1 );
-	}
-	return( 1 );
+	return( result );
 }
 

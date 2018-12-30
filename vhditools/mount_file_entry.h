@@ -37,28 +37,28 @@ typedef struct mount_file_entry mount_file_entry_t;
 
 struct mount_file_entry
 {
-	/* The name
-	 */
-	system_character_t *name;
-
 	/* The file system
 	 */
 	mount_file_system_t *file_system;
 
 	/* The name
 	 */
+	system_character_t *name;
+
+	/* The name size
+	 */
 	size_t name_size;
 
-	/* The file index
+	/* The file
 	 */
-	int file_index;
+	libvhdi_file_t *file;
 };
 
 int mount_file_entry_initialize(
      mount_file_entry_t **file_entry,
      mount_file_system_t *file_system,
-     int file_index,
      const system_character_t *name,
+     libvhdi_file_t *file,
      libcerror_error_t **error );
 
 int mount_file_entry_free(
