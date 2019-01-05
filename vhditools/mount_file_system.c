@@ -1,7 +1,7 @@
 /*
  * Mount file system
  *
- * Copyright (C) 2012-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -281,10 +281,10 @@ int mount_file_system_signal_abort(
      mount_file_system_t *file_system,
      libcerror_error_t **error )
 {
-	libvhdi_file_t *file  = NULL;
-	static char *function = "mount_file_system_signal_abort";
-	int file_index        = 0;
-	int number_of_files   = 0;
+	libvhdi_file_t *vhdi_file = NULL;
+	static char *function     = "mount_file_system_signal_abort";
+	int file_index            = 0;
+	int number_of_files       = 0;
 
 	if( file_system == NULL )
 	{
@@ -318,7 +318,7 @@ int mount_file_system_signal_abort(
 		if( libcdata_array_get_entry_by_index(
 		     file_system->files_array,
 		     file_index,
-		     (intptr_t **) &file,
+		     (intptr_t **) &vhdi_file,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -332,7 +332,7 @@ int mount_file_system_signal_abort(
 			return( -1 );
 		}
 		if( libvhdi_file_signal_abort(
-		     file,
+		     vhdi_file,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -545,7 +545,7 @@ int mount_file_system_get_number_of_files(
 int mount_file_system_get_file_by_index(
      mount_file_system_t *file_system,
      int file_index,
-     libvhdi_file_t **file,
+     libvhdi_file_t **vhdi_file,
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_system_get_file_by_index";
@@ -564,7 +564,7 @@ int mount_file_system_get_file_by_index(
 	if( libcdata_array_get_entry_by_index(
 	     file_system->files_array,
 	     file_index,
-	     (intptr_t **) file,
+	     (intptr_t **) vhdi_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -581,13 +581,13 @@ int mount_file_system_get_file_by_index(
 }
 
 /* Retrieves the file for a specific path
- * Returns 1 if successful, 0 if no such file index or -1 on error
+ * Returns 1 if successful, 0 if no such file or -1 on error
  */
 int mount_file_system_get_file_by_path(
      mount_file_system_t *file_system,
      const system_character_t *path,
      size_t path_length,
-     libvhdi_file_t **file,
+     libvhdi_file_t **vhdi_file,
      libcerror_error_t **error )
 {
 	static char *function        = "mount_file_system_get_file_by_path";
@@ -640,7 +640,7 @@ int mount_file_system_get_file_by_path(
 
 		return( -1 );
 	}
-	if( file == NULL )
+	if( vhdi_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -657,7 +657,7 @@ int mount_file_system_get_file_by_path(
 	if( ( path_length == 1 )
 	 && ( path[ 0 ] == file_system->path_prefix[ 0 ] ) )
 	{
-		*file = NULL;
+		*vhdi_file = NULL;
 
 		return( 1 );
 	}
@@ -702,7 +702,7 @@ int mount_file_system_get_file_by_path(
 	if( libcdata_array_get_entry_by_index(
 	     file_system->files_array,
 	     file_index,
-	     (intptr_t **) file,
+	     (intptr_t **) vhdi_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -723,7 +723,7 @@ int mount_file_system_get_file_by_path(
  */
 int mount_file_system_append_file(
      mount_file_system_t *file_system,
-     libvhdi_file_t *file,
+     libvhdi_file_t *vhdi_file,
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_system_append_file";
@@ -743,7 +743,7 @@ int mount_file_system_append_file(
 	if( libcdata_array_append_entry(
 	     file_system->files_array,
 	     &entry_index,
-	     (intptr_t *) file,
+	     (intptr_t *) vhdi_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

@@ -1,7 +1,7 @@
 /*
  * Mount file entry
  *
- * Copyright (C) 2012-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -51,11 +51,11 @@ int mount_file_entry_initialize(
      mount_file_entry_t **file_entry,
      mount_file_system_t *file_system,
      const system_character_t *name,
-     libvhdi_file_t *file,
+     size_t name_length,
+     libvhdi_file_t *vhdi_file,
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_entry_initialize";
-	size_t name_length    = 0;
 
 	if( file_entry == NULL )
 	{
@@ -86,6 +86,17 @@ int mount_file_entry_initialize(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file system.",
+		 function );
+
+		return( -1 );
+	}
+	if( name_length > (size_t) ( SSIZE_MAX - 1 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid name length value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -127,9 +138,6 @@ int mount_file_entry_initialize(
 
 	if( name != NULL )
 	{
-		name_length = system_string_length(
-		               name );
-
 		( *file_entry )->name = system_string_allocate(
 		                         name_length + 1 );
 
@@ -144,25 +152,28 @@ int mount_file_entry_initialize(
 
 			goto on_error;
 		}
-		if( system_string_copy(
-		     ( *file_entry )->name,
-		     name,
-		     name_length ) == NULL )
+		if( name_length > 0 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy name.",
-			 function );
+			if( system_string_copy(
+			     ( *file_entry )->name,
+			     name,
+			     name_length ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy name.",
+				 function );
 
-			goto on_error;
+				goto on_error;
+			}
 		}
 		( *file_entry )->name[ name_length ] = 0;
 
 		( *file_entry )->name_size = name_length + 1;
 	}
-	( *file_entry )->file = file;
+	( *file_entry )->vhdi_file = vhdi_file;
 
 	return( 1 );
 
@@ -260,12 +271,13 @@ int mount_file_entry_get_parent_file_entry(
 
 		return( -1 );
 	}
-	if( file_entry->file != NULL )
+	if( file_entry->vhdi_file != NULL )
 	{
 		if( mount_file_entry_initialize(
 		     parent_file_entry,
 		     file_entry->file_system,
-		     "",
+		     _SYSTEM_STRING( "" ),
+		     0,
 		     NULL,
 		     error ) != 1 )
 		{
@@ -475,7 +487,7 @@ int mount_file_entry_get_file_mode(
 
 		return( -1 );
 	}
-	if( file_entry->file == NULL )
+	if( file_entry->vhdi_file == NULL )
 	{
 		*file_mode = S_IFDIR | 0555;
 	}
@@ -643,7 +655,7 @@ int mount_file_entry_get_number_of_sub_file_entries(
 
 		return( -1 );
 	}
-	if( file_entry->file == NULL )
+	if( file_entry->vhdi_file == NULL )
 	{
 		if( mount_file_system_get_number_of_files(
 		     file_entry->file_system,
@@ -688,8 +700,9 @@ int mount_file_entry_get_sub_file_entry_by_index(
 {
 	system_character_t path[ 32 ];
 
-	libvhdi_file_t *file           = NULL;
+	libvhdi_file_t *vhdi_file      = NULL;
 	static char *function          = "mount_file_entry_get_sub_file_entry_by_index";
+	size_t path_length             = 0;
 	int number_of_sub_file_entries = 0;
 
 	if( file_entry == NULL )
@@ -771,7 +784,7 @@ int mount_file_entry_get_sub_file_entry_by_index(
 	if( mount_file_system_get_file_by_index(
 	     file_entry->file_system,
 	     sub_file_entry_index,
-	     &file,
+	     &vhdi_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -784,7 +797,7 @@ int mount_file_entry_get_sub_file_entry_by_index(
 
 		return( -1 );
 	}
-	if( file == NULL )
+	if( vhdi_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -796,11 +809,15 @@ int mount_file_entry_get_sub_file_entry_by_index(
 
 		return( -1 );
 	}
+	path_length = system_string_length(
+	               path );
+
 	if( mount_file_entry_initialize(
 	     sub_file_entry,
 	     file_entry->file_system,
 	     &( path[ 1 ] ),
-	     file,
+	     path_length - 1,
+	     vhdi_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -840,19 +857,8 @@ ssize_t mount_file_entry_read_buffer_at_offset(
 
 		return( -1 );
 	}
-	if( file_entry->file == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file.",
-		 function );
-
-		return( -1 );
-	}
 	read_count = libvhdi_file_read_buffer_at_offset(
-	              file_entry->file,
+	              file_entry->vhdi_file,
 	              buffer,
 	              buffer_size,
 	              offset,
@@ -895,7 +901,7 @@ int mount_file_entry_get_size(
 
 		return( -1 );
 	}
-	if( file_entry->file == NULL )
+	if( file_entry->vhdi_file == NULL )
 	{
 		if( size == NULL )
 		{
@@ -913,7 +919,7 @@ int mount_file_entry_get_size(
 	else
 	{
 		if( libvhdi_file_get_media_size(
-		     file_entry->file,
+		     file_entry->vhdi_file,
 		     size,
 		     error ) != 1 )
 		{

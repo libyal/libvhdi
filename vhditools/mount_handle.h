@@ -1,7 +1,7 @@
 /*
  * Mount handle
  *
- * Copyright (C) 2012-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -87,7 +87,7 @@ int mount_handle_open(
 
 int mount_handle_open_parent(
      mount_handle_t *mount_handle,
-     libvhdi_file_t *file,
+     libvhdi_file_t *vhdi_file,
      libcerror_error_t **error );
 
 int mount_handle_close(

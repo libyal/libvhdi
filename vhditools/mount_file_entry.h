@@ -1,7 +1,7 @@
 /*
  * Mount file entry
  *
- * Copyright (C) 2012-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -51,14 +51,15 @@ struct mount_file_entry
 
 	/* The file
 	 */
-	libvhdi_file_t *file;
+	libvhdi_file_t *vhdi_file;
 };
 
 int mount_file_entry_initialize(
      mount_file_entry_t **file_entry,
      mount_file_system_t *file_system,
      const system_character_t *name,
-     libvhdi_file_t *file,
+     size_t name_length,
+     libvhdi_file_t *vhdi_file,
      libcerror_error_t **error );
 
 int mount_file_entry_free(

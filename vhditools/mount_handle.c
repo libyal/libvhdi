@@ -1,7 +1,7 @@
 /*
  * Mount handle
  *
- * Copyright (C) 2012-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -357,7 +357,7 @@ int mount_handle_set_path_prefix(
 	return( 1 );
 }
 
-/* Opens a mount handle
+/* Opens the mount handle
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int mount_handle_open(
@@ -365,7 +365,7 @@ int mount_handle_open(
      const system_character_t *filename,
      libcerror_error_t **error )
 {
-	libvhdi_file_t *file             = NULL;
+	libvhdi_file_t *vhdi_file        = NULL;
 	system_character_t *basename_end = NULL;
 	static char *function            = "mount_handle_open";
 	size_t basename_length           = 0;
@@ -425,7 +425,7 @@ int mount_handle_open(
 		}
 	}
 	if( libvhdi_file_initialize(
-	     &file,
+	     &vhdi_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -439,13 +439,13 @@ int mount_handle_open(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libvhdi_file_open_wide(
-	          file,
+	          vhdi_file,
 	          filename,
 	          LIBVHDI_OPEN_READ,
 	          error );
 #else
 	result = libvhdi_file_open(
-	          file,
+	          vhdi_file,
 	          filename,
 	          LIBVHDI_OPEN_READ,
 	          error );
@@ -463,7 +463,7 @@ int mount_handle_open(
 	}
 	if( mount_handle_open_parent(
 	     mount_handle,
-	     file,
+	     vhdi_file,
 	     error ) == -1 )
 	{
 		libcerror_error_set(
@@ -477,7 +477,7 @@ int mount_handle_open(
 	}
 	if( mount_file_system_append_file(
 	     mount_handle->file_system,
-	     file,
+	     vhdi_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -492,10 +492,10 @@ int mount_handle_open(
 	return( 1 );
 
 on_error:
-	if( file != NULL )
+	if( vhdi_file != NULL )
 	{
 		libvhdi_file_free(
-		 &file,
+		 &vhdi_file,
 		 NULL );
 	}
 	return( -1 );
@@ -506,12 +506,12 @@ on_error:
  */
 int mount_handle_open_parent(
      mount_handle_t *mount_handle,
-     libvhdi_file_t *file,
+     libvhdi_file_t *vhdi_file,
      libcerror_error_t **error )
 {
 	uint8_t guid[ 16 ];
 
-	libvhdi_file_t *parent_file             = NULL;
+	libvhdi_file_t *parent_vhdi_file        = NULL;
 	system_character_t *parent_basename_end = NULL;
 	system_character_t *parent_filename     = NULL;
 	system_character_t *parent_path         = NULL;
@@ -533,7 +533,7 @@ int mount_handle_open_parent(
 		return( -1 );
 	}
 	result = libvhdi_file_get_parent_identifier(
-	          file,
+	          vhdi_file,
 	          guid,
 	          16,
 	          error );
@@ -555,14 +555,14 @@ int mount_handle_open_parent(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libvhdi_file_get_utf16_parent_filename_size(
-		  file,
-		  &parent_filename_size,
-		  error );
+	          vhdi_file,
+	          &parent_filename_size,
+	          error );
 #else
 	result = libvhdi_file_get_utf8_parent_filename_size(
-		  file,
-		  &parent_filename_size,
-		  error );
+	          vhdi_file,
+	          &parent_filename_size,
+	          error );
 #endif
 	if( result != 1 )
 	{
@@ -599,7 +599,7 @@ int mount_handle_open_parent(
 		goto on_error;
 	}
 	parent_filename = system_string_allocate(
-			   parent_filename_size );
+	                   parent_filename_size );
 
 	if( parent_filename == NULL )
 	{
@@ -614,16 +614,16 @@ int mount_handle_open_parent(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libvhdi_file_get_utf16_parent_filename(
-		  file,
-		  (uint16_t *) parent_filename,
-		  parent_filename_size,
-		  error );
+	          vhdi_file,
+	          (uint16_t *) parent_filename,
+	          parent_filename_size,
+	          error );
 #else
 	result = libvhdi_file_get_utf8_parent_filename(
-		  file,
-		  (uint8_t *) parent_filename,
-		  parent_filename_size,
-		  error );
+	          vhdi_file,
+	          (uint8_t *) parent_filename,
+	          parent_filename_size,
+	          error );
 #endif
 	if( result != 1 )
 	{
@@ -683,7 +683,7 @@ int mount_handle_open_parent(
 		}
 	}
 	if( libvhdi_file_initialize(
-	     &parent_file,
+	     &parent_vhdi_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -697,13 +697,13 @@ int mount_handle_open_parent(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libvhdi_file_open_wide(
-	     parent_file,
+	     parent_vhdi_file,
 	     parent_path,
 	     LIBVHDI_OPEN_READ,
 	     error ) != 1 )
 #else
 	if( libvhdi_file_open(
-	     parent_file,
+	     parent_vhdi_file,
 	     parent_path,
 	     LIBVHDI_OPEN_READ,
 	     error ) != 1 )
@@ -721,7 +721,7 @@ int mount_handle_open_parent(
 	}
 	if( mount_handle_open_parent(
 	     mount_handle,
-	     parent_file,
+	     parent_vhdi_file,
 	     error ) == -1 )
 	{
 		libcerror_error_set(
@@ -735,8 +735,8 @@ int mount_handle_open_parent(
 		return( -1 );
 	}
 	if( libvhdi_file_set_parent_file(
-	     file,
-	     parent_file,
+	     vhdi_file,
+	     parent_vhdi_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -750,7 +750,7 @@ int mount_handle_open_parent(
 	}
 	if( mount_file_system_append_file(
 	     mount_handle->file_system,
-	     file,
+	     vhdi_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -781,10 +781,10 @@ int mount_handle_open_parent(
 	return( 1 );
 
 on_error:
-	if( parent_file != NULL )
+	if( parent_vhdi_file != NULL )
 	{
 		libvhdi_file_free(
-		 &parent_file,
+		 &parent_vhdi_file,
 		 NULL );
 	}
 	if( ( parent_path != NULL )
@@ -808,10 +808,10 @@ int mount_handle_close(
      mount_handle_t *mount_handle,
      libcerror_error_t **error )
 {
-	libvhdi_file_t *file  = NULL;
-	static char *function = "mount_handle_close";
-	int file_index        = 0;
-	int number_of_files   = 0;
+	libvhdi_file_t *vhdi_file = NULL;
+	static char *function     = "mount_handle_close";
+	int file_index            = 0;
+	int number_of_files       = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -836,7 +836,7 @@ int mount_handle_close(
 		 "%s: unable to retrieve number of files.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	for( file_index = number_of_files - 1;
 	     file_index > 0;
@@ -845,7 +845,7 @@ int mount_handle_close(
 		if( mount_file_system_get_file_by_index(
 		     mount_handle->file_system,
 		     file_index,
-		     &file,
+		     &vhdi_file,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -856,10 +856,12 @@ int mount_handle_close(
 			 function,
 			 file_index );
 
-			return( -1 );
+			goto on_error;
 		}
+/* TODO remove vhdi_file from file system */
+
 		if( libvhdi_file_close(
-		     file,
+		     vhdi_file,
 		     error ) != 0 )
 		{
 			libcerror_error_set(
@@ -870,10 +872,10 @@ int mount_handle_close(
 			 function,
 			 file_index );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libvhdi_file_free(
-		     &file,
+		     &vhdi_file,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -884,10 +886,19 @@ int mount_handle_close(
 			 function,
 			 file_index );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( 0 );
+
+on_error:
+	if( vhdi_file != NULL )
+	{
+		libvhdi_file_free(
+		 &vhdi_file,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Retrieves a file entry for a specific path
@@ -899,9 +910,11 @@ int mount_handle_get_file_entry_by_path(
      mount_file_entry_t **file_entry,
      libcerror_error_t **error )
 {
-	libvhdi_file_t *file               = NULL;
+	libvhdi_file_t *vhdi_file          = NULL;
 	const system_character_t *filename = NULL;
 	static char *function              = "mount_handle_get_file_entry_by_path";
+	size_t filename_length             = 0;
+	size_t path_index                  = 0;
 	size_t path_length                 = 0;
 	int result                         = 0;
 
@@ -939,13 +952,40 @@ int mount_handle_get_file_entry_by_path(
 		 "%s: invalid path length value out of bounds.",
 		 function );
 
-		return( -1 );
+		goto on_error;
+	}
+	if( ( path_length >= 2 )
+	 && ( path[ path_length - 1 ] == LIBCPATH_SEPARATOR ) )
+	{
+		path_length--;
+	}
+	path_index = path_length;
+
+	while( path_index > 0 )
+	{
+		if( path[ path_index ] == LIBCPATH_SEPARATOR )
+		{
+			break;
+		}
+		path_index--;
+	}
+	/* Ignore the name of the root item
+	 */
+	if( path_length == 0 )
+	{
+		filename        = _SYSTEM_STRING( "" );
+		filename_length = 0;
+	}
+	else
+	{
+		filename        = &( path[ path_index + 1 ] );
+		filename_length = path_length - ( path_index + 1 );
 	}
 	result = mount_file_system_get_file_by_path(
 	          mount_handle->file_system,
 	          path,
 	          path_length,
-	          &file,
+	          &vhdi_file,
 	          error );
 
 	if( result == -1 )
@@ -957,35 +997,31 @@ int mount_handle_get_file_entry_by_path(
 		 "%s: unable to retrieve file.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	else if( result != 0 )
 	{
-		if( file == NULL )
-		{
-			filename = "";
-		}
-		else
-		{
-			filename = &( path[ 0 ] );
-		}
 		if( mount_file_entry_initialize(
 		     file_entry,
 		     mount_handle->file_system,
 		     filename,
-		     file,
+		     filename_length,
+		     vhdi_file,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize file entry for file.",
+			 "%s: unable to initialize file entry.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( result );
+
+on_error:
+	return( -1 );
 }
 
