@@ -1908,7 +1908,6 @@ int vhdi_test_file_get_offset(
 {
 	libcerror_error_t *error = NULL;
 	off64_t offset           = 0;
-	int offset_is_set        = 0;
 	int result               = 0;
 
 	/* Test regular cases
@@ -1926,8 +1925,6 @@ int vhdi_test_file_get_offset(
 	VHDI_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	offset_is_set = result;
 
 	/* Test error cases
 	 */
@@ -1948,25 +1945,23 @@ int vhdi_test_file_get_offset(
 	libcerror_error_free(
 	 &error );
 
-	if( offset_is_set != 0 )
-	{
-		result = libvhdi_file_get_offset(
-		          file,
-		          NULL,
-		          &error );
+	result = libvhdi_file_get_offset(
+	          file,
+	          NULL,
+	          &error );
 
-		VHDI_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		VHDI_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
-	}
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -1986,7 +1981,6 @@ int vhdi_test_file_get_media_size(
 {
 	libcerror_error_t *error = NULL;
 	size64_t media_size      = 0;
-	int media_size_is_set    = 0;
 	int result               = 0;
 
 	/* Test regular cases
@@ -2004,8 +1998,6 @@ int vhdi_test_file_get_media_size(
 	VHDI_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	media_size_is_set = result;
 
 	/* Test error cases
 	 */
@@ -2026,25 +2018,23 @@ int vhdi_test_file_get_media_size(
 	libcerror_error_free(
 	 &error );
 
-	if( media_size_is_set != 0 )
-	{
-		result = libvhdi_file_get_media_size(
-		          file,
-		          NULL,
-		          &error );
+	result = libvhdi_file_get_media_size(
+	          file,
+	          NULL,
+	          &error );
 
-		VHDI_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		VHDI_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
-	}
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -2064,7 +2054,6 @@ int vhdi_test_file_get_disk_type(
 {
 	libcerror_error_t *error = NULL;
 	uint32_t disk_type       = 0;
-	int disk_type_is_set     = 0;
 	int result               = 0;
 
 	/* Test regular cases
@@ -2082,8 +2071,6 @@ int vhdi_test_file_get_disk_type(
 	VHDI_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	disk_type_is_set = result;
 
 	/* Test error cases
 	 */
@@ -2104,25 +2091,23 @@ int vhdi_test_file_get_disk_type(
 	libcerror_error_free(
 	 &error );
 
-	if( disk_type_is_set != 0 )
-	{
-		result = libvhdi_file_get_disk_type(
-		          file,
-		          NULL,
-		          &error );
+	result = libvhdi_file_get_disk_type(
+	          file,
+	          NULL,
+	          &error );
 
-		VHDI_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		VHDI_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
-	}
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
