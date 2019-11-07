@@ -29,7 +29,6 @@ TESTS = \
 
 check_SCRIPTS = \
 	pyvhdi_test_file.py \
-	pyvhdi_test_read.py \
 	pyvhdi_test_support.py \
 	test_library.sh \
 	test_manpage.sh \
