@@ -116,6 +116,8 @@ int vhdi_test_data_block_initialize(
 	          4096,
 	          &error );
 
+	data_block = NULL;
+
 	VHDI_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -127,8 +129,6 @@ int vhdi_test_data_block_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	data_block = NULL;
 
 	result = libvhdi_data_block_initialize(
 	          &data_block,

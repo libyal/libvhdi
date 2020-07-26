@@ -113,6 +113,8 @@ int vhdi_test_block_table_initialize(
 	          &block_table,
 	          &error );
 
+	block_table = NULL;
+
 	VHDI_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -124,8 +126,6 @@ int vhdi_test_block_table_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	block_table = NULL;
 
 #if defined( HAVE_VHDI_TEST_MEMORY )
 

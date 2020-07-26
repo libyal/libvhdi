@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #endif
 
-#include "vhdi_test_libcerror.h"
 #include "vhdi_test_libvhdi.h"
 #include "vhdi_test_macros.h"
 #include "vhdi_test_unused.h"

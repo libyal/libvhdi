@@ -1,5 +1,5 @@
 /*
- * Python bindings for libvhdi (pyvhdi)
+ * Python bindings module for libvhdi (pyvhdi)
  *
  * Copyright (C) 2012-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -41,6 +41,16 @@ PyObject *pyvhdi_check_file_signature(
            PyObject *keywords );
 
 PyObject *pyvhdi_check_file_signature_file_object(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject *pyvhdi_open_new_file(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject *pyvhdi_open_new_file_with_file_object(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords );

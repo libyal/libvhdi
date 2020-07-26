@@ -941,6 +941,8 @@ int vhdi_test_file_initialize(
 	          &file,
 	          &error );
 
+	file = NULL;
+
 	VHDI_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -952,8 +954,6 @@ int vhdi_test_file_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	file = NULL;
 
 #if defined( HAVE_VHDI_TEST_MEMORY )
 

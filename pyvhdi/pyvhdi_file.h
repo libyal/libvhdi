@@ -53,19 +53,6 @@ struct pyvhdi_file
 extern PyMethodDef pyvhdi_file_object_methods[];
 extern PyTypeObject pyvhdi_file_type_object;
 
-PyObject *pyvhdi_file_new(
-           void );
-
-PyObject *pyvhdi_file_new_open(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords );
-
-PyObject *pyvhdi_file_new_open_file_object(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords );
-
 int pyvhdi_file_init(
      pyvhdi_file_t *pyvhdi_file );
 

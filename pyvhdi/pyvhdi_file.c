@@ -317,93 +317,6 @@ PyTypeObject pyvhdi_file_type_object = {
 	0
 };
 
-/* Creates a new file object
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyvhdi_file_new(
-           void )
-{
-	pyvhdi_file_t *pyvhdi_file = NULL;
-	static char *function      = "pyvhdi_file_new";
-
-	pyvhdi_file = PyObject_New(
-	               struct pyvhdi_file,
-	               &pyvhdi_file_type_object );
-
-	if( pyvhdi_file == NULL )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize file.",
-		 function );
-
-		goto on_error;
-	}
-	if( pyvhdi_file_init(
-	     pyvhdi_file ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize file.",
-		 function );
-
-		goto on_error;
-	}
-	return( (PyObject *) pyvhdi_file );
-
-on_error:
-	if( pyvhdi_file != NULL )
-	{
-		Py_DecRef(
-		 (PyObject *) pyvhdi_file );
-	}
-	return( NULL );
-}
-
-/* Creates a new file object and opens it
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyvhdi_file_new_open(
-           PyObject *self PYVHDI_ATTRIBUTE_UNUSED,
-           PyObject *arguments,
-           PyObject *keywords )
-{
-	PyObject *pyvhdi_file = NULL;
-
-	PYVHDI_UNREFERENCED_PARAMETER( self )
-
-	pyvhdi_file = pyvhdi_file_new();
-
-	pyvhdi_file_open(
-	 (pyvhdi_file_t *) pyvhdi_file,
-	 arguments,
-	 keywords );
-
-	return( pyvhdi_file );
-}
-
-/* Creates a new file object and opens it using a file-like object
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyvhdi_file_new_open_file_object(
-           PyObject *self PYVHDI_ATTRIBUTE_UNUSED,
-           PyObject *arguments,
-           PyObject *keywords )
-{
-	PyObject *pyvhdi_file = NULL;
-
-	PYVHDI_UNREFERENCED_PARAMETER( self )
-
-	pyvhdi_file = pyvhdi_file_new();
-
-	pyvhdi_file_open_file_object(
-	 (pyvhdi_file_t *) pyvhdi_file,
-	 arguments,
-	 keywords );
-
-	return( pyvhdi_file );
-}
-
 /* Intializes a file object
  * Returns 0 if successful or -1 on error
  */
@@ -462,15 +375,6 @@ void pyvhdi_file_free(
 
 		return;
 	}
-	if( pyvhdi_file->file == NULL )
-	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid file - missing libvhdi file.",
-		 function );
-
-		return;
-	}
 	ob_type = Py_TYPE(
 	           pyvhdi_file );
 
@@ -492,24 +396,27 @@ void pyvhdi_file_free(
 
 		return;
 	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libvhdi_file_free(
-	          &( pyvhdi_file->file ),
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
+	if( pyvhdi_file->file != NULL )
 	{
-		pyvhdi_error_raise(
-		 error,
-		 PyExc_MemoryError,
-		 "%s: unable to free libvhdi file.",
-		 function );
+		Py_BEGIN_ALLOW_THREADS
 
-		libcerror_error_free(
-		 &error );
+		result = libvhdi_file_free(
+		          &( pyvhdi_file->file ),
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyvhdi_error_raise(
+			 error,
+			 PyExc_MemoryError,
+			 "%s: unable to free libvhdi file.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+		}
 	}
 	ob_type->tp_free(
 	 (PyObject*) pyvhdi_file );
@@ -812,6 +719,36 @@ PyObject *pyvhdi_file_open_file_object(
 		 "%s: unsupported mode: %s.",
 		 function,
 		 mode );
+
+		return( NULL );
+	}
+	PyErr_Clear();
+
+	result = PyObject_HasAttrString(
+	          file_object,
+	          "read" );
+
+	if( result != 1 )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: unsupported file object - missing read attribute.",
+		 function );
+
+		return( NULL );
+	}
+	PyErr_Clear();
+
+	result = PyObject_HasAttrString(
+	          file_object,
+	          "seek" );
+
+	if( result != 1 )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: unsupported file object - missing seek attribute.",
+		 function );
 
 		return( NULL );
 	}

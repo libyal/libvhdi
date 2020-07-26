@@ -30,19 +30,22 @@
 #include "pyvhdi.h"
 #include "pyvhdi_disk_types.h"
 #include "pyvhdi_error.h"
-#include "pyvhdi_libcerror.h"
-#include "pyvhdi_libvhdi.h"
 #include "pyvhdi_file.h"
 #include "pyvhdi_file_object_io_handle.h"
+#include "pyvhdi_libbfio.h"
+#include "pyvhdi_libcerror.h"
+#include "pyvhdi_libvhdi.h"
 #include "pyvhdi_python.h"
 #include "pyvhdi_unused.h"
 
 #if !defined( LIBVHDI_HAVE_BFIO )
+
 LIBVHDI_EXTERN \
 int libvhdi_check_file_signature_file_io_handle(
      libbfio_handle_t *file_io_handle,
      libvhdi_error_t **error );
-#endif
+
+#endif /* !defined( LIBVHDI_HAVE_BFIO ) */
 
 /* The pyvhdi module methods
  */
@@ -64,19 +67,19 @@ PyMethodDef pyvhdi_module_methods[] = {
 	{ "check_file_signature_file_object",
 	  (PyCFunction) pyvhdi_check_file_signature_file_object,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "check_file_signature(file_object) -> Boolean\n"
+	  "check_file_signature_file_object(file_object) -> Boolean\n"
 	  "\n"
 	  "Checks if a file has a Virtual Hard Disk (VHD) image file signature using a file-like object." },
 
 	{ "open",
-	  (PyCFunction) pyvhdi_file_new_open,
+	  (PyCFunction) pyvhdi_open_new_file,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "open(filename, mode='r') -> Object\n"
 	  "\n"
 	  "Opens a file." },
 
 	{ "open_file_object",
-	  (PyCFunction) pyvhdi_file_new_open_file_object,
+	  (PyCFunction) pyvhdi_open_new_file_with_file_object,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "open_file_object(file_object, mode='r') -> Object\n"
 	  "\n"
@@ -119,7 +122,7 @@ PyObject *pyvhdi_get_version(
 	         errors ) );
 }
 
-/* Checks if the file has a Virtual Hard Disk (VHD) image file signature
+/* Checks if a file has a Virtual Hard Disk (VHD) image file signature
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyvhdi_check_file_signature(
@@ -127,12 +130,12 @@ PyObject *pyvhdi_check_file_signature(
            PyObject *arguments,
            PyObject *keywords )
 {
-	PyObject *string_object      = NULL;
-	libcerror_error_t *error     = NULL;
-	static char *function        = "pyvhdi_check_file_signature";
-	static char *keyword_list[]  = { "filename", NULL };
-	const char *filename_narrow  = NULL;
-	int result                   = 0;
+	PyObject *string_object     = NULL;
+	libcerror_error_t *error    = NULL;
+	const char *filename_narrow = NULL;
+	static char *function       = "pyvhdi_check_file_signature";
+	static char *keyword_list[] = { "filename", NULL };
+	int result                  = 0;
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	const wchar_t *filename_wide = NULL;
@@ -150,7 +153,7 @@ PyObject *pyvhdi_check_file_signature(
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
-	     "|O",
+	     "O|",
 	     keyword_list,
 	     &string_object ) == 0 )
 	{
@@ -165,8 +168,8 @@ PyObject *pyvhdi_check_file_signature(
 	if( result == -1 )
 	{
 		pyvhdi_error_fetch_and_raise(
-	         PyExc_RuntimeError,
-		 "%s: unable to determine if string object is of type unicode.",
+		 PyExc_RuntimeError,
+		 "%s: unable to determine if string object is of type Unicode.",
 		 function );
 
 		return( NULL );
@@ -193,17 +196,17 @@ PyObject *pyvhdi_check_file_signature(
 		{
 			pyvhdi_error_fetch_and_raise(
 			 PyExc_RuntimeError,
-			 "%s: unable to convert unicode string to UTF-8.",
+			 "%s: unable to convert Unicode string to UTF-8.",
 			 function );
 
 			return( NULL );
 		}
 #if PY_MAJOR_VERSION >= 3
 		filename_narrow = PyBytes_AsString(
-				   utf8_string_object );
+		                   utf8_string_object );
 #else
 		filename_narrow = PyString_AsString(
-				   utf8_string_object );
+		                   utf8_string_object );
 #endif
 		Py_BEGIN_ALLOW_THREADS
 
@@ -215,7 +218,9 @@ PyObject *pyvhdi_check_file_signature(
 
 		Py_DecRef(
 		 utf8_string_object );
-#endif
+
+#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
+
 		if( result == -1 )
 		{
 			pyvhdi_error_raise(
@@ -245,17 +250,17 @@ PyObject *pyvhdi_check_file_signature(
 
 #if PY_MAJOR_VERSION >= 3
 	result = PyObject_IsInstance(
-		  string_object,
-		  (PyObject *) &PyBytes_Type );
+	          string_object,
+	          (PyObject *) &PyBytes_Type );
 #else
 	result = PyObject_IsInstance(
-		  string_object,
-		  (PyObject *) &PyString_Type );
+	          string_object,
+	          (PyObject *) &PyString_Type );
 #endif
 	if( result == -1 )
 	{
 		pyvhdi_error_fetch_and_raise(
-	         PyExc_RuntimeError,
+		 PyExc_RuntimeError,
 		 "%s: unable to determine if string object is of type string.",
 		 function );
 
@@ -267,10 +272,10 @@ PyObject *pyvhdi_check_file_signature(
 
 #if PY_MAJOR_VERSION >= 3
 		filename_narrow = PyBytes_AsString(
-				   string_object );
+		                   string_object );
 #else
 		filename_narrow = PyString_AsString(
-				   string_object );
+		                   string_object );
 #endif
 		Py_BEGIN_ALLOW_THREADS
 
@@ -313,7 +318,7 @@ PyObject *pyvhdi_check_file_signature(
 	return( NULL );
 }
 
-/* Checks if the file has a Virtual Hard Disk (VHD) image file signature using a file-like object
+/* Checks if a file has a Virtual Hard Disk (VHD) image file signature using a file-like object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyvhdi_check_file_signature_file_object(
@@ -321,9 +326,9 @@ PyObject *pyvhdi_check_file_signature_file_object(
            PyObject *arguments,
            PyObject *keywords )
 {
-	libcerror_error_t *error         = NULL;
-	libbfio_handle_t *file_io_handle = NULL;
 	PyObject *file_object            = NULL;
+	libbfio_handle_t *file_io_handle = NULL;
+	libcerror_error_t *error         = NULL;
 	static char *function            = "pyvhdi_check_file_signature_file_object";
 	static char *keyword_list[]      = { "file_object", NULL };
 	int result                       = 0;
@@ -413,6 +418,108 @@ on_error:
 	return( NULL );
 }
 
+/* Creates a new file object and opens it
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyvhdi_open_new_file(
+           PyObject *self PYVHDI_ATTRIBUTE_UNUSED,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	pyvhdi_file_t *pyvhdi_file = NULL;
+	static char *function      = "pyvhdi_open_new_file";
+
+	PYVHDI_UNREFERENCED_PARAMETER( self )
+
+	/* PyObject_New does not invoke tp_init
+	 */
+	pyvhdi_file = PyObject_New(
+	               struct pyvhdi_file,
+	               &pyvhdi_file_type_object );
+
+	if( pyvhdi_file == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create file.",
+		 function );
+
+		goto on_error;
+	}
+	if( pyvhdi_file_init(
+	     pyvhdi_file ) != 0 )
+	{
+		goto on_error;
+	}
+	if( pyvhdi_file_open(
+	     pyvhdi_file,
+	     arguments,
+	     keywords ) == NULL )
+	{
+		goto on_error;
+	}
+	return( (PyObject *) pyvhdi_file );
+
+on_error:
+	if( pyvhdi_file != NULL )
+	{
+		Py_DecRef(
+		 (PyObject *) pyvhdi_file );
+	}
+	return( NULL );
+}
+
+/* Creates a new file object and opens it using a file-like object
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyvhdi_open_new_file_with_file_object(
+           PyObject *self PYVHDI_ATTRIBUTE_UNUSED,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	pyvhdi_file_t *pyvhdi_file = NULL;
+	static char *function      = "pyvhdi_open_new_file_with_file_object";
+
+	PYVHDI_UNREFERENCED_PARAMETER( self )
+
+	/* PyObject_New does not invoke tp_init
+	 */
+	pyvhdi_file = PyObject_New(
+	               struct pyvhdi_file,
+	               &pyvhdi_file_type_object );
+
+	if( pyvhdi_file == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create file.",
+		 function );
+
+		goto on_error;
+	}
+	if( pyvhdi_file_init(
+	     pyvhdi_file ) != 0 )
+	{
+		goto on_error;
+	}
+	if( pyvhdi_file_open_file_object(
+	     pyvhdi_file,
+	     arguments,
+	     keywords ) == NULL )
+	{
+		goto on_error;
+	}
+	return( (PyObject *) pyvhdi_file );
+
+on_error:
+	if( pyvhdi_file != NULL )
+	{
+		Py_DecRef(
+		 (PyObject *) pyvhdi_file );
+	}
+	return( NULL );
+}
+
 #if PY_MAJOR_VERSION >= 3
 
 /* The pyvhdi module definition
@@ -450,10 +557,8 @@ PyMODINIT_FUNC initpyvhdi(
                 void )
 #endif
 {
-	PyObject *module                     = NULL;
-	PyTypeObject *disk_types_type_object = NULL;
-	PyTypeObject *file_type_object       = NULL;
-	PyGILState_STATE gil_state           = 0;
+	PyObject *module           = NULL;
+	PyGILState_STATE gil_state = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	libvhdi_notify_set_stream(
@@ -488,26 +593,7 @@ PyMODINIT_FUNC initpyvhdi(
 
 	gil_state = PyGILState_Ensure();
 
-	/* Setup the file type object
-	 */
-	pyvhdi_file_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyvhdi_file_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyvhdi_file_type_object );
-
-	file_type_object = &pyvhdi_file_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "file",
-	 (PyObject *) file_type_object );
-
-	/* Setup the disk types type object
+	/* Setup the disk_types type object
 	 */
 	pyvhdi_disk_types_type_object.tp_new = PyType_GenericNew;
 
@@ -524,12 +610,27 @@ PyMODINIT_FUNC initpyvhdi(
 	Py_IncRef(
 	 (PyObject *) &pyvhdi_disk_types_type_object );
 
-	disk_types_type_object = &pyvhdi_disk_types_type_object;
-
 	PyModule_AddObject(
 	 module,
 	 "disk_types",
-	 (PyObject *) disk_types_type_object );
+	 (PyObject *) &pyvhdi_disk_types_type_object );
+
+	/* Setup the file type object
+	 */
+	pyvhdi_file_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyvhdi_file_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyvhdi_file_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "file",
+	 (PyObject *) &pyvhdi_file_type_object );
 
 	PyGILState_Release(
 	 gil_state );
