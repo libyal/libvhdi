@@ -704,6 +704,17 @@ int libvhdi_io_handle_read_dynamic_disk_header(
 	}
 	if( parent_filename_size > 0 )
 	{
+		if( parent_filename_size > (size_t) ( MEMORY_MAXIMUM_ALLOCATION_SIZE - 2 ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 "%s: invalid parent filename size value exceeds maximum allocation size.",
+			 function );
+
+			return( -1 );
+		}
 		parent_filename_size += 2;
 
 		io_handle->parent_filename = (uint8_t *) memory_allocate(

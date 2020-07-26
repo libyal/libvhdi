@@ -274,32 +274,20 @@ int libvhdi_block_table_read(
 
 		return( -1 );
 	}
-/* TODO improve check ? */
-	if( (size_t) number_of_blocks > (size_t) INT_MAX )
+	if( ( number_of_blocks == 0 )
+	 || ( (size_t) number_of_blocks > ( (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE / sizeof( uint32_t ) ) ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid number of blocks value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	block_table->size = number_of_blocks * sizeof( uint32_t );
-
-	if( block_table->size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid block table size value exceeds maximum.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of blocks value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
 	block_table->number_of_references = (int) number_of_blocks;
+	block_table->size                 = number_of_blocks * sizeof( uint32_t );
 
 	block_table->references = (uint32_t *) memory_allocate(
 	                                        block_table->size );
