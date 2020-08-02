@@ -24,6 +24,7 @@ endif
 
 TESTS = \
 	test_library.sh \
+	test_tools.sh \
 	test_vhdiinfo.sh \
 	$(TESTS_PYVHDI)
 
@@ -34,6 +35,7 @@ check_SCRIPTS = \
 	test_manpage.sh \
 	test_python_module.sh \
 	test_runner.sh \
+	test_tools.sh \
 	test_vhdiinfo.sh
 
 EXTRA_DIST = \
@@ -42,12 +44,15 @@ EXTRA_DIST = \
 check_PROGRAMS = \
 	vhdi_test_block_table \
 	vhdi_test_data_block \
+	vhdi_test_dynamic_disk_header \
 	vhdi_test_error \
 	vhdi_test_file \
 	vhdi_test_file_footer \
 	vhdi_test_io_handle \
 	vhdi_test_notify \
-	vhdi_test_support
+	vhdi_test_support \
+	vhdi_test_tools_output \
+	vhdi_test_tools_signal
 
 vhdi_test_block_table_SOURCES = \
 	vhdi_test_block_table.c \
@@ -70,6 +75,28 @@ vhdi_test_data_block_SOURCES = \
 	vhdi_test_unused.h
 
 vhdi_test_data_block_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_dynamic_disk_header_SOURCES = \
+	vhdi_test_dynamic_disk_header.c \
+	vhdi_test_functions.c vhdi_test_functions.h \
+	vhdi_test_libbfio.h \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_unused.h
+
+vhdi_test_dynamic_disk_header_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@
 
@@ -180,6 +207,28 @@ vhdi_test_support_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_tools_output_SOURCES = \
+	../vhditools/vhditools_output.c ../vhditools/vhditools_output.h \
+	vhdi_test_libcerror.h \
+	vhdi_test_macros.h \
+	vhdi_test_tools_output.c \
+	vhdi_test_unused.h
+
+vhdi_test_tools_output_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_tools_signal_SOURCES = \
+	../vhditools/vhditools_signal.c ../vhditools/vhditools_signal.h \
+	vhdi_test_libcerror.h \
+	vhdi_test_macros.h \
+	vhdi_test_tools_signal.c \
+	vhdi_test_unused.h
+
+vhdi_test_tools_signal_LDADD = \
 	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@
 

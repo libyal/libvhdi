@@ -6,7 +6,7 @@ $ExitSuccess = 0
 $ExitFailure = 1
 $ExitIgnore = 77
 
-$LibraryTests = "block_table data_block error file_footer io_handle notify"
+$LibraryTests = "block_table data_block dynamic_disk_header error file_footer io_handle notify"
 $LibraryTestsWithInput = "file support"
 $OptionSets = ""
 

@@ -27,6 +27,7 @@ libvhdi_la_SOURCES = \
 	libvhdi_data_block.c libvhdi_data_block.h \
 	libvhdi_debug.c libvhdi_debug.h \
 	libvhdi_definitions.h \
+	libvhdi_dynamic_disk_header.c libvhdi_dynamic_disk_header.h \
 	libvhdi_error.c libvhdi_error.h \
 	libvhdi_extern.h \
 	libvhdi_file.c libvhdi_file.h \

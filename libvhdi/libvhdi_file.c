@@ -912,6 +912,22 @@ int libvhdi_file_close(
 
 		result = -1;
 	}
+	if( internal_file->dynamic_disk_header != NULL )
+	{
+		if( libvhdi_dynamic_disk_header_free(
+		     &( internal_file->dynamic_disk_header ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free dynamic disk header.",
+			 function );
+
+			result = -1;
+		}
+	}
 	if( libvhdi_block_table_free(
 	     &( internal_file->block_table ),
 	     error ) != 1 )
@@ -1015,6 +1031,17 @@ int libvhdi_internal_file_open_read(
 
 		return( -1 );
 	}
+	if( internal_file->dynamic_disk_header != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - dynamic disk header already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_file->block_table != NULL )
 	{
 		libcerror_error_set(
@@ -1096,8 +1123,6 @@ int libvhdi_internal_file_open_read(
 
 		goto on_error;
 	}
-	internal_file->io_handle->format_version = internal_file->file_footer->format_version;
-
 	next_offset = internal_file->file_footer->next_offset;
 
 /* TODO check disk type */
@@ -1137,11 +1162,23 @@ int libvhdi_internal_file_open_read(
 			 "Reading dynamic disk header:\n" );
 		}
 #endif
-		if( libvhdi_io_handle_read_dynamic_disk_header(
-		     internal_file->io_handle,
+		if( libvhdi_dynamic_disk_header_initialize(
+		     &( internal_file->dynamic_disk_header ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create dynamic disk header.",
+			 function );
+
+			goto on_error;
+		}
+		if( libvhdi_dynamic_disk_header_read_file_io_handle(
+		     internal_file->dynamic_disk_header,
 		     file_io_handle,
 		     next_offset,
-		     &next_offset,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1152,6 +1189,16 @@ int libvhdi_internal_file_open_read(
 			 function );
 
 			goto on_error;
+		}
+		next_offset = internal_file->dynamic_disk_header->next_offset;
+
+		internal_file->io_handle->block_bitmap_size = internal_file->dynamic_disk_header->block_size / ( 512 * 8 );
+
+		if( ( internal_file->io_handle->block_bitmap_size % 512 ) != 0 )
+		{
+			internal_file->io_handle->block_bitmap_size /= 512;
+			internal_file->io_handle->block_bitmap_size += 1;
+			internal_file->io_handle->block_bitmap_size *= 512;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1176,8 +1223,8 @@ int libvhdi_internal_file_open_read(
 		if( libvhdi_block_table_read(
 		     internal_file->block_table,
 		     file_io_handle,
-		     internal_file->io_handle->block_table_offset,
-		     internal_file->io_handle->number_of_blocks,
+		     internal_file->dynamic_disk_header->block_table_offset,
+		     internal_file->dynamic_disk_header->number_of_blocks,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1189,7 +1236,7 @@ int libvhdi_internal_file_open_read(
 
 			goto on_error;
 		}
-		internal_file->io_handle->block_data_offset = internal_file->io_handle->block_table_offset
+		internal_file->io_handle->block_data_offset = internal_file->dynamic_disk_header->block_table_offset
 							    + internal_file->block_table->size;
 
 		if( ( internal_file->io_handle->block_data_offset % 512 ) != 0 )
@@ -1273,6 +1320,12 @@ on_error:
 		 &( internal_file->block_table ),
 		 NULL );
 	}
+	if( internal_file->dynamic_disk_header != NULL )
+	{
+		libvhdi_dynamic_disk_header_free(
+		 &( internal_file->dynamic_disk_header ),
+		 NULL );
+	}
 	if( internal_file->file_footer != NULL )
 	{
 		libvhdi_file_footer_free(
@@ -1339,17 +1392,32 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 
 		return( -1 );
 	}
-	if( ( internal_file->io_handle->parent_filename != NULL )
-	 && ( internal_file->parent_file == NULL ) )
+	if( ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DYNAMIC )
+	 || ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - invalid IO handle - missing parent file.",
-		 function );
+		if( internal_file->dynamic_disk_header == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid file - missing dynamic disk header.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+		if( ( internal_file->dynamic_disk_header->parent_filename != NULL )
+		 && ( internal_file->parent_file == NULL ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid file - invalid IO handle - missing parent file.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	if( internal_file->current_offset < 0 )
 	{
@@ -1411,7 +1479,7 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 		      || ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 		{
 			block_table_index = internal_file->current_offset
-					  / internal_file->io_handle->block_size;
+					  / internal_file->dynamic_disk_header->block_size;
 
 			if( block_table_index > (uint64_t) INT_MAX )
 			{
@@ -1455,7 +1523,7 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 			}
 #endif
 			block_offset = internal_file->current_offset
-				     % internal_file->io_handle->block_size;
+				     % internal_file->dynamic_disk_header->block_size;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
@@ -2123,17 +2191,32 @@ off64_t libvhdi_internal_file_seek_offset(
 
 		return( -1 );
 	}
-	if( ( internal_file->io_handle->parent_filename != NULL )
-	 && ( internal_file->parent_file == NULL ) )
+	if( ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DYNAMIC )
+	 || ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - invalid IO handle - missing parent file.",
-		 function );
+		if( internal_file->dynamic_disk_header == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid file - missing dynamic disk header.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+		if( ( internal_file->dynamic_disk_header->parent_filename != NULL )
+		 && ( internal_file->parent_file == NULL ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid file - invalid IO handle - missing parent file.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	if( ( whence != SEEK_CUR )
 	 && ( whence != SEEK_END )
@@ -2377,17 +2460,6 @@ int libvhdi_file_set_parent_file(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
-	if( internal_file->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( internal_file->file_footer == NULL )
 	{
 		libcerror_error_set(
@@ -2406,6 +2478,17 @@ int libvhdi_file_set_parent_file(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: invalid file - unsupported disk type.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->dynamic_disk_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing dynamic disk header.",
 		 function );
 
 		return( -1 );
@@ -2441,7 +2524,7 @@ int libvhdi_file_set_parent_file(
 	}
 #endif
 	if( memory_compare(
-	     internal_file->io_handle->parent_identifier,
+	     internal_file->dynamic_disk_header->parent_identifier,
 	     identifier,
 	     16 ) != 0 )
 	{
@@ -2588,24 +2671,13 @@ int libvhdi_file_get_format_version(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
-	if( internal_file->io_handle == NULL )
+	if( internal_file->file_footer == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file->file_io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing file IO handle.",
+		 "%s: invalid file - missing file footer.",
 		 function );
 
 		return( -1 );
@@ -2647,8 +2719,9 @@ int libvhdi_file_get_format_version(
 		return( -1 );
 	}
 #endif
-	*major_version = ( internal_file->io_handle->format_version >> 16 ) & 0x0000ffffUL;
-	*minor_version = internal_file->io_handle->format_version & 0x0000ffffUL;
+/* TODO move into file footer function */
+	*major_version = ( internal_file->file_footer->format_version >> 16 ) & 0x0000ffffUL;
+	*minor_version = internal_file->file_footer->format_version & 0x0000ffffUL;
 
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -2892,8 +2965,8 @@ int libvhdi_file_get_parent_identifier(
 #endif
 	if( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL )
 	{
-		result = libvhdi_io_handle_get_parent_identifier(
-			  internal_file->io_handle,
+		result = libvhdi_dynamic_disk_header_get_parent_identifier(
+			  internal_file->dynamic_disk_header,
 			  guid_data,
 			  guid_data_size,
 			  error );
@@ -2982,8 +3055,8 @@ int libvhdi_file_get_utf8_parent_filename_size(
 #endif
 	if( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL )
 	{
-		result = libvhdi_io_handle_get_utf8_parent_filename_size(
-			  internal_file->io_handle,
+		result = libvhdi_dynamic_disk_header_get_utf8_parent_filename_size(
+			  internal_file->dynamic_disk_header,
 			  utf8_string_size,
 			  error );
 
@@ -3072,8 +3145,8 @@ int libvhdi_file_get_utf8_parent_filename(
 #endif
 	if( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL )
 	{
-		result = libvhdi_io_handle_get_utf8_parent_filename(
-		          internal_file->io_handle,
+		result = libvhdi_dynamic_disk_header_get_utf8_parent_filename(
+			  internal_file->dynamic_disk_header,
 		          utf8_string,
 		          utf8_string_size,
 		          error );
@@ -3162,8 +3235,8 @@ int libvhdi_file_get_utf16_parent_filename_size(
 #endif
 	if( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL )
 	{
-		result = libvhdi_io_handle_get_utf16_parent_filename_size(
-		          internal_file->io_handle,
+		result = libvhdi_dynamic_disk_header_get_utf16_parent_filename_size(
+			  internal_file->dynamic_disk_header,
 		          utf16_string_size,
 		          error );
 
@@ -3252,8 +3325,8 @@ int libvhdi_file_get_utf16_parent_filename(
 #endif
 	if( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL )
 	{
-		result = libvhdi_io_handle_get_utf16_parent_filename(
-		          internal_file->io_handle,
+		result = libvhdi_dynamic_disk_header_get_utf16_parent_filename(
+			  internal_file->dynamic_disk_header,
 		          utf16_string,
 		          utf16_string_size,
 		          error );

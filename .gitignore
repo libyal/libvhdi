@@ -131,12 +131,15 @@ stamp-h[1-9]
 /tests/tmp*
 /tests/vhdi_test_block_table
 /tests/vhdi_test_data_block
+/tests/vhdi_test_dynamic_disk_header
 /tests/vhdi_test_error
 /tests/vhdi_test_file
 /tests/vhdi_test_file_footer
 /tests/vhdi_test_io_handle
 /tests/vhdi_test_notify
 /tests/vhdi_test_support
+/tests/vhdi_test_tools_output
+/tests/vhdi_test_tools_signal
 
 # Local library dependencies specific files
 /libbfio

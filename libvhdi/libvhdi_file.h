@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libvhdi_block_table.h"
+#include "libvhdi_dynamic_disk_header.h"
 #include "libvhdi_extern.h"
 #include "libvhdi_file_footer.h"
 #include "libvhdi_io_handle.h"
@@ -66,6 +67,10 @@ struct libvhdi_internal_file
 	/* The file footer
 	 */
 	libvhdi_file_footer_t *file_footer;
+
+	/* The dynamic disk header
+	 */
+	libvhdi_dynamic_disk_header_t *dynamic_disk_header;
 
 	/* The block table
 	 */
