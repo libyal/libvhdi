@@ -40,17 +40,9 @@ typedef struct libvhdi_io_handle libvhdi_io_handle_t;
 
 struct libvhdi_io_handle
 {
-	/* The (storage) media size
-	 */
-	size64_t media_size;
-
 	/* The format version
 	 */
 	uint32_t format_version;
-
-	/* The disk type
-	 */
-	uint32_t disk_type;
 
 	/* The block table offset
  	 */
@@ -71,10 +63,6 @@ struct libvhdi_io_handle
 	/* The number of blocks
 	 */
 	uint32_t number_of_blocks;
-
-	/* The identifier
-	 */
-	uint8_t identifier[ 16 ];
 
 	/* The parent identifier
 	 */
@@ -105,23 +93,11 @@ int libvhdi_io_handle_clear(
      libvhdi_io_handle_t *io_handle,
      libcerror_error_t **error );
 
-int libvhdi_io_handle_read_file_footer(
-     libvhdi_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     off64_t *next_offset,
-     libcerror_error_t **error );
-
 int libvhdi_io_handle_read_dynamic_disk_header(
      libvhdi_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      off64_t file_offset,
      off64_t *next_offset,
-     libcerror_error_t **error );
-
-int libvhdi_io_handle_get_identifier(
-     libvhdi_io_handle_t *io_handle,
-     uint8_t *guid_data,
-     size_t guid_data_size,
      libcerror_error_t **error );
 
 int libvhdi_io_handle_get_parent_identifier(

@@ -2,6 +2,7 @@ TODO
 * fix info_handle_file_fprint: unable to retrieve parent filename string size.
 * complete multi-threading support
 * complete differential images support
+* debug print timestamps
 
 Tests:
 * Test concurrent read from diff image and parent
@@ -17,119 +18,10 @@ Tests:
 * read data block + bitmap at once
 * read backup file footer ?
 
-20160424
-* fixed byte order of identifiers
-
-20160423
-* Changes to Python bindings
-* Worked on tests
-* Worked on diff image parent support
-
-20160111
-* Changes to Python bindings
-
-20160109
-* fixes for rpmbuild
-
-20160108
-* 2016 update
-* worked on Python 3 support
-
-20151220
-* updated dependencies
-* changes for deployment
-
-20151205
-* worked on Python bindings
-
-20150905
-* updated dependencies
-
-20150125
-* vhdiinfo: fix for handling missing parent filename
-
-20150110
-* updated version for release
-
-20150105
-* 2015 update
-
-20141229
-* updated dpkg files
-* updated dependencies
-* updated .gitignore
-
-20141221
-* worked on Python 3 support
-* worked on tests
-
-20141205
-* worked on test scripts
-
-20141129
-* code clean up
-
-20141114
-* code clean up
-
-20141105
-* worked on multi-threading support
-* removed deprecated functions
-  - libvhdi_file_read_random
-  - pyvhdi file.read_random
-
-20141029
-* bug fix in Python-bindings
-
-20141027
-* changes for deployment
-
-20141021
-* changes for deployment
-
-20140929
-* removed README.macosx
-* changes for project site move
-
-20140803
-* bug fix in Python-bindings
-* updated dependencies
-
-20140330
-* worked on Python bindings
-* worked on setup.py
-
-20140317
-* fix in synclibs.sh for missing libfguid
-* updated libfdata
-* worked on setup.py
-
-20140201
-* worked on Python bindings
-
-20140119
-* 2014 update
-* updated dependencies
-
-20131211
-* worked on Python bindings
-
-20131210
-* updated dependencies
-* worked on Python bindings
-* fixed issue in mount handle
-  - for empty basename
-  - for vhd files with parent path instead of filename
-
-20131017
-* updated dependencies
-
-20131013
-* updated dependencies
-
 20130922
 * updated msvscpp files
 * removed libfvalue
+* see `git log' for more recent change log
 
 20130916
 * updated dependencies

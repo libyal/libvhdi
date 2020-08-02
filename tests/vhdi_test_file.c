@@ -2871,7 +2871,7 @@ int main(
 
 #if defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT )
 
-		/* TODO: add tests for libvhdi_file_open_read */
+		/* TODO: add tests for libvhdi_internal_file_open_read */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT ) */
 

@@ -30,6 +30,7 @@ libvhdi_la_SOURCES = \
 	libvhdi_error.c libvhdi_error.h \
 	libvhdi_extern.h \
 	libvhdi_file.c libvhdi_file.h \
+	libvhdi_file_footer.c libvhdi_file_footer.h \
 	libvhdi_i18n.c libvhdi_i18n.h \
 	libvhdi_io_handle.c libvhdi_io_handle.h \
 	libvhdi_libbfio.h \

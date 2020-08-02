@@ -27,6 +27,7 @@
 
 #include "libvhdi_block_table.h"
 #include "libvhdi_extern.h"
+#include "libvhdi_file_footer.h"
 #include "libvhdi_io_handle.h"
 #include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
@@ -61,6 +62,10 @@ struct libvhdi_internal_file
 	/* Value to indicate if the file IO handle was opened inside the library
 	 */
 	uint8_t file_io_handle_opened_in_library;
+
+	/* The file footer
+	 */
+	libvhdi_file_footer_t *file_footer;
 
 	/* The block table
 	 */
@@ -130,7 +135,7 @@ int libvhdi_file_close(
      libvhdi_file_t *file,
      libcerror_error_t **error );
 
-int libvhdi_file_open_read(
+int libvhdi_internal_file_open_read(
      libvhdi_internal_file_t *internal_file,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );

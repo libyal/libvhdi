@@ -2,9 +2,10 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="libvhdi"
-	ProjectGUID="{0B57B96F-7885-4101-98B7-4E91C9434020}"
-	RootNamespace="libvhdi"
+	Name="vhdi_test_file_footer"
+	ProjectGUID="{3F7A2500-D5E7-4F5D-A36B-16B0879887E0}"
+	RootNamespace="vhdi_test_file_footer"
+	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -19,8 +20,9 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
+			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -40,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcerror;..\..\libcthreads;..\..\libcdata;..\..\libclocale;..\..\libcnotify;..\..\libcsplit;..\..\libuna;..\..\libcfile;..\..\libcpath;..\..\libbfio;..\..\libfcache;..\..\libfdata;..\..\libfguid"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCTHREADS;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBCSPLIT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCPATH;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBFDATA;HAVE_LOCAL_LIBFGUID;LIBVHDI_DLL_EXPORT"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCTHREADS;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBCSPLIT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCPATH;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBFDATA;HAVE_LOCAL_LIBFGUID;LIBVHDI_DLL_IMPORT"
 				RuntimeLibrary="2"
 				WarningLevel="4"
 				CompileAs="1"
@@ -56,12 +58,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName).dll"
+				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="2"
 				DataExecutionPrevention="2"
 				TargetMachine="1"
-				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -89,7 +93,7 @@
 			Name="VSDebug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
 			>
 			<Tool
@@ -111,7 +115,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcerror;..\..\libcthreads;..\..\libcdata;..\..\libclocale;..\..\libcnotify;..\..\libcsplit;..\..\libuna;..\..\libcfile;..\..\libcpath;..\..\libbfio;..\..\libfcache;..\..\libfdata;..\..\libfguid"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCTHREADS;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBCSPLIT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCPATH;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBFDATA;HAVE_LOCAL_LIBFGUID;LIBVHDI_DLL_EXPORT"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCTHREADS;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBCSPLIT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCPATH;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBFDATA;HAVE_LOCAL_LIBFGUID;LIBVHDI_DLL_IMPORT"
 				BasicRuntimeChecks="3"
 				SmallerTypeCheck="true"
 				RuntimeLibrary="3"
@@ -130,13 +134,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName).dll"
+				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="1"
 				TargetMachine="1"
-				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -170,47 +176,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\libvhdi\libvhdi.c"
+				RelativePath="..\..\tests\vhdi_test_file_footer.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libvhdi\libvhdi_block_table.c"
+				RelativePath="..\..\tests\vhdi_test_functions.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libvhdi\libvhdi_data_block.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_debug.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_error.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_file.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_file_footer.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_i18n.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_io_handle.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_notify.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_support.c"
+				RelativePath="..\..\tests\vhdi_test_memory.c"
 				>
 			</File>
 		</Filter>
@@ -220,107 +194,31 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\libvhdi\libvhdi_block_table.h"
+				RelativePath="..\..\tests\vhdi_test_functions.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libvhdi\libvhdi_codepage.h"
+				RelativePath="..\..\tests\vhdi_test_libbfio.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libvhdi\libvhdi_data_block.h"
+				RelativePath="..\..\tests\vhdi_test_libcerror.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libvhdi\libvhdi_debug.h"
+				RelativePath="..\..\tests\vhdi_test_libvhdi.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libvhdi\libvhdi_definitions.h"
+				RelativePath="..\..\tests\vhdi_test_macros.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libvhdi\libvhdi_error.h"
+				RelativePath="..\..\tests\vhdi_test_memory.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libvhdi\libvhdi_extern.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_file.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_file_footer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_i18n.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_io_handle.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_libbfio.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_libcerror.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_libclocale.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_libcnotify.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_libcthreads.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_libfcache.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_libfdata.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_libfguid.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_libuna.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_notify.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_support.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_types.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_unused.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\vhdi_dynamic_disk_header.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\vhdi_file_footer.h"
+				RelativePath="..\..\tests\vhdi_test_unused.h"
 				>
 			</File>
 		</Filter>
@@ -329,10 +227,6 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi.rc"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>

@@ -7,7 +7,7 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-LIBRARY_TESTS="block_table data_block error io_handle notify";
+LIBRARY_TESTS="block_table data_block error file_footer io_handle notify";
 LIBRARY_TESTS_WITH_INPUT="file support";
 OPTION_SETS="";
 

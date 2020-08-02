@@ -133,6 +133,7 @@ stamp-h[1-9]
 /tests/vhdi_test_data_block
 /tests/vhdi_test_error
 /tests/vhdi_test_file
+/tests/vhdi_test_file_footer
 /tests/vhdi_test_io_handle
 /tests/vhdi_test_notify
 /tests/vhdi_test_support
