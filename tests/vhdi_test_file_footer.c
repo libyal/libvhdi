@@ -804,9 +804,15 @@ int main(
      char * const argv[] VHDI_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
+#if defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT )
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
+
 	libcerror_error_t *error           = NULL;
 	libvhdi_file_footer_t *file_footer = NULL;
 	int result                         = 0;
+
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT ) */
 
 	VHDI_TEST_UNREFERENCED_PARAMETER( argc )
 	VHDI_TEST_UNREFERENCED_PARAMETER( argv )
@@ -828,8 +834,6 @@ int main(
 	VHDI_TEST_RUN(
 	 "libvhdi_file_footer_read_file_io_handle",
 	 vhdi_test_file_footer_read_file_io_handle );
-
-#endif /* defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT ) */
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 
@@ -869,14 +873,10 @@ int main(
 
 	/* Run tests
 	 */
-#if defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT )
-
 	VHDI_TEST_RUN_WITH_ARGS(
 	 "libvhdi_file_footer_get_identifier",
 	 vhdi_test_file_footer_get_identifier,
 	 file_footer );
-
-#endif /* defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT ) */
 
 	/* Clean up
 	 */
@@ -898,10 +898,14 @@ int main(
 	 error );
 
 #endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT )
+
 on_error:
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 	if( error != NULL )
 	{
 		libcerror_error_free(
@@ -913,6 +917,10 @@ on_error:
 		 &file_footer,
 		 NULL );
 	}
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
+
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT ) */
 }
 
