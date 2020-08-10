@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>libvhdi</id>
+    <version>20200810</version>
+    <authors>Joachim Metz</authors>
+    <owners>joachimmetz</owners>
+    <licenseUrl>https://raw.githubusercontent.com/libyal/libvhdi/master/COPYING.LESSER</licenseUrl>
+    <projectUrl>https://github.com/libyal/libvhdi</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <title>libvhdi</title>
+    <description>Library to access the Virtual Hard Disk (VHD) image format</description>
+    <releaseNotes>Release of libvhdi 20200810</releaseNotes>
+    <copyright>Copyright (C) 2012-2020</copyright>
+    <tags>native</tags>
+  </metadata>
+  <files>
+    <file src="include\*.h" target="lib\native\include\" />
+    <file src="include\libvhdi\*.h" target="lib\native\include\libvhdi\" />
+    <file src="msvscpp\Release\Win32\libvhdi.dll" target="lib\native\lib\Win32\" />
+    <file src="msvscpp\Release\Win32\libvhdi.lib" target="lib\native\lib\Win32\" />
+    <file src="msvscpp\Release\Win32\libvhdi.pdb" target="lib\native\lib\Win32\" />
+    <file src="msvscpp\Release\x64\libvhdi.dll" target="lib\native\lib\x64\" />
+    <file src="msvscpp\Release\x64\libvhdi.lib" target="lib\native\lib\x64\" />
+    <file src="msvscpp\Release\x64\libvhdi.pdb" target="lib\native\lib\x64\" />
+  </files>
+</package>
