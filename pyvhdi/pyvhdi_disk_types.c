@@ -242,7 +242,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a disk types object
+/* Initializes a disk types object
  * Returns 0 if successful or -1 on error
  */
 int pyvhdi_disk_types_init(
