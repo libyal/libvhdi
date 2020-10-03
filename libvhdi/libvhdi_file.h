@@ -167,32 +167,6 @@ ssize_t libvhdi_file_read_buffer_at_offset(
          off64_t offset,
          libcerror_error_t **error );
 
-#ifdef TODO_WRITE_SUPPORT
-
-ssize_t libvhdi_internal_file_write_buffer_to_file_io_handle(
-         libvhdi_internal_file_t *internal_file,
-         libbfio_handle_t *file_io_handle,
-         void *buffer,
-         size_t buffer_size,
-         libcerror_error_t **error );
-
-LIBVHDI_EXTERN \
-ssize_t libvhdi_file_write_buffer(
-         libvhdi_file_t *file,
-         const void *buffer,
-         size_t buffer_size,
-         libcerror_error_t **error );
-
-LIBVHDI_EXTERN \
-ssize_t libvhdi_file_write_buffer_at_offset(
-         libvhdi_file_t *file,
-         void *buffer,
-         size_t buffer_size,
-         off64_t offset,
-         libcerror_error_t **error );
-
-#endif /* TODO_WRITE_SUPPORT */
-
 off64_t libvhdi_internal_file_seek_offset(
          libvhdi_internal_file_t *internal_file,
          off64_t offset,
