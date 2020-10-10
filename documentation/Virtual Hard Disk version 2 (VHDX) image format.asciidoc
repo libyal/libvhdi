@@ -8,12 +8,12 @@ Analysis of the VHDX format
 [abstract]
 == Summary
 
-A commonly image format used in Microsoft virtualization products is the
-Virtual Hard Disk version 2 (VHDX) Image format. This specification is
-based on available documentation and was enhanced by analyzing test data.
+A commonly image format used in Microsoft virtualization products is the Virtual
+Hard Disk version 2 (VHDX) Image format. This specification is based on
+available documentation and was enhanced by analyzing test data.
 
-This document is intended as a working document for the Virtual Hard Disk
-version 2 (VHDX) Image format for the libvhdi project.
+This document is intended as a working document of the data format specification
+for the libvhdi project.
 
 [preface]
 == Document information
@@ -57,11 +57,13 @@ based on available documentation and was enhanced by analyzing test images.
 A VHDX image file consist of the following distinguishable elements:
 
 * file (type) identifier
-* 2x headers
+* 2x image headers
 * 2x region tables
 * log or metadata journal
 * block allocation table (BAT) region
 * metadata region
+** metadata table
+** metadata items
 * image (content) data
 
 The elements are stored in 64 KiB (65536 bytes) aligned blocks
@@ -90,21 +92,21 @@ The file (type) identifier is 64 KiB (65536 bytes) of size and consists of:
 |===
 | Offset | Size | Value | Description
 | 0 | 8 | "vhdxfile" | Signature
-| 8 | 512 | | Creator +
+| 8 | 512 | | Creator application and version +
 UTF-16 little-endian string with end-of-string character
 | 520 | 65016 | | [yellow-background]*Unknown (reserved)*
 |===
 
-== Header
+== Image header
 
-The header is 4 KiB (4096 bytes) of size and consists of:
+The image header is 4 KiB (4096 bytes) of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
 | 0 | 4 | "head" | Signature
 | 4 | 4 | | Checksum +
-Contains a CRC-32C, which uses the Castagnoli polynomial (0x11edc6f41) of the 4 KiB header where the checksum value is set to 0
+Contains a CRC-32C, which uses the Castagnoli polynomial (0x1edc6f41) of the 4 KiB image header where the checksum value is set to 0
 | 8 | 8 | | Sequence number
 | 16 | 16 | | [yellow-background]*Unknown (file write identifier)* +
 Contains a GUID
@@ -124,7 +126,7 @@ According to `[MS-VHDX]` this value must be set to 0
 
 == Region table
 
-The region table s 64 KiB (65536 bytes) of size and consists of:
+The region table is stored in a block of 64 KiB (65536 bytes) and consists of:
 
 * region table header
 * 0 or more region table entries
@@ -141,7 +143,7 @@ The region table header is 16 bytes of size and consists of:
 | Offset | Size | Value | Description
 | 0 | 4 | "regi" | Signature
 | 4 | 4 | | Checksum +
-Contains a CRC-32C, which uses the Castagnoli polynomial (0x11edc6f41) of the 64 KiB region table where the checksum value is set to 0
+Contains a CRC-32C, which uses the Castagnoli polynomial (0x1edc6f41) of the 64 KiB region table where the checksum value is set to 0
 | 8 | 4 | | Number of table entries +
 According to `[MS-VHDX]` this value must be less than or equal to 2047
 | 12 | 4 | 0 | [yellow-background]*Unknown (reserved)* +
@@ -176,71 +178,61 @@ Contains 1 to indicate the region is required to be supported by the implementat
 | 8b7ca206-4790-4b9a-b8fe-575f050f886e | | Metadata region
 |===
 
-== Block allocation table (BAT) region
+== Metadata region
 
-[yellow-background]*TODO: complete this section*
+The metadata region contains:
 
-array of payload and sector bitmap block allocation table (BAT) entries
+* metadata table
+* metadata items
 
-=== Block allocation table (BAT) entry
+=== Metadata table
 
-The block allocation table (BAT) entry is 64 bits of size and consists of:
+The metadata table is stored in a block of 64 KiB (65536 bytes) and consists of:
+
+* metadata table header
+* 0 or more metadata table entries
+* [yellow-background]*Unknown (reserved)*
+
+[yellow-background]*TODO: determine if 0 entries is actually supported*
+
+==== Metadata table header
+
+The metadata table header is 32 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
-| 0.0 | 44 bits | | Block offset +
-Contains the offset relative from the start of the file as a multitude of 1 MiB
-| 5.4 | 17 bits | 0 | [yellow-background]*Unknown (reserved)* +
+| 0 | 8 | "metadata" | Signature
+| 8 | 2 | 0 | [yellow-background]*Unknown (reserved)* +
 According to `[MS-VHDX]` this value must be set to 0
-| 7.5 | 3 bits | | Block state
+| 10 | 2 | | Number of table entries +
+According to `[MS-VHDX]` this value must be less than or equal to 2047
+| 12 | 20 | 0 | [yellow-background]*Unknown (reserved)* +
+According to `[MS-VHDX]` this value must be set to 0
 |===
-
-=== Block states
-
-==== Payload block states
-
-[cols="1,1,5",options="header"]
-|===
-| Value | Identifier | Description
-| 0 | PAYLOAD_BLOCK_NOT_PRESENT
-| 1 | PAYLOAD_BLOCK_UNDEFINED
-| 2 | PAYLOAD_BLOCK_ZERO
-| 3 | PAYLOAD_BLOCK_UNMAPPED
-3+|
-| 6 | PAYLOAD_BLOCK_FULLY_PRESENT
-| 7 | PAYLOAD_BLOCK_PARTIALLY_PRESENT
-|===
-
-==== Sector bitmap block states
-
-[cols="1,1,5",options="header"]
-|===
-| Value | Identifier | Description
-| 0 | SB_BLOCK_NOT_PRESENT
-3+|
-| 6 | SB_BLOCK_PRESENT
-|===
-
-== Metadata region
-
-[yellow-background]*TODO: complete this section*
-
-=== Metadata table
-
-[yellow-background]*TODO: complete this section*
-
-==== Metadata table header
-
-[yellow-background]*TODO: complete this section*
 
 ==== Metadata table entry
 
-[yellow-background]*TODO: complete this section*
+The metdata table entry is 32 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 16 | | Metadata item identifier +
+Contains a GUID +
+See section: <<metdata_item_identifiers,Metadata item identifiers>>
+| 16 | 4 | | Metadata item offset +
+Contains an offset relative to the start of the metadata region +
+According to `[MS-VHDX]` this value must be greater than 64 KiB
+| 20 | 4 | | Metadata item size
+| 24 | 8 | | [yellow-background]*Unknown*
+|===
+
+[yellow-background]*TODO: describe last 8 bytes*
 
 === Metadata items
 
-[yellow-background]*TODO: complete this section*
+==== [[metdata_item_identifiers]]Metadata item identifiers
 
 [cols="1,1,5",options="header"]
 |===
@@ -327,6 +319,52 @@ The virtual disk size metadata item is 8 bytes of size and consists of:
 |===
 | Offset | Size | Value | Description
 | 0 | 8 | | Virtual disk size
+|===
+
+== Block allocation table (BAT) region
+
+[yellow-background]*TODO: complete this section*
+
+array of payload and sector bitmap block allocation table (BAT) entries
+
+=== Block allocation table (BAT) entry
+
+The block allocation table (BAT) entry is 64 bits of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0.0 | 44 bits | | Block offset +
+Contains the offset relative from the start of the file as a multitude of 1 MiB
+| 5.4 | 17 bits | 0 | [yellow-background]*Unknown (reserved)* +
+According to `[MS-VHDX]` this value must be set to 0
+| 7.5 | 3 bits | | Block state
+|===
+
+=== Block states
+
+==== Payload block states
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0 | PAYLOAD_BLOCK_NOT_PRESENT
+| 1 | PAYLOAD_BLOCK_UNDEFINED
+| 2 | PAYLOAD_BLOCK_ZERO
+| 3 | PAYLOAD_BLOCK_UNMAPPED
+3+|
+| 6 | PAYLOAD_BLOCK_FULLY_PRESENT
+| 7 | PAYLOAD_BLOCK_PARTIALLY_PRESENT
+|===
+
+==== Sector bitmap block states
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0 | SB_BLOCK_NOT_PRESENT
+3+|
+| 6 | SB_BLOCK_PRESENT
 |===
 
 == Log (metadata journal)

@@ -178,6 +178,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libvhdi\libvhdi_checksum.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libvhdi\libvhdi_data_block.c"
 				>
 			</File>
@@ -202,7 +206,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libvhdi\libvhdi_file_information.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libvhdi\libvhdi_i18n.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_image_header.c"
 				>
 			</File>
 			<File
@@ -210,7 +222,43 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libvhdi\libvhdi_metadata_item_identifier.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_metadata_table.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_metadata_table_entry.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_metadata_table_header.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_metadata_values.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libvhdi\libvhdi_notify.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_region_table.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_region_table_entry.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_region_table_header.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_region_type_identifier.c"
 				>
 			</File>
 			<File
@@ -225,6 +273,10 @@
 			>
 			<File
 				RelativePath="..\..\libvhdi\libvhdi_block_table.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_checksum.h"
 				>
 			</File>
 			<File
@@ -264,7 +316,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libvhdi\libvhdi_file_information.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libvhdi\libvhdi_i18n.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_image_header.h"
 				>
 			</File>
 			<File
@@ -273,6 +333,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libvhdi\libvhdi_libbfio.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_libcdata.h"
 				>
 			</File>
 			<File
@@ -308,7 +372,43 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libvhdi\libvhdi_metadata_item_identifier.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_metadata_table.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_metadata_table_entry.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_metadata_table_header.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_metadata_values.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libvhdi\libvhdi_notify.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_region_table.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_region_table_entry.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_region_table_header.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_region_type_identifier.h"
 				>
 			</File>
 			<File
@@ -329,6 +429,22 @@
 			</File>
 			<File
 				RelativePath="..\..\libvhdi\vhdi_file_footer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\vhdi_file_information.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\vhdi_image_header.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\vhdi_metadata_table.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\vhdi_region_table.h"
 				>
 			</File>
 		</Filter>

@@ -29,12 +29,15 @@
 #include "libvhdi_dynamic_disk_header.h"
 #include "libvhdi_extern.h"
 #include "libvhdi_file_footer.h"
+#include "libvhdi_file_information.h"
+#include "libvhdi_image_header.h"
 #include "libvhdi_io_handle.h"
 #include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcthreads.h"
 #include "libvhdi_libfcache.h"
 #include "libvhdi_libfdata.h"
+#include "libvhdi_metadata_values.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -68,9 +71,21 @@ struct libvhdi_internal_file
 	 */
 	libvhdi_file_footer_t *file_footer;
 
+	/* The file information
+	 */
+	libvhdi_file_information_t *file_information;
+
 	/* The dynamic disk header
 	 */
 	libvhdi_dynamic_disk_header_t *dynamic_disk_header;
+
+	/* The image header
+	 */
+	libvhdi_image_header_t *image_header;
+
+	/* The metadata values
+	 */
+	libvhdi_metadata_values_t *metadata_values;
 
 	/* The block table
 	 */
@@ -196,6 +211,12 @@ LIBVHDI_EXTERN \
 int libvhdi_file_get_media_size(
      libvhdi_file_t *file,
      size64_t *media_size,
+     libcerror_error_t **error );
+
+LIBVHDI_EXTERN \
+int libvhdi_file_get_file_type(
+     libvhdi_file_t *file,
+     int *file_type,
      libcerror_error_t **error );
 
 LIBVHDI_EXTERN \

@@ -1,5 +1,5 @@
 /*
- * The dynamic disk header definition of a Virtual Hard Disk (VHD) image file
+ * The dynamic disk header definition of a Virtual Hard Disk (VHD) file
  *
  * Copyright (C) 2012-2020, Joachim Metz <joachim.metz@gmail.com>
  *

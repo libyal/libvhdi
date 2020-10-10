@@ -1,6 +1,6 @@
 TODO
+* add VHDX log (journal) support
 * fix info_handle_file_fprint: unable to retrieve parent filename string size.
-* complete multi-threading support
 * complete differential images support
 * debug print timestamps
 

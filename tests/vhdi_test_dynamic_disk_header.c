@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <byte_stream.h>
 #include <file_stream.h>
 #include <types.h>
 
@@ -348,6 +349,12 @@ int vhdi_test_dynamic_disk_header_read_data(
 	libvhdi_dynamic_disk_header_t *dynamic_disk_header = NULL;
 	int result                                         = 0;
 
+#if defined( HAVE_VHDI_TEST_MEMORY )
+	int number_of_malloc_fail_tests                    = 1;
+	int number_of_memcpy_fail_tests                    = 2;
+	int test_number                                    = 0;
+#endif
+
 	/* Initialize test
 	 */
 	result = libvhdi_dynamic_disk_header_initialize(
@@ -379,6 +386,44 @@ int vhdi_test_dynamic_disk_header_read_data(
 	 "result",
 	 result,
 	 1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Clean up
+	 */
+	result = libvhdi_dynamic_disk_header_free(
+	          &dynamic_disk_header,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "dynamic_disk_header",
+	 dynamic_disk_header );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libvhdi_dynamic_disk_header_initialize(
+	          &dynamic_disk_header,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "dynamic_disk_header",
+	 dynamic_disk_header );
 
 	VHDI_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -457,6 +502,136 @@ int vhdi_test_dynamic_disk_header_read_data(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_VHDI_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libvhdi_dynamic_disk_header_read_data with malloc failing
+		 */
+		vhdi_test_malloc_attempts_before_fail = test_number;
+
+		result = libvhdi_dynamic_disk_header_read_data(
+		          dynamic_disk_header,
+		          vhdi_test_dynamic_disk_header_data1,
+		          1024,
+		          &error );
+
+		if( vhdi_test_malloc_attempts_before_fail != -1 )
+		{
+			vhdi_test_malloc_attempts_before_fail = -1;
+		}
+		else
+		{
+			VHDI_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			VHDI_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+	for( test_number = 0;
+	     test_number < number_of_memcpy_fail_tests;
+	     test_number++ )
+	{
+		/* Test libvhdi_dynamic_disk_header_read_data with memcpy failing
+		 */
+		vhdi_test_memcpy_attempts_before_fail = test_number;
+
+		result = libvhdi_dynamic_disk_header_read_data(
+		          dynamic_disk_header,
+		          vhdi_test_dynamic_disk_header_data1,
+		          1024,
+		          &error );
+
+		if( vhdi_test_memcpy_attempts_before_fail != -1 )
+		{
+			vhdi_test_memcpy_attempts_before_fail = -1;
+		}
+		else
+		{
+			VHDI_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			VHDI_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( HAVE_VHDI_TEST_MEMORY ) */
+
+	/* Test error case where signature is invalid
+	 */
+	byte_stream_copy_from_uint64_big_endian(
+	 vhdi_test_dynamic_disk_header_data1,
+	 0xffffffffffffffffUL );
+
+	result = libvhdi_dynamic_disk_header_read_data(
+	          dynamic_disk_header,
+	          vhdi_test_dynamic_disk_header_data1,
+	          1024,
+	          &error );
+
+	byte_stream_copy_from_uint64_big_endian(
+	 vhdi_test_dynamic_disk_header_data1,
+	 0x6378737061727365UL );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test error case where format version is invalid
+	 */
+	byte_stream_copy_from_uint32_big_endian(
+	 &( vhdi_test_dynamic_disk_header_data1[ 24 ] ),
+	 0xffffffffUL );
+
+	result = libvhdi_dynamic_disk_header_read_data(
+	          dynamic_disk_header,
+	          vhdi_test_dynamic_disk_header_data1,
+	          1024,
+	          &error );
+
+	byte_stream_copy_from_uint32_big_endian(
+	 &( vhdi_test_dynamic_disk_header_data1[ 24 ] ),
+	 0x00010000UL );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test error case where block size is invalid
+	 */
+/* TODO implement */
 
 	/* Clean up
 	 */
@@ -618,6 +793,34 @@ int vhdi_test_dynamic_disk_header_read_file_io_handle(
 	libcerror_error_free(
 	 &error );
 
+	/* Test error case where signature is invalid
+	 */
+	byte_stream_copy_from_uint64_big_endian(
+	 vhdi_test_dynamic_disk_header_data1,
+	 0xffffffffffffffffUL );
+
+	result = libvhdi_dynamic_disk_header_read_file_io_handle(
+	          dynamic_disk_header,
+	          file_io_handle,
+	          0,
+	          &error );
+
+	byte_stream_copy_from_uint64_big_endian(
+	 vhdi_test_dynamic_disk_header_data1,
+	 0x6378737061727365UL );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	/* Clean up file IO handle
 	 */
 	result = vhdi_test_close_file_io_handle(
@@ -684,10 +887,6 @@ int vhdi_test_dynamic_disk_header_read_file_io_handle(
 	VHDI_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	/* Test data invalid
-	 */
-/* TODO implement */
 
 	/* Clean up
 	 */
@@ -832,6 +1031,38 @@ int vhdi_test_dynamic_disk_header_get_parent_identifier(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_VHDI_TEST_MEMORY )
+
+	/* Test libvhdi_dynamic_disk_header_get_parent_identifier with memcpy failing
+	 */
+	vhdi_test_memcpy_attempts_before_fail = 0;
+
+	result = libvhdi_dynamic_disk_header_get_parent_identifier(
+	          dynamic_disk_header,
+	          guid_data,
+	          16,
+	          &error );
+
+	if( vhdi_test_memcpy_attempts_before_fail != -1 )
+	{
+		vhdi_test_memcpy_attempts_before_fail = -1;
+	}
+	else
+	{
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		VHDI_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_VHDI_TEST_MEMORY ) */
 
 	return( 1 );
 

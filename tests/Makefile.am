@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
@@ -43,13 +45,23 @@ EXTRA_DIST = \
 
 check_PROGRAMS = \
 	vhdi_test_block_table \
+	vhdi_test_checksum \
 	vhdi_test_data_block \
 	vhdi_test_dynamic_disk_header \
 	vhdi_test_error \
 	vhdi_test_file \
 	vhdi_test_file_footer \
+	vhdi_test_file_information \
+	vhdi_test_image_header \
 	vhdi_test_io_handle \
+	vhdi_test_metadata_table \
+	vhdi_test_metadata_table_entry \
+	vhdi_test_metadata_table_header \
+	vhdi_test_metadata_values \
 	vhdi_test_notify \
+	vhdi_test_region_table \
+	vhdi_test_region_table_entry \
+	vhdi_test_region_table_header \
 	vhdi_test_support \
 	vhdi_test_tools_output \
 	vhdi_test_tools_signal
@@ -63,6 +75,17 @@ vhdi_test_block_table_SOURCES = \
 	vhdi_test_unused.h
 
 vhdi_test_block_table_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_checksum_SOURCES = \
+	vhdi_test_checksum.c \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_unused.h
+
+vhdi_test_checksum_LDADD = \
 	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@
 
@@ -160,6 +183,50 @@ vhdi_test_file_footer_LDADD = \
 	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@
 
+vhdi_test_file_information_SOURCES = \
+	vhdi_test_file_information.c \
+	vhdi_test_functions.c vhdi_test_functions.h \
+	vhdi_test_libbfio.h \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_unused.h
+
+vhdi_test_file_information_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_image_header_SOURCES = \
+	vhdi_test_functions.c vhdi_test_functions.h \
+	vhdi_test_image_header.c \
+	vhdi_test_libbfio.h \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_unused.h
+
+vhdi_test_image_header_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
 vhdi_test_io_handle_SOURCES = \
 	vhdi_test_io_handle.c \
 	vhdi_test_libcerror.h \
@@ -172,6 +239,54 @@ vhdi_test_io_handle_LDADD = \
 	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@
 
+vhdi_test_metadata_table_SOURCES = \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_metadata_table.c \
+	vhdi_test_unused.h
+
+vhdi_test_metadata_table_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_metadata_table_entry_SOURCES = \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_metadata_table_entry.c \
+	vhdi_test_unused.h
+
+vhdi_test_metadata_table_entry_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_metadata_table_header_SOURCES = \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_metadata_table_header.c \
+	vhdi_test_unused.h
+
+vhdi_test_metadata_table_header_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_metadata_values_SOURCES = \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_metadata_values.c \
+	vhdi_test_unused.h
+
+vhdi_test_metadata_values_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
 vhdi_test_notify_SOURCES = \
 	vhdi_test_libbfio.h \
 	vhdi_test_libcerror.h \
@@ -181,6 +296,42 @@ vhdi_test_notify_SOURCES = \
 	vhdi_test_unused.h
 
 vhdi_test_notify_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_region_table_SOURCES = \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_region_table.c \
+	vhdi_test_unused.h
+
+vhdi_test_region_table_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_region_table_entry_SOURCES = \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_region_table_entry.c \
+	vhdi_test_unused.h
+
+vhdi_test_region_table_entry_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_region_table_header_SOURCES = \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_region_table_header.c \
+	vhdi_test_unused.h
+
+vhdi_test_region_table_header_LDADD = \
 	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@
 

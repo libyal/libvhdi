@@ -314,6 +314,7 @@ int info_handle_input_fprint(
 	uint32_t disk_type               = 0;
 	uint16_t major_version           = 0;
 	uint16_t minor_version           = 0;
+	int file_type                    = 0;
 	int result                       = 0;
 
 	if( info_handle == NULL )
@@ -327,9 +328,51 @@ int info_handle_input_fprint(
 
 		return( -1 );
 	}
+	if( libvhdi_file_get_file_type(
+	     info_handle->input,
+	     &file_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file type.",
+		 function );
+
+		goto on_error;
+	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "Virtual Hard Disk (VHD) image information:\n" );
+	 "Virtual Hard Disk image information:\n" );
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tFormat\t\t\t:" );
+
+	switch( file_type )
+	{
+		case LIBVHDI_FILE_TYPE_VHD:
+			fprintf(
+			 info_handle->notify_stream,
+			 " VHD (version 1)" );
+			break;
+
+		case LIBVHDI_FILE_TYPE_VHDX:
+			fprintf(
+			 info_handle->notify_stream,
+			 " VHDX (version 2)" );
+			break;
+
+		default:
+			fprintf(
+			 info_handle->notify_stream,
+			 " Unknown" );
+			break;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\n" );
 
 	if( libvhdi_file_get_format_version(
 	     info_handle->input,
@@ -348,58 +391,77 @@ int info_handle_input_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tFormat:\t\t\t%" PRIu16 ".%" PRIu16 "\n",
-	 major_version,
-	 minor_version );
+	 "\tFormat version\t\t:" );
 
-	if( libvhdi_file_get_disk_type(
-	     info_handle->input,
-	     &disk_type,
-	     error ) != 1 )
+	if( file_type == LIBVHDI_FILE_TYPE_VHD )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve disk type.",
-		 function );
-
-		goto on_error;
+		fprintf(
+		 info_handle->notify_stream,
+		 " %" PRIu16 ".%" PRIu16 "",
+		 major_version,
+		 minor_version );
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tDisk type:\t\t" );
-
-	switch( disk_type )
+	else if( file_type == LIBVHDI_FILE_TYPE_VHDX )
 	{
-		case LIBVHDI_DISK_TYPE_FIXED:
-			fprintf(
-			 info_handle->notify_stream,
-			 "Fixed" );
-			break;
-
-		case LIBVHDI_DISK_TYPE_DYNAMIC:
-			fprintf(
-			 info_handle->notify_stream,
-			 "Dynamic" );
-			break;
-
-		case LIBVHDI_DISK_TYPE_DIFFERENTIAL:
-			fprintf(
-			 info_handle->notify_stream,
-			 "Differential" );
-			break;
-
-		default:
-			fprintf(
-			 info_handle->notify_stream,
-			 "Unknown" );
-			break;
+		fprintf(
+		 info_handle->notify_stream,
+		 " %" PRIu16 "",
+		 major_version );
 	}
 	fprintf(
 	 info_handle->notify_stream,
 	 "\n" );
 
+	if( file_type == LIBVHDI_FILE_TYPE_VHD )
+	{
+		if( libvhdi_file_get_disk_type(
+		     info_handle->input,
+		     &disk_type,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve disk type.",
+			 function );
+
+			goto on_error;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tDisk type\t\t: " );
+
+		switch( disk_type )
+		{
+			case LIBVHDI_DISK_TYPE_FIXED:
+				fprintf(
+				 info_handle->notify_stream,
+				 "Fixed" );
+				break;
+
+			case LIBVHDI_DISK_TYPE_DYNAMIC:
+				fprintf(
+				 info_handle->notify_stream,
+				 "Dynamic" );
+				break;
+
+			case LIBVHDI_DISK_TYPE_DIFFERENTIAL:
+				fprintf(
+				 info_handle->notify_stream,
+				 "Differential" );
+				break;
+
+			default:
+				fprintf(
+				 info_handle->notify_stream,
+				 "Unknown" );
+				break;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\n" );
+	}
 	if( libvhdi_file_get_media_size(
 	     info_handle->input,
 	     &media_size,
@@ -425,7 +487,7 @@ int info_handle_input_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tMedia size:\t\t%" PRIs_SYSTEM " (%" PRIu64 " bytes)\n",
+		 "\tMedia size\t\t: %" PRIs_SYSTEM " (%" PRIu64 " bytes)\n",
 		 byte_size_string,
 		 media_size );
 	}
@@ -433,7 +495,7 @@ int info_handle_input_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tMedia size:\t\t%" PRIu64 " bytes\n",
+		 "\tMedia size\t\t: %" PRIu64 " bytes\n",
 		 media_size );
 	}
 	if( libfguid_identifier_initialize(
@@ -508,7 +570,7 @@ int info_handle_input_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tIdentifier:\t\t%" PRIs_SYSTEM "\n",
+	 "\tIdentifier\t\t: %" PRIs_SYSTEM "\n",
 	 guid_string );
 
 	result = libvhdi_file_get_parent_identifier(
@@ -574,7 +636,7 @@ int info_handle_input_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tParent identifier:\t%" PRIs_SYSTEM "\n",
+		 "\tParent identifier\t: %" PRIs_SYSTEM "\n",
 		 guid_string );
 	}
 	if( libfguid_identifier_free(
@@ -666,7 +728,7 @@ int info_handle_input_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tParent filename:\t%s\n",
+		 "\tParent filename\t: %s\n",
 		 value_string );
 
 		memory_free(

@@ -8,13 +8,13 @@ Analysis of the Virtual PC VHD format
 [abstract]
 == Summary
 
-A commonly image format used in Microsoft virtualization products is the
-Virtual Hard Disk (VHD) Image format. It is both used the store hard disk
-images and snapshots. This specification is based on available documentation
+A commonly image format used in Microsoft virtualization products is the Virtual
+Hard Disk (VHD) Image format. It is both used the store hard disk images and
+snapshots. This specification is based on available documentation
 and was enhanced by analyzing test data.
 
-This document is intended as a working document for the Virtual Hard Disk (VHD)
-Image format for the libvhdi project.
+This document is intended as a working document of the data format specification
+for the libvhdi project.
 
 [preface]
 == Document information

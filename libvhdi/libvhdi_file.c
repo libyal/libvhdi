@@ -31,7 +31,9 @@
 #include "libvhdi_definitions.h"
 #include "libvhdi_file.h"
 #include "libvhdi_file_footer.h"
+#include "libvhdi_file_information.h"
 #include "libvhdi_i18n.h"
+#include "libvhdi_image_header.h"
 #include "libvhdi_io_handle.h"
 #include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
@@ -39,6 +41,8 @@
 #include "libvhdi_libcthreads.h"
 #include "libvhdi_libfcache.h"
 #include "libvhdi_libfdata.h"
+#include "libvhdi_metadata_values.h"
+#include "libvhdi_region_table.h"
 
 /* Creates a file
  * Make sure the value file is referencing, is set to NULL
@@ -899,18 +903,37 @@ int libvhdi_file_close(
 
 		result = -1;
 	}
-	if( libvhdi_file_footer_free(
-	     &( internal_file->file_footer ),
-	     error ) != 1 )
+	if( internal_file->file_footer != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free file footer.",
-		 function );
+		if( libvhdi_file_footer_free(
+		     &( internal_file->file_footer ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free file footer.",
+			 function );
 
-		result = -1;
+			result = -1;
+		}
+	}
+	if( internal_file->file_information != NULL )
+	{
+		if( libvhdi_file_information_free(
+		     &( internal_file->file_information ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free file information.",
+			 function );
+
+			result = -1;
+		}
 	}
 	if( internal_file->dynamic_disk_header != NULL )
 	{
@@ -923,6 +946,38 @@ int libvhdi_file_close(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free dynamic disk header.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_file->image_header != NULL )
+	{
+		if( libvhdi_image_header_free(
+		     &( internal_file->image_header ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free image header.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_file->metadata_values != NULL )
+	{
+		if( libvhdi_metadata_values_free(
+		     &( internal_file->metadata_values ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free metadata values.",
 			 function );
 
 			result = -1;
@@ -993,10 +1048,12 @@ int libvhdi_internal_file_open_read(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
-	static char *function = "libvhdi_internal_file_open_read";
-	off64_t next_offset   = 0;
-	size64_t file_size    = 0;
-	int segment_index     = 0;
+	libvhdi_image_header_t *image_header = NULL;
+	libvhdi_region_table_t *region_table = NULL;
+	static char *function                = "libvhdi_internal_file_open_read";
+	size64_t file_size                   = 0;
+	int result                           = 0;
+	int segment_index                    = 0;
 
 	if( internal_file == NULL )
 	{
@@ -1031,6 +1088,17 @@ int libvhdi_internal_file_open_read(
 
 		return( -1 );
 	}
+	if( internal_file->file_information != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - file information already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_file->dynamic_disk_header != NULL )
 	{
 		libcerror_error_set(
@@ -1038,6 +1106,28 @@ int libvhdi_internal_file_open_read(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid file - dynamic disk header already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->image_header != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - image header already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->metadata_values != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - metadata values already set.",
 		 function );
 
 		return( -1 );
@@ -1093,68 +1183,106 @@ int libvhdi_internal_file_open_read(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "Reading file footer:\n" );
+		 "Reading file information:\n" );
 	}
 #endif
-	if( libvhdi_file_footer_initialize(
-	     &( internal_file->file_footer ),
+	if( libvhdi_file_information_initialize(
+	     &( internal_file->file_information ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create file footer.",
+		 "%s: unable to create file information.",
 		 function );
 
 		goto on_error;
 	}
-	if( libvhdi_file_footer_read_file_io_handle(
-	     internal_file->file_footer,
-	     file_io_handle,
-	     error ) != 1 )
+	result = libvhdi_file_information_read_file_io_handle(
+	          internal_file->file_information,
+	          file_io_handle,
+	          0,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read file footer.",
+		 "%s: unable to read file information.",
 		 function );
 
 		goto on_error;
 	}
-	next_offset = internal_file->file_footer->next_offset;
-
-/* TODO check disk type */
-	if( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_FIXED )
+	else if( result == 0 )
 	{
-		if( next_offset != -1LL )
+		if( libvhdi_file_information_free(
+		     &( internal_file->file_information ),
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported next offset.",
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free file information.",
 			 function );
 
 			goto on_error;
 		}
-		internal_file->io_handle->block_data_offset = 0;
+		internal_file->io_handle->file_type = LIBVHDI_FILE_TYPE_VHD;
 	}
 	else
 	{
-		if( ( next_offset == -1LL )
-		 || ( next_offset < 0x200 ) )
+		internal_file->io_handle->file_type = LIBVHDI_FILE_TYPE_VHDX;
+	}
+	if( internal_file->io_handle->file_type == LIBVHDI_FILE_TYPE_VHD )
+	{
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "Reading file footer:\n" );
+		}
+#endif
+		if( libvhdi_file_footer_initialize(
+		     &( internal_file->file_footer ),
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported next offset.",
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create file footer.",
 			 function );
 
 			goto on_error;
 		}
+		if( libvhdi_file_footer_read_file_io_handle(
+		     internal_file->file_footer,
+		     file_io_handle,
+		     file_size - 512,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read file footer.",
+			 function );
+
+			goto on_error;
+		}
+		internal_file->io_handle->media_size = internal_file->file_footer->media_size;
+	}
+	internal_file->io_handle->block_data_offset = 0;
+
+	if( ( internal_file->file_footer != NULL )
+	 && ( internal_file->file_footer->disk_type != LIBVHDI_DISK_TYPE_FIXED ) )
+	{
+/* TODO check copy of file footer */
+
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
@@ -1178,7 +1306,7 @@ int libvhdi_internal_file_open_read(
 		if( libvhdi_dynamic_disk_header_read_file_io_handle(
 		     internal_file->dynamic_disk_header,
 		     file_io_handle,
-		     next_offset,
+		     internal_file->file_footer->next_offset,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1190,8 +1318,6 @@ int libvhdi_internal_file_open_read(
 
 			goto on_error;
 		}
-		next_offset = internal_file->dynamic_disk_header->next_offset;
-
 		internal_file->io_handle->block_bitmap_size = internal_file->dynamic_disk_header->block_size / ( 512 * 8 );
 
 		if( ( internal_file->io_handle->block_bitmap_size % 512 ) != 0 )
@@ -1200,6 +1326,219 @@ int libvhdi_internal_file_open_read(
 			internal_file->io_handle->block_bitmap_size += 1;
 			internal_file->io_handle->block_bitmap_size *= 512;
 		}
+	}
+	else if( internal_file->file_information != NULL )
+	{
+		if( libvhdi_image_header_initialize(
+		     &( internal_file->image_header ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create first image header.",
+			 function );
+
+			goto on_error;
+		}
+		if( libvhdi_image_header_read_file_io_handle(
+		     internal_file->image_header,
+		     file_io_handle,
+		     64 * 1024,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read first image header.",
+			 function );
+
+			goto on_error;
+		}
+		if( libvhdi_image_header_initialize(
+		     &image_header,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create second image header.",
+			 function );
+
+			goto on_error;
+		}
+		if( libvhdi_image_header_read_file_io_handle(
+		     image_header,
+		     file_io_handle,
+		     2 * 64 * 1024,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read second image header.",
+			 function );
+
+			goto on_error;
+		}
+		if( image_header->sequence_number > internal_file->image_header->sequence_number )
+		{
+			if( libvhdi_image_header_free(
+			     &( internal_file->image_header ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free primary image header.",
+				 function );
+
+				goto on_error;
+			}
+			internal_file->image_header = image_header;
+			image_header                = NULL;
+		}
+		else
+		{
+			if( libvhdi_image_header_free(
+			     &image_header,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free second image header.",
+				 function );
+
+				goto on_error;
+			}
+		}
+/* TODO */
+		if( libvhdi_region_table_initialize(
+		     &region_table,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create first region table.",
+			 function );
+
+			goto on_error;
+		}
+		if( libvhdi_region_table_read_file_io_handle(
+		     region_table,
+		     file_io_handle,
+		     3 * 64 * 1024,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read first region table.",
+			 function );
+
+			goto on_error;
+		}
+		if( libvhdi_region_table_free(
+		     &region_table,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free first region table.",
+			 function );
+
+			goto on_error;
+		}
+/* TODO */
+		if( libvhdi_region_table_initialize(
+		     &region_table,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create second region table.",
+			 function );
+
+			goto on_error;
+		}
+		if( libvhdi_region_table_read_file_io_handle(
+		     region_table,
+		     file_io_handle,
+		     4 * 64 * 1024,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read second region table.",
+			 function );
+
+			goto on_error;
+		}
+		if( libvhdi_region_table_free(
+		     &region_table,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free second region table.",
+			 function );
+
+			goto on_error;
+		}
+/* TODO
+ * Get metadata region table entry
+ */
+		if( libvhdi_metadata_values_initialize(
+		     &( internal_file->metadata_values ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create metadata values.",
+			 function );
+
+			goto on_error;
+		}
+		if( libvhdi_metadata_values_read_file_io_handle(
+		     internal_file->metadata_values,
+		     file_io_handle,
+		     0x00200000,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read metadata values.",
+			 function );
+
+			goto on_error;
+		}
+		internal_file->io_handle->media_size = internal_file->metadata_values->virtual_disk_size;
+	}
+	if( ( internal_file->file_footer != NULL )
+	 && ( internal_file->file_footer->disk_type != LIBVHDI_DISK_TYPE_FIXED ) )
+	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
@@ -1320,6 +1659,30 @@ on_error:
 		 &( internal_file->block_table ),
 		 NULL );
 	}
+	if( internal_file->metadata_values != NULL )
+	{
+		libvhdi_metadata_values_free(
+		 &( internal_file->metadata_values ),
+		 NULL );
+	}
+	if( region_table != NULL )
+	{
+		libvhdi_region_table_free(
+		 &region_table,
+		 NULL );
+	}
+	if( image_header != NULL )
+	{
+		libvhdi_image_header_free(
+		 &image_header,
+		 NULL );
+	}
+	if( internal_file->image_header != NULL )
+	{
+		libvhdi_image_header_free(
+		 &( internal_file->image_header ),
+		 NULL );
+	}
 	if( internal_file->dynamic_disk_header != NULL )
 	{
 		libvhdi_dynamic_disk_header_free(
@@ -1330,6 +1693,12 @@ on_error:
 	{
 		libvhdi_file_footer_free(
 		 &( internal_file->file_footer ),
+		 NULL );
+	}
+	if( internal_file->file_information != NULL )
+	{
+		libvhdi_file_information_free(
+		 &( internal_file->file_information ),
 		 NULL );
 	}
 	return( -1 );
@@ -1452,7 +1821,7 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 
 		return( -1 );
 	}
-	if( (size64_t) internal_file->current_offset >= internal_file->file_footer->media_size )
+	if( (size64_t) internal_file->current_offset >= internal_file->io_handle->media_size )
 	{
 		return( 0 );
 	}
@@ -1576,9 +1945,9 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 /* TODO optimize read ? */
 			read_size = 512 - (size_t) block_offset;
 		}
-		if( ( (size64_t) internal_file->current_offset + read_size ) > internal_file->file_footer->media_size )
+		if( ( (size64_t) internal_file->current_offset + read_size ) > internal_file->io_handle->media_size )
 		{
-			read_size = (size_t) ( internal_file->file_footer->media_size - internal_file->current_offset );
+			read_size = (size_t) ( internal_file->io_handle->media_size - internal_file->current_offset );
 		}
 		if( ( buffer_offset + read_size ) > buffer_size )
 		{
@@ -1713,7 +2082,7 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 
 		buffer_offset += read_size;
 
-		if( (size64_t) internal_file->current_offset >= internal_file->file_footer->media_size )
+		if( (size64_t) internal_file->current_offset >= internal_file->io_handle->media_size )
 		{
 			break;
 		}
@@ -1875,25 +2244,28 @@ ssize_t libvhdi_file_read_buffer_at_offset(
 		 "%s: unable to seek offset.",
 		 function );
 
-		goto on_error;
+		read_count = -1;
 	}
-	read_count = libvhdi_internal_file_read_buffer_from_file_io_handle(
-		      internal_file,
-		      internal_file->file_io_handle,
-		      buffer,
-		      buffer_size,
-		      error );
-
-	if( read_count == -1 )
+	else
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read buffer.",
-		 function );
+		read_count = libvhdi_internal_file_read_buffer_from_file_io_handle(
+			      internal_file,
+			      internal_file->file_io_handle,
+			      buffer,
+			      buffer_size,
+			      error );
 
-		goto on_error;
+		if( read_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read buffer.",
+			 function );
+
+			read_count = -1;
+		}
 	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -1911,14 +2283,6 @@ ssize_t libvhdi_file_read_buffer_at_offset(
 	}
 #endif
 	return( read_count );
-
-on_error:
-#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_file->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
 }
 
 /* Seeks a certain offset of the (media) data
@@ -2012,7 +2376,7 @@ off64_t libvhdi_internal_file_seek_offset(
 	}
 	else if( whence == SEEK_END )
 	{
-		offset += (off64_t) internal_file->file_footer->media_size;
+		offset += (off64_t) internal_file->io_handle->media_size;
 	}
 	if( offset < 0 )
 	{
@@ -2310,10 +2674,12 @@ int libvhdi_file_set_parent_file(
 		 "%s: mismatch in identifier.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
-	internal_file->parent_file = parent_file;
-
+	else
+	{
+		internal_file->parent_file = parent_file;
+	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_file->read_write_lock,
@@ -2330,14 +2696,6 @@ int libvhdi_file_set_parent_file(
 	}
 #endif
 	return( result );
-
-on_error:
-#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_file->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
 }
 
 /* Retrieves the number of media size
@@ -2364,13 +2722,13 @@ int libvhdi_file_get_media_size(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
-	if( internal_file->file_footer == NULL )
+	if( internal_file->io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing file footer.",
+		 "%s: invalid file - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -2401,7 +2759,88 @@ int libvhdi_file_get_media_size(
 		return( -1 );
 	}
 #endif
-	*media_size = internal_file->file_footer->media_size;
+	*media_size = internal_file->io_handle->media_size;
+
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( 1 );
+}
+
+/* Retrieves the file type
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_file_get_file_type(
+     libvhdi_file_t *file,
+     int *file_type,
+     libcerror_error_t **error )
+{
+	libvhdi_internal_file_t *internal_file = NULL;
+	static char *function                  = "libvhdi_file_get_file_type";
+
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libvhdi_internal_file_t *) file;
+
+	if( internal_file->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( file_type == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file type.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	*file_type = internal_file->io_handle->file_type;
 
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -2432,6 +2871,7 @@ int libvhdi_file_get_format_version(
 {
 	libvhdi_internal_file_t *internal_file = NULL;
 	static char *function                  = "libvhdi_file_get_format_version";
+	int result                             = 0;
 
 	if( file == NULL )
 	{
@@ -2446,24 +2886,13 @@ int libvhdi_file_get_format_version(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
-	if( internal_file->file_footer == NULL )
+	if( internal_file->io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing file footer.",
-		 function );
-
-		return( -1 );
-	}
-	if( major_version == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid major version.",
+		 "%s: invalid file - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -2472,13 +2901,15 @@ int libvhdi_file_get_format_version(
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid minor version.",
 		 function );
 
 		return( -1 );
 	}
+	*minor_version = 0;
+
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
@@ -2494,10 +2925,32 @@ int libvhdi_file_get_format_version(
 		return( -1 );
 	}
 #endif
-/* TODO move into file footer function */
-	*major_version = ( internal_file->file_footer->format_version >> 16 ) & 0x0000ffffUL;
-	*minor_version = internal_file->file_footer->format_version & 0x0000ffffUL;
+	if( internal_file->io_handle->file_type == LIBVHDI_FILE_TYPE_VHDX )
+	{
+		result = libvhdi_image_header_get_format_version(
+		          internal_file->image_header,
+		          major_version,
+		          error );
+	}
+	else
+	{
+		result = libvhdi_file_footer_get_format_version(
+		          internal_file->file_footer,
+		          major_version,
+		          minor_version,
+		          error );
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve format version.",
+		 function );
 
+		result = -1;
+	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_file->read_write_lock,
@@ -2513,7 +2966,7 @@ int libvhdi_file_get_format_version(
 		return( -1 );
 	}
 #endif
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the disk type
@@ -2526,6 +2979,7 @@ int libvhdi_file_get_disk_type(
 {
 	libvhdi_internal_file_t *internal_file = NULL;
 	static char *function                  = "libvhdi_file_get_disk_type";
+	int result                             = 0;
 
 	if( file == NULL )
 	{
@@ -2540,28 +2994,6 @@ int libvhdi_file_get_disk_type(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
-	if( internal_file->file_footer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing file footer.",
-		 function );
-
-		return( -1 );
-	}
-	if( disk_type == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid disk type.",
-		 function );
-
-		return( -1 );
-	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
@@ -2577,8 +3009,22 @@ int libvhdi_file_get_disk_type(
 		return( -1 );
 	}
 #endif
-	*disk_type = internal_file->file_footer->disk_type;
+	result = libvhdi_file_footer_get_disk_type(
+	          internal_file->file_footer,
+	          disk_type,
+	          error );
 
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve disk type.",
+		 function );
+
+		result = -1;
+	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_file->read_write_lock,
@@ -2594,10 +3040,10 @@ int libvhdi_file_get_disk_type(
 		return( -1 );
 	}
 #endif
-	return( 1 );
+	return( result );
 }
 
-/* Retrieves the identifier
+/* Retrieves the (virtual disk) identifier
  * The identifier is a big-endian GUID and is 16 bytes of size
  * Returns 1 if successful or -1 on error
  */
@@ -2624,17 +3070,6 @@ int libvhdi_file_get_identifier(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
-	if( internal_file->file_footer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing file footer.",
-		 function );
-
-		return( -1 );
-	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
@@ -2650,22 +3085,45 @@ int libvhdi_file_get_identifier(
 		return( -1 );
 	}
 #endif
-	result = libvhdi_file_footer_get_identifier(
-	          internal_file->file_footer,
-	          guid_data,
-	          guid_data_size,
-	          error );
-
-	if( result != 1 )
+	if( internal_file->metadata_values != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve identifier.",
-		 function );
+		result = libvhdi_metadata_values_get_virtual_disk_identifier(
+		          internal_file->metadata_values,
+		          guid_data,
+		          guid_data_size,
+		          error );
 
-		result = -1;
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve virtual disk identifier.",
+			 function );
+
+			result = -1;
+		}
+	}
+	else
+	{
+		result = libvhdi_file_footer_get_identifier(
+		          internal_file->file_footer,
+		          guid_data,
+		          guid_data_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve identifier.",
+			 function );
+
+			result = -1;
+		}
 	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -2712,17 +3170,6 @@ int libvhdi_file_get_parent_identifier(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
-	if( internal_file->file_footer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing file footer.",
-		 function );
-
-		return( -1 );
-	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
@@ -2738,7 +3185,8 @@ int libvhdi_file_get_parent_identifier(
 		return( -1 );
 	}
 #endif
-	if( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL )
+	if( ( internal_file->file_footer != NULL )
+	 && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 	{
 		result = libvhdi_dynamic_disk_header_get_parent_identifier(
 			  internal_file->dynamic_disk_header,
@@ -2802,17 +3250,6 @@ int libvhdi_file_get_utf8_parent_filename_size(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
-	if( internal_file->file_footer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing file footer.",
-		 function );
-
-		return( -1 );
-	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
@@ -2828,7 +3265,8 @@ int libvhdi_file_get_utf8_parent_filename_size(
 		return( -1 );
 	}
 #endif
-	if( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL )
+	if( ( internal_file->file_footer != NULL )
+	 && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 	{
 		result = libvhdi_dynamic_disk_header_get_utf8_parent_filename_size(
 			  internal_file->dynamic_disk_header,
@@ -2892,17 +3330,6 @@ int libvhdi_file_get_utf8_parent_filename(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
-	if( internal_file->file_footer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing file footer.",
-		 function );
-
-		return( -1 );
-	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
@@ -2918,7 +3345,8 @@ int libvhdi_file_get_utf8_parent_filename(
 		return( -1 );
 	}
 #endif
-	if( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL )
+	if( ( internal_file->file_footer != NULL )
+	 && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 	{
 		result = libvhdi_dynamic_disk_header_get_utf8_parent_filename(
 			  internal_file->dynamic_disk_header,
@@ -2982,17 +3410,6 @@ int libvhdi_file_get_utf16_parent_filename_size(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
-	if( internal_file->file_footer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing file footer.",
-		 function );
-
-		return( -1 );
-	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
@@ -3008,7 +3425,8 @@ int libvhdi_file_get_utf16_parent_filename_size(
 		return( -1 );
 	}
 #endif
-	if( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL )
+	if( ( internal_file->file_footer != NULL )
+	 && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 	{
 		result = libvhdi_dynamic_disk_header_get_utf16_parent_filename_size(
 			  internal_file->dynamic_disk_header,
@@ -3072,17 +3490,6 @@ int libvhdi_file_get_utf16_parent_filename(
 	}
 	internal_file = (libvhdi_internal_file_t *) file;
 
-	if( internal_file->file_footer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing file footer.",
-		 function );
-
-		return( -1 );
-	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file->read_write_lock,
@@ -3098,7 +3505,8 @@ int libvhdi_file_get_utf16_parent_filename(
 		return( -1 );
 	}
 #endif
-	if( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL )
+	if( ( internal_file->file_footer != NULL )
+	 && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 	{
 		result = libvhdi_dynamic_disk_header_get_utf16_parent_filename(
 			  internal_file->dynamic_disk_header,

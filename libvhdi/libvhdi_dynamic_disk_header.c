@@ -27,14 +27,13 @@
 #include "libvhdi_debug.h"
 #include "libvhdi_definitions.h"
 #include "libvhdi_dynamic_disk_header.h"
+#include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcnotify.h"
 #include "libvhdi_libfguid.h"
 #include "libvhdi_libuna.h"
 
 #include "vhdi_dynamic_disk_header.h"
-
-const uint8_t *vhdi_dynamic_disk_signature = (uint8_t *) "cxsparse";
 
 /* Creates dynamic disk header
  * Make sure the value dynamic_disk_header is referencing, is set to NULL
@@ -221,7 +220,7 @@ int libvhdi_dynamic_disk_header_read_data(
 #endif
 	if( memory_compare(
 	     ( (vhdi_dynamic_disk_header_t *) data )->signature,
-	     vhdi_dynamic_disk_signature,
+	     "cxsparse",
 	     8 ) != 0 )
 	{
 		libcerror_error_set(
@@ -646,6 +645,7 @@ int libvhdi_dynamic_disk_header_get_utf8_parent_filename_size(
      libcerror_error_t **error )
 {
 	static char *function = "libvhdi_dynamic_disk_header_get_utf8_parent_filename_size";
+	int result            = 0;
 
 	if( dynamic_disk_header == NULL )
 	{
@@ -658,28 +658,29 @@ int libvhdi_dynamic_disk_header_get_utf8_parent_filename_size(
 
 		return( -1 );
 	}
-	if( ( dynamic_disk_header->parent_filename == NULL )
-	 || ( dynamic_disk_header->parent_filename_size == 0 ) )
+	if( ( dynamic_disk_header->parent_filename != NULL )
+	 && ( dynamic_disk_header->parent_filename_size > 0 ) )
 	{
-		return( 0 );
-	}
-	if( libuna_utf8_string_size_from_utf16_stream(
-	     dynamic_disk_header->parent_filename,
-	     dynamic_disk_header->parent_filename_size,
-	     LIBUNA_ENDIAN_BIG,
-	     utf8_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 string size.",
-		 function );
+		result = libuna_utf8_string_size_from_utf16_stream(
+		          dynamic_disk_header->parent_filename,
+		          dynamic_disk_header->parent_filename_size,
+		          LIBUNA_ENDIAN_BIG,
+		          utf8_string_size,
+		          error );
 
-		return( -1 );
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 string size.",
+			 function );
+
+			return( -1 );
+		}
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the UTF-8 encoded parent filename
@@ -693,6 +694,7 @@ int libvhdi_dynamic_disk_header_get_utf8_parent_filename(
      libcerror_error_t **error )
 {
 	static char *function = "libvhdi_dynamic_disk_header_get_utf8_parent_filename";
+	int result            = 0;
 
 	if( dynamic_disk_header == NULL )
 	{
@@ -705,29 +707,30 @@ int libvhdi_dynamic_disk_header_get_utf8_parent_filename(
 
 		return( -1 );
 	}
-	if( ( dynamic_disk_header->parent_filename == NULL )
-	 || ( dynamic_disk_header->parent_filename_size == 0 ) )
+	if( ( dynamic_disk_header->parent_filename != NULL )
+	 && ( dynamic_disk_header->parent_filename_size > 0 ) )
 	{
-		return( 0 );
-	}
-	if( libuna_utf8_string_copy_from_utf16_stream(
-	     utf8_string,
-	     utf8_string_size,
-	     dynamic_disk_header->parent_filename,
-	     dynamic_disk_header->parent_filename_size,
-	     LIBUNA_ENDIAN_BIG,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-		 "%s: unable to copy parent filename to UTF-8 string.",
-		 function );
+		result = libuna_utf8_string_copy_from_utf16_stream(
+		          utf8_string,
+		          utf8_string_size,
+		          dynamic_disk_header->parent_filename,
+		          dynamic_disk_header->parent_filename_size,
+		          LIBUNA_ENDIAN_BIG,
+		          error );
 
-		return( -1 );
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy parent filename to UTF-8 string.",
+			 function );
+
+			return( -1 );
+		}
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the size of the UTF-16 encoded parent filename
@@ -740,6 +743,7 @@ int libvhdi_dynamic_disk_header_get_utf16_parent_filename_size(
      libcerror_error_t **error )
 {
 	static char *function = "libvhdi_dynamic_disk_header_get_utf16_parent_filename_size";
+	int result            = 0;
 
 	if( dynamic_disk_header == NULL )
 	{
@@ -752,28 +756,29 @@ int libvhdi_dynamic_disk_header_get_utf16_parent_filename_size(
 
 		return( -1 );
 	}
-	if( ( dynamic_disk_header->parent_filename == NULL )
-	 || ( dynamic_disk_header->parent_filename_size == 0 ) )
+	if( ( dynamic_disk_header->parent_filename != NULL )
+	 && ( dynamic_disk_header->parent_filename_size > 0 ) )
 	{
-		return( 0 );
-	}
-	if( libuna_utf16_string_size_from_utf16_stream(
-	     dynamic_disk_header->parent_filename,
-	     dynamic_disk_header->parent_filename_size,
-	     LIBUNA_ENDIAN_BIG,
-	     utf16_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-16 string size.",
-		 function );
+		result = libuna_utf16_string_size_from_utf16_stream(
+		          dynamic_disk_header->parent_filename,
+		          dynamic_disk_header->parent_filename_size,
+		          LIBUNA_ENDIAN_BIG,
+		          utf16_string_size,
+		          error );
 
-		return( -1 );
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-16 string size.",
+			 function );
+
+			return( -1 );
+		}
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the UTF-16 encoded parent filename
@@ -787,6 +792,7 @@ int libvhdi_dynamic_disk_header_get_utf16_parent_filename(
      libcerror_error_t **error )
 {
 	static char *function = "libvhdi_dynamic_disk_header_get_utf16_parent_filename";
+	int result            = 0;
 
 	if( dynamic_disk_header == NULL )
 	{
@@ -799,28 +805,29 @@ int libvhdi_dynamic_disk_header_get_utf16_parent_filename(
 
 		return( -1 );
 	}
-	if( ( dynamic_disk_header->parent_filename == NULL )
-	 || ( dynamic_disk_header->parent_filename_size == 0 ) )
+	if( ( dynamic_disk_header->parent_filename != NULL )
+	 && ( dynamic_disk_header->parent_filename_size > 0 ) )
 	{
-		return( 0 );
-	}
-	if( libuna_utf16_string_copy_from_utf16_stream(
-	     utf16_string,
-	     utf16_string_size,
-	     dynamic_disk_header->parent_filename,
-	     dynamic_disk_header->parent_filename_size,
-	     LIBUNA_ENDIAN_BIG,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-		 "%s: unable to copy parent filename to UTF-16 string.",
-		 function );
+		result = libuna_utf16_string_copy_from_utf16_stream(
+		          utf16_string,
+		          utf16_string_size,
+		          dynamic_disk_header->parent_filename,
+		          dynamic_disk_header->parent_filename_size,
+		          LIBUNA_ENDIAN_BIG,
+		          error );
 
-		return( -1 );
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy parent filename to UTF-16 string.",
+			 function );
+
+			return( -1 );
+		}
 	}
-	return( 1 );
+	return( result );
 }
 

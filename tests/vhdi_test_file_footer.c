@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <byte_stream.h>
 #include <file_stream.h>
 #include <types.h>
 
@@ -426,6 +427,98 @@ int vhdi_test_file_footer_read_data(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_VHDI_TEST_MEMORY )
+
+	/* Test libvhdi_file_footer_read_data with memcpy failing
+	 */
+	vhdi_test_memcpy_attempts_before_fail = 0;
+
+	result = libvhdi_file_footer_read_data(
+	          file_footer,
+	          vhdi_test_file_footer_data1,
+	          512,
+	          &error );
+
+	if( vhdi_test_memcpy_attempts_before_fail != -1 )
+	{
+		vhdi_test_memcpy_attempts_before_fail = -1;
+	}
+	else
+	{
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		VHDI_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_VHDI_TEST_MEMORY ) */
+
+	/* Test error case where signature is invalid
+	 */
+	byte_stream_copy_from_uint64_big_endian(
+	 vhdi_test_file_footer_data1,
+	 0xffffffffffffffffUL );
+
+	result = libvhdi_file_footer_read_data(
+	          file_footer,
+	          vhdi_test_file_footer_data1,
+	          512,
+	          &error );
+
+	byte_stream_copy_from_uint64_big_endian(
+	 vhdi_test_file_footer_data1,
+	 0x636f6e6563746978UL );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test error case where format version is invalid
+	 */
+	byte_stream_copy_from_uint32_big_endian(
+	 &( vhdi_test_file_footer_data1[ 12 ] ),
+	 0xffffffffUL );
+
+	result = libvhdi_file_footer_read_data(
+	          file_footer,
+	          vhdi_test_file_footer_data1,
+	          512,
+	          &error );
+
+	byte_stream_copy_from_uint32_big_endian(
+	 &( vhdi_test_file_footer_data1[ 12 ] ),
+	 0x00010000UL );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test error case where disk type is invalid
+	 */
+/* TODO implement */
+
 	/* Clean up
 	 */
 	result = libvhdi_file_footer_free(
@@ -518,6 +611,7 @@ int vhdi_test_file_footer_read_file_io_handle(
 	result = libvhdi_file_footer_read_file_io_handle(
 	          file_footer,
 	          file_io_handle,
+	          0,
 	          &error );
 
 	VHDI_TEST_ASSERT_EQUAL_INT(
@@ -534,6 +628,7 @@ int vhdi_test_file_footer_read_file_io_handle(
 	result = libvhdi_file_footer_read_file_io_handle(
 	          NULL,
 	          file_io_handle,
+	          0,
 	          &error );
 
 	VHDI_TEST_ASSERT_EQUAL_INT(
@@ -551,7 +646,54 @@ int vhdi_test_file_footer_read_file_io_handle(
 	result = libvhdi_file_footer_read_file_io_handle(
 	          file_footer,
 	          NULL,
+	          0,
 	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_file_footer_read_file_io_handle(
+	          file_footer,
+	          file_io_handle,
+	          -1,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test data invalid
+	 */
+	byte_stream_copy_from_uint64_big_endian(
+	 vhdi_test_file_footer_data1,
+	 0xffffffffffffffffUL );
+
+	result = libvhdi_file_footer_read_file_io_handle(
+	          file_footer,
+	          file_io_handle,
+	          0,
+	          &error );
+
+	byte_stream_copy_from_uint64_big_endian(
+	 vhdi_test_file_footer_data1,
+	 0x636f6e6563746978UL );
 
 	VHDI_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -604,6 +746,7 @@ int vhdi_test_file_footer_read_file_io_handle(
 	result = libvhdi_file_footer_read_file_io_handle(
 	          file_footer,
 	          file_io_handle,
+	          0,
 	          &error );
 
 	VHDI_TEST_ASSERT_EQUAL_INT(
@@ -630,10 +773,6 @@ int vhdi_test_file_footer_read_file_io_handle(
 	VHDI_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	/* Test data invalid
-	 */
-/* TODO implement */
 
 	/* Clean up
 	 */
@@ -673,6 +812,174 @@ on_error:
 		libvhdi_file_footer_free(
 		 &file_footer,
 		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libvhdi_file_footer_get_format_version function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_file_footer_get_format_version(
+     libvhdi_file_footer_t *file_footer )
+{
+	libcerror_error_t *error = NULL;
+	uint16_t major_version   = 0;
+	uint16_t minor_version   = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libvhdi_file_footer_get_format_version(
+	          file_footer,
+	          &major_version,
+	          &minor_version,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libvhdi_file_footer_get_format_version(
+	          NULL,
+	          &major_version,
+	          &minor_version,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_file_footer_get_format_version(
+	          file_footer,
+	          NULL,
+	          &minor_version,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_file_footer_get_format_version(
+	          file_footer,
+	          &major_version,
+	          NULL,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libvhdi_file_footer_get_disk_type function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_file_footer_get_disk_type(
+     libvhdi_file_footer_t *file_footer )
+{
+	libcerror_error_t *error = NULL;
+	uint32_t disk_type       = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libvhdi_file_footer_get_disk_type(
+	          file_footer,
+	          &disk_type,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libvhdi_file_footer_get_disk_type(
+	          NULL,
+	          &disk_type,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_file_footer_get_disk_type(
+	          file_footer,
+	          NULL,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
 	}
 	return( 0 );
 }
@@ -779,6 +1086,38 @@ int vhdi_test_file_footer_get_identifier(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_VHDI_TEST_MEMORY )
+
+	/* Test libvhdi_file_footer_get_identifier with memcpy failing
+	 */
+	vhdi_test_memcpy_attempts_before_fail = 0;
+
+	result = libvhdi_file_footer_get_identifier(
+	          file_footer,
+	          guid_data,
+	          16,
+	          &error );
+
+	if( vhdi_test_memcpy_attempts_before_fail != -1 )
+	{
+		vhdi_test_memcpy_attempts_before_fail = -1;
+	}
+	else
+	{
+		VHDI_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		VHDI_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_VHDI_TEST_MEMORY ) */
+
 	return( 1 );
 
 on_error:
@@ -873,6 +1212,16 @@ int main(
 
 	/* Run tests
 	 */
+	VHDI_TEST_RUN_WITH_ARGS(
+	 "libvhdi_file_footer_get_format_version",
+	 vhdi_test_file_footer_get_format_version,
+	 file_footer );
+
+	VHDI_TEST_RUN_WITH_ARGS(
+	 "libvhdi_file_footer_get_disk_type",
+	 vhdi_test_file_footer_get_disk_type,
+	 file_footer );
+
 	VHDI_TEST_RUN_WITH_ARGS(
 	 "libvhdi_file_footer_get_identifier",
 	 vhdi_test_file_footer_get_identifier,

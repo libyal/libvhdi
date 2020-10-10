@@ -23,6 +23,7 @@ lib_LTLIBRARIES = libvhdi.la
 libvhdi_la_SOURCES = \
 	libvhdi.c \
 	libvhdi_block_table.c libvhdi_block_table.h \
+	libvhdi_checksum.c libvhdi_checksum.h \
 	libvhdi_codepage.h \
 	libvhdi_data_block.c libvhdi_data_block.h \
 	libvhdi_debug.c libvhdi_debug.h \
@@ -32,9 +33,12 @@ libvhdi_la_SOURCES = \
 	libvhdi_extern.h \
 	libvhdi_file.c libvhdi_file.h \
 	libvhdi_file_footer.c libvhdi_file_footer.h \
+	libvhdi_file_information.c libvhdi_file_information.h \
 	libvhdi_i18n.c libvhdi_i18n.h \
+	libvhdi_image_header.c libvhdi_image_header.h \
 	libvhdi_io_handle.c libvhdi_io_handle.h \
 	libvhdi_libbfio.h \
+	libvhdi_libcdata.h \
 	libvhdi_libcerror.h \
 	libvhdi_libclocale.h \
 	libvhdi_libcnotify.h \
@@ -43,12 +47,25 @@ libvhdi_la_SOURCES = \
 	libvhdi_libfdata.h \
 	libvhdi_libfguid.h \
 	libvhdi_libuna.h \
+	libvhdi_metadata_item_identifier.c libvhdi_metadata_item_identifier.h \
+	libvhdi_metadata_table.c libvhdi_metadata_table.h \
+	libvhdi_metadata_table_entry.c libvhdi_metadata_table_entry.h \
+	libvhdi_metadata_table_header.c libvhdi_metadata_table_header.h \
+	libvhdi_metadata_values.c libvhdi_metadata_values.h \
 	libvhdi_notify.c libvhdi_notify.h \
+	libvhdi_region_table.c libvhdi_region_table.h \
+	libvhdi_region_table_entry.c libvhdi_region_table_entry.h \
+	libvhdi_region_table_header.c libvhdi_region_table_header.h \
+	libvhdi_region_type_identifier.c libvhdi_region_type_identifier.h \
 	libvhdi_support.c libvhdi_support.h \
 	libvhdi_types.h \
 	libvhdi_unused.h \
 	vhdi_dynamic_disk_header.h \
-	vhdi_file_footer.h
+	vhdi_file_footer.h \
+	vhdi_file_information.h \
+	vhdi_image_header.h \
+	vhdi_metadata_table.h \
+	vhdi_region_table.h
 
 libvhdi_la_LIBADD = \
 	@LIBCERROR_LIBADD@ \

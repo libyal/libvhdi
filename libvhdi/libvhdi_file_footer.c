@@ -27,7 +27,7 @@
 #include "libvhdi_debug.h"
 #include "libvhdi_definitions.h"
 #include "libvhdi_file_footer.h"
-#include "libvhdi_io_handle.h"
+#include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcnotify.h"
 #include "libvhdi_libfguid.h"
@@ -202,14 +202,14 @@ int libvhdi_file_footer_read_data(
 #endif
 	if( memory_compare(
 	     ( (vhdi_file_footer_t *) data )->signature,
-	     vhdi_file_signature,
+	     "conectix",
 	     8 ) != 0 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported file signature.",
+		 "%s: unsupported signature.",
 		 function );
 
 		return( -1 );
@@ -404,6 +404,34 @@ int libvhdi_file_footer_read_data(
 
 		return( -1 );
 	}
+	if( file_footer->disk_type == LIBVHDI_DISK_TYPE_FIXED )
+	{
+		if( (off64_t) safe_next_offset != -1LL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported next offset.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		if( (off64_t) safe_next_offset < 512 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported next offset.",
+			 function );
+
+			return( -1 );
+		}
+	}
 	file_footer->next_offset = (off64_t) safe_next_offset;
 
 	return( 1 );
@@ -415,6 +443,7 @@ int libvhdi_file_footer_read_data(
 int libvhdi_file_footer_read_file_io_handle(
      libvhdi_file_footer_t *file_footer,
      libbfio_handle_t *file_io_handle,
+     off64_t file_offset,
      libcerror_error_t **error )
 {
 	uint8_t file_footer_data[ sizeof( vhdi_file_footer_t ) ];
@@ -437,22 +466,26 @@ int libvhdi_file_footer_read_file_io_handle(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: reading file footer at offset: -512 from the end.\n",
-		 function );
+		 "%s: reading file footer at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
+		 function,
+		 file_offset,
+		 file_offset );
 	}
 #endif
 	if( libbfio_handle_seek_offset(
 	     file_io_handle,
-	     -512,
-	     SEEK_END,
+	     file_offset,
+	     SEEK_SET,
 	     error ) == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek file footer offset: -512 from the end.",
-		 function );
+		 "%s: unable to seek file footer offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 file_offset,
+		 file_offset );
 
 		return( -1 );
 	}
@@ -491,7 +524,95 @@ int libvhdi_file_footer_read_file_io_handle(
 	return( 1 );
 }
 
+/* Retrieves the format version
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_file_footer_get_format_version(
+     libvhdi_file_footer_t *file_footer,
+     uint16_t *major_version,
+     uint16_t *minor_version,
+     libcerror_error_t **error )
+{
+	static char *function = "libvhdi_file_footer_get_format_version";
+
+	if( file_footer == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file footer.",
+		 function );
+
+		return( -1 );
+	}
+	if( major_version == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid major version.",
+		 function );
+
+		return( -1 );
+	}
+	if( minor_version == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid minor version.",
+		 function );
+
+		return( -1 );
+	}
+	*major_version = ( file_footer->format_version >> 16 ) & 0x0000ffffUL;
+	*minor_version = file_footer->format_version & 0x0000ffffUL;
+
+	return( 1 );
+}
+
+/* Retrieves the disk type
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_file_footer_get_disk_type(
+     libvhdi_file_footer_t *file_footer,
+     uint32_t *disk_type,
+     libcerror_error_t **error )
+{
+	static char *function = "libvhdi_file_footer_get_disk_type";
+
+	if( file_footer == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file footer.",
+		 function );
+
+		return( -1 );
+	}
+	if( disk_type == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid disk type.",
+		 function );
+
+		return( -1 );
+	}
+	*disk_type = file_footer->disk_type;
+
+	return( 1 );
+}
+
 /* Retrieves the identifier
+ * The identifier is a big-endian GUID and is 16 bytes of size
  * Returns 1 if successful or -1 on error
  */
 int libvhdi_file_footer_get_identifier(

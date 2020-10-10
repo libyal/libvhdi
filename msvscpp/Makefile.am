@@ -15,13 +15,23 @@ MSVSCPP_FILES = \
 	libvhdi/libvhdi.vcproj \
 	pyvhdi/pyvhdi.vcproj \
 	vhdi_test_block_table/vhdi_test_block_table.vcproj \
+	vhdi_test_checksum/vhdi_test_checksum.vcproj \
 	vhdi_test_data_block/vhdi_test_data_block.vcproj \
 	vhdi_test_dynamic_disk_header/vhdi_test_dynamic_disk_header.vcproj \
 	vhdi_test_error/vhdi_test_error.vcproj \
 	vhdi_test_file/vhdi_test_file.vcproj \
 	vhdi_test_file_footer/vhdi_test_file_footer.vcproj \
+	vhdi_test_file_information/vhdi_test_file_information.vcproj \
+	vhdi_test_image_header/vhdi_test_image_header.vcproj \
 	vhdi_test_io_handle/vhdi_test_io_handle.vcproj \
+	vhdi_test_metadata_table/vhdi_test_metadata_table.vcproj \
+	vhdi_test_metadata_table_entry/vhdi_test_metadata_table_entry.vcproj \
+	vhdi_test_metadata_table_header/vhdi_test_metadata_table_header.vcproj \
+	vhdi_test_metadata_values/vhdi_test_metadata_values.vcproj \
 	vhdi_test_notify/vhdi_test_notify.vcproj \
+	vhdi_test_region_table/vhdi_test_region_table.vcproj \
+	vhdi_test_region_table_entry/vhdi_test_region_table_entry.vcproj \
+	vhdi_test_region_table_header/vhdi_test_region_table_header.vcproj \
 	vhdi_test_support/vhdi_test_support.vcproj \
 	vhdi_test_tools_output/vhdi_test_tools_output.vcproj \
 	vhdi_test_tools_signal/vhdi_test_tools_signal.vcproj \

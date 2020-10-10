@@ -346,7 +346,8 @@ int libvhdi_check_file_signature_file_io_handle(
 	static char *function      = "libvhdi_check_file_signature_file_io_handle";
 	size64_t file_size         = 0;
 	ssize_t read_count         = 0;
-	int file_io_handle_is_open = 1;
+	int file_io_handle_is_open = 0;
+	int result                 = 0;
 
 	if( file_io_handle == NULL )
 	{
@@ -405,41 +406,93 @@ int libvhdi_check_file_signature_file_io_handle(
 
 		goto on_error;
 	}
-	if( file_size < 512 )
+	if( file_size > 512 )
 	{
-		return( 0 );
-	}
-	if( libbfio_handle_seek_offset(
-	     file_io_handle,
-	     -512,
-	     SEEK_END,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek file header offset: -512 from the end.",
-		 function );
+		if( libbfio_handle_seek_offset(
+		     file_io_handle,
+		     0,
+		     SEEK_SET,
+		     error ) == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek file header offset: 0.",
+			 function );
 
-		goto on_error;
-	}
-	read_count = libbfio_handle_read_buffer(
-	              file_io_handle,
-	              signature,
-	              8,
-	              error );
+			goto on_error;
+		}
+		read_count = libbfio_handle_read_buffer(
+		              file_io_handle,
+		              signature,
+		              8,
+		              error );
 
-	if( read_count != 8 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read signature.",
-		 function );
+		if( read_count != 8 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read signature.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
+		/* Virtual Hard Disk version 2 (VHDX) signature in file information.
+		 */
+		if( memory_compare(
+		     "vhdxfile",
+		     signature,
+		     8 ) == 0 )
+		{
+			result = 1;
+		}
+		else
+		{
+			if( libbfio_handle_seek_offset(
+			     file_io_handle,
+			     -512,
+			     SEEK_END,
+			     error ) == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_SEEK_FAILED,
+				 "%s: unable to seek file header offset: -512 from the end.",
+				 function );
+
+				goto on_error;
+			}
+			read_count = libbfio_handle_read_buffer(
+			              file_io_handle,
+			              signature,
+			              8,
+			              error );
+
+			if( read_count != 8 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read signature.",
+				 function );
+
+				goto on_error;
+			}
+			/* Virtual Hard Disk version 1 (VHD) signature in footer.
+			 */
+			if( memory_compare(
+			     "conectix",
+			     signature,
+			     8 ) == 0 )
+			{
+				result = 1;
+			}
+		}
 	}
 	if( file_io_handle_is_open == 0 )
 	{
@@ -459,14 +512,7 @@ int libvhdi_check_file_signature_file_io_handle(
 			goto on_error;
 		}
 	}
-	if( memory_compare(
-	     vhdi_file_signature,
-	     signature,
-	     8 ) == 0 )
-	{
-		return( 1 );
-	}
-	return( 0 );
+	return( result );
 
 on_error:
 	if( file_io_handle_is_open == 0 )

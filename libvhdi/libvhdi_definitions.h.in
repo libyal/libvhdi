@@ -63,13 +63,24 @@ enum LIBVHDI_ACCESS_FLAGS
 /* Reserved: not supported yet */
 #define LIBVHDI_OPEN_READ_WRITE					( LIBVHDI_ACCESS_FLAG_READ | LIBVHDI_ACCESS_FLAG_WRITE )
 
-/* The disk type definitions
+/* The file type definitions
+ */
+enum LIBVHDI_FILE_TYPES
+{
+	LIBVHDI_FILE_TYPE_UNKNOWN				= 0,
+	/* Virtual Hard Disk version 1 (VHD) file */
+	LIBVHDI_FILE_TYPE_VHD					= 1,
+	/* Virtual Hard Disk version 2 (VHDX) file */
+	LIBVHDI_FILE_TYPE_VHDX					= 2
+};
+
+/* The Virtual Hard Disk version 1 (VHD) disk type definitions
  */
 enum LIBVHDI_DISK_TYPES
 {
 	LIBVHDI_DISK_TYPE_FIXED					= 0x00000002UL,
 	LIBVHDI_DISK_TYPE_DYNAMIC				= 0x00000003UL,
-	LIBVHDI_DISK_TYPE_DIFFERENTIAL				= 0x00000004UL,
+	LIBVHDI_DISK_TYPE_DIFFERENTIAL				= 0x00000004UL
 };
 
 #endif /* !defined( HAVE_LOCAL_LIBVHDI ) */
@@ -78,5 +89,5 @@ enum LIBVHDI_DISK_TYPES
  */
 #define LIBVHDI_MAXIMUM_CACHE_ENTRIES_DATA_BLOCKS		1024
 
-#endif
+#endif /* !defined( _LIBVHDI_INTERNAL_DEFINITIONS_H ) */
 

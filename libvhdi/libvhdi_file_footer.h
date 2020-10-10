@@ -74,6 +74,18 @@ int libvhdi_file_footer_read_data(
 int libvhdi_file_footer_read_file_io_handle(
      libvhdi_file_footer_t *file_footer,
      libbfio_handle_t *file_io_handle,
+     off64_t file_offset,
+     libcerror_error_t **error );
+
+int libvhdi_file_footer_get_format_version(
+     libvhdi_file_footer_t *file_footer,
+     uint16_t *major_version,
+     uint16_t *minor_version,
+     libcerror_error_t **error );
+
+int libvhdi_file_footer_get_disk_type(
+     libvhdi_file_footer_t *file_footer,
+     uint32_t *disk_type,
      libcerror_error_t **error );
 
 int libvhdi_file_footer_get_identifier(

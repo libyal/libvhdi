@@ -34,12 +34,18 @@
 extern "C" {
 #endif
 
-extern const uint8_t *vhdi_file_signature;
-
 typedef struct libvhdi_io_handle libvhdi_io_handle_t;
 
 struct libvhdi_io_handle
 {
+	/* The file type
+ 	 */
+	int file_type;
+
+	/* The (storage) media size
+	 */
+	size64_t media_size;
+
 	/* The block data offset
  	 */
 	off64_t block_data_offset;

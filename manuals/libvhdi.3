@@ -1,4 +1,4 @@
-.Dd October  3, 2019
+.Dd October 10, 2020
 .Dt libvhdi 3
 .Os libvhdi
 .Sh NAME
@@ -82,6 +82,8 @@ Available when compiled with libbfio support:
 .Fn libvhdi_file_open_file_io_handle "libvhdi_file_t *file" "libbfio_handle_t *file_io_handle" "int access_flags" "libvhdi_error_t **error"
 .Pp
 Meta data functions
+.Ft int
+.Fn libvhdi_file_get_file_type "libvhdi_file_t *file" "int *file_type" "libvhdi_error_t **error"
 .Ft int
 .Fn libvhdi_file_get_format_version "libvhdi_file_t *file" "uint16_t *major_version" "uint16_t *minor_version" "libvhdi_error_t **error"
 .Ft int

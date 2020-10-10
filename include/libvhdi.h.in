@@ -324,6 +324,15 @@ int libvhdi_file_set_parent_file(
  * Meta data functions
  * ------------------------------------------------------------------------- */
 
+/* Retrieves the file type
+ * Returns 1 if successful or -1 on error
+ */
+LIBVHDI_EXTERN \
+int libvhdi_file_get_file_type(
+     libvhdi_file_t *file,
+     int *file_type,
+     libvhdi_error_t **error );
+
 /* Retrieves the format version
  * Returns 1 if successful or -1 on error
  */
@@ -352,7 +361,7 @@ int libvhdi_file_get_media_size(
      size64_t *media_size,
      libvhdi_error_t **error );
 
-/* Retrieves the identifier
+/* Retrieves the (virtual disk) identifier
  * The identifier is a big-endian GUID and is 16 bytes of size
  * Returns 1 if successful or -1 on error
  */

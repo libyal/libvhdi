@@ -24,13 +24,12 @@
 #include <types.h>
 
 #include "libvhdi_data_block.h"
+#include "libvhdi_definitions.h"
 #include "libvhdi_io_handle.h"
 #include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libfdata.h"
 #include "libvhdi_unused.h"
-
-const uint8_t *vhdi_file_signature = (uint8_t *) "conectix";
 
 /* Creates an IO handle
  * Make sure the value io_handle is referencing, is set to NULL
@@ -92,6 +91,8 @@ int libvhdi_io_handle_initialize(
 
 		goto on_error;
 	}
+	( *io_handle )->file_type = LIBVHDI_FILE_TYPE_UNKNOWN;
+
 	return( 1 );
 
 on_error:
@@ -169,6 +170,8 @@ int libvhdi_io_handle_clear(
 
 		return( -1 );
 	}
+	io_handle->file_type = LIBVHDI_FILE_TYPE_UNKNOWN;
+
 	return( 1 );
 }
 
