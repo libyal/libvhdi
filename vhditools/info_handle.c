@@ -728,7 +728,7 @@ int info_handle_input_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tParent filename\t: %s\n",
+		 "\tParent filename\t\t: %s\n",
 		 value_string );
 
 		memory_free(

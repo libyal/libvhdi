@@ -22,10 +22,9 @@ lib_LTLIBRARIES = libvhdi.la
 
 libvhdi_la_SOURCES = \
 	libvhdi.c \
-	libvhdi_block_table.c libvhdi_block_table.h \
+	libvhdi_block_allocation_table.c libvhdi_allocation_block_table.h \
 	libvhdi_checksum.c libvhdi_checksum.h \
 	libvhdi_codepage.h \
-	libvhdi_data_block.c libvhdi_data_block.h \
 	libvhdi_debug.c libvhdi_debug.h \
 	libvhdi_definitions.h \
 	libvhdi_dynamic_disk_header.c libvhdi_dynamic_disk_header.h \

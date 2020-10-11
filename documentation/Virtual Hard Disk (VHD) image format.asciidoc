@@ -116,6 +116,7 @@ The differential (or differencing) hard disk image consists of:
 
 Virtual PC has a feature to create "Undo Disks". This undo disk feature stores
 a differential hard disk image in files named something similar like:
+
 ....
 VirtualPCUndo_<name>_0_0_hhmmssMMDDYYYY.vud
 ....
@@ -238,11 +239,11 @@ The dynamic disk header is 1024 bytes of size and consists of:
 | 8 | 8 | | Next offset +
 Offset to the next (metadata) structure. The offset is relative from the start of the file. Currently this is unused and should be set to 0xffffffffffffffff (-1).
 | 16 | 8 | | Block table offset +
-Offset to the block table structure. The offset is relative from the start of the file.
+Offset to the block allocation table structure. The offset is relative from the start of the file.
 | 24 | 4 | 0x00010000 | Format version +
 Where the upper 16-bit are the major version and the lower 16-bit the minor version
 | 28 | 4 | | Number of blocks +
-Maximum number of block table entries
+Maximum number of block allocation table entries
 | 32 | 4 | | Block size +
 [yellow-background]*The block size must be a power-of-two multitude of the sector size. The default block size is 4096 x 512-byte sectors (2 MB).* +
 [yellow-background]*Does not include the size of the data block bitmap.*
@@ -263,8 +264,8 @@ Only used by differential hard disk images.
 | 768 | 256 | | Reserved (empty values)
 |===
 
-The maximum number of block table entries should match the maximum possible
-number of blocks in the disk.
+The maximum number of block allocation table entries should match the maximum
+possible number of blocks in the disk.
 
 [NOTE]
 The parent name can also contain a full path, e.g. in .avhd files. The part
@@ -305,23 +306,24 @@ Offset to the locator data. The offset is relative from the start of the file.
 | "Wi2r" | Wi2r | [yellow-background]*(deprecated)*
 |===
 
-== Block table
+== Block allocation table
 
-The block table is only used in dynamic and differential disk images.
+The block allocation table is only used in dynamic and differential disk images.
 
-The block table consists of 32-bit entries. The entries represent the sector
-number where the data block starts or unused when set to 0xffffffff (-1).
+The block allocation table consists of 32-bit entries. The entries represent
+the sector number where the data block starts or unused when set to
+0xffffffff (-1).
 
 ....
-if block table entry == 0xffffffff (-1):
-	block is sparse
+if block allocation table entry == 0xffffffff (-1):
+	block is sparse or stored in parent
 else:
-	data block offset =  block table entry x 512
+	file offset = ( block allocation table entry x 512 ) + sector bitmap size
 ....
 
 Unused block in a dynamic disk are sparse and should be filled with zero byte
-values. [yellow-background]*In a differential disks the sparse block is defined
-in the parent disk image.*
+values. In a differential disk the sparse block is defined in the parent disk
+image.
 
 == Data blocks
 
@@ -351,6 +353,7 @@ The bitmap is padded to a 512-byte sector boundary.
 == Notes
 
 Virtual PC fixed disk image, repeated data after initialization:
+
 ....
 00000000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
 *

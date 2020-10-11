@@ -550,7 +550,6 @@ int vhdi_test_file_open_parent(
 	size_t parent_basename_length           = 0;
 	size_t parent_filename_size             = 0;
 	size_t parent_path_size                 = 0;
-	int entry_index                         = 0;
 	int result                              = 0;
 
 	if( parent_file == NULL )

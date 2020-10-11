@@ -25,8 +25,7 @@
 #include <types.h>
 #include <wide_string.h>
 
-#include "libvhdi_block_table.h"
-#include "libvhdi_data_block.h"
+#include "libvhdi_block_allocation_table.h"
 #include "libvhdi_debug.h"
 #include "libvhdi_definitions.h"
 #include "libvhdi_file.h"
@@ -39,10 +38,9 @@
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcnotify.h"
 #include "libvhdi_libcthreads.h"
-#include "libvhdi_libfcache.h"
-#include "libvhdi_libfdata.h"
 #include "libvhdi_metadata_values.h"
 #include "libvhdi_region_table.h"
+#include "libvhdi_region_type_identifier.h"
 
 /* Creates a file
  * Make sure the value file is referencing, is set to NULL
@@ -967,6 +965,22 @@ int libvhdi_file_close(
 			result = -1;
 		}
 	}
+	if( internal_file->region_table != NULL )
+	{
+		if( libvhdi_region_table_free(
+		     &( internal_file->region_table ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free region table.",
+			 function );
+
+			result = -1;
+		}
+	}
 	if( internal_file->metadata_values != NULL )
 	{
 		if( libvhdi_metadata_values_free(
@@ -983,44 +997,21 @@ int libvhdi_file_close(
 			result = -1;
 		}
 	}
-	if( libvhdi_block_table_free(
-	     &( internal_file->block_table ),
-	     error ) != 1 )
+	if( internal_file->block_allocation_table != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free block table.",
-		 function );
+		if( libvhdi_block_allocation_table_free(
+		     &( internal_file->block_allocation_table ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free block allocation table.",
+			 function );
 
-		result = -1;
-	}
-	if( libfdata_vector_free(
-	     &( internal_file->data_block_vector ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free data block vector.",
-		 function );
-
-		result = -1;
-	}
-	if( libfcache_cache_free(
-	     &( internal_file->data_block_cache ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free data block cache.",
-		 function );
-
-		result = -1;
+			result = -1;
+		}
 	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -1048,12 +1039,9 @@ int libvhdi_internal_file_open_read(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
-	libvhdi_image_header_t *image_header = NULL;
-	libvhdi_region_table_t *region_table = NULL;
-	static char *function                = "libvhdi_internal_file_open_read";
-	size64_t file_size                   = 0;
-	int result                           = 0;
-	int segment_index                    = 0;
+	static char *function = "libvhdi_internal_file_open_read";
+	size64_t file_size    = 0;
+	int result            = 0;
 
 	if( internal_file == NULL )
 	{
@@ -1095,72 +1083,6 @@ int libvhdi_internal_file_open_read(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid file - file information already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file->dynamic_disk_header != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid file - dynamic disk header already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file->image_header != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid file - image header already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file->metadata_values != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid file - metadata values already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file->block_table != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid file - block table already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file->data_block_vector != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid file - data block vector already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file->data_block_cache != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid file - data block cache already set.",
 		 function );
 
 		return( -1 );
@@ -1276,37 +1198,14 @@ int libvhdi_internal_file_open_read(
 		}
 		internal_file->io_handle->media_size = internal_file->file_footer->media_size;
 	}
-	internal_file->io_handle->block_data_offset = 0;
-
 	if( ( internal_file->file_footer != NULL )
 	 && ( internal_file->file_footer->disk_type != LIBVHDI_DISK_TYPE_FIXED ) )
 	{
 /* TODO check copy of file footer */
 
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "Reading dynamic disk header:\n" );
-		}
-#endif
-		if( libvhdi_dynamic_disk_header_initialize(
-		     &( internal_file->dynamic_disk_header ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create dynamic disk header.",
-			 function );
-
-			goto on_error;
-		}
-		if( libvhdi_dynamic_disk_header_read_file_io_handle(
-		     internal_file->dynamic_disk_header,
+		if( libvhdi_internal_file_open_read_dynamic_disk_header(
+		     internal_file,
 		     file_io_handle,
-		     internal_file->file_footer->next_offset,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1318,211 +1217,40 @@ int libvhdi_internal_file_open_read(
 
 			goto on_error;
 		}
-		internal_file->io_handle->block_bitmap_size = internal_file->dynamic_disk_header->block_size / ( 512 * 8 );
-
-		if( ( internal_file->io_handle->block_bitmap_size % 512 ) != 0 )
-		{
-			internal_file->io_handle->block_bitmap_size /= 512;
-			internal_file->io_handle->block_bitmap_size += 1;
-			internal_file->io_handle->block_bitmap_size *= 512;
-		}
 	}
 	else if( internal_file->file_information != NULL )
 	{
-		if( libvhdi_image_header_initialize(
-		     &( internal_file->image_header ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create first image header.",
-			 function );
-
-			goto on_error;
-		}
-		if( libvhdi_image_header_read_file_io_handle(
-		     internal_file->image_header,
+		if( libvhdi_internal_file_open_read_image_header(
+		     internal_file,
 		     file_io_handle,
-		     64 * 1024,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read first image header.",
+			 "%s: unable to read image header.",
 			 function );
 
 			goto on_error;
 		}
-		if( libvhdi_image_header_initialize(
-		     &image_header,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create second image header.",
-			 function );
-
-			goto on_error;
-		}
-		if( libvhdi_image_header_read_file_io_handle(
-		     image_header,
+		if( libvhdi_internal_file_open_read_region_table(
+		     internal_file,
 		     file_io_handle,
-		     2 * 64 * 1024,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read second image header.",
+			 "%s: unable to read region table.",
 			 function );
 
 			goto on_error;
 		}
-		if( image_header->sequence_number > internal_file->image_header->sequence_number )
-		{
-			if( libvhdi_image_header_free(
-			     &( internal_file->image_header ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free primary image header.",
-				 function );
-
-				goto on_error;
-			}
-			internal_file->image_header = image_header;
-			image_header                = NULL;
-		}
-		else
-		{
-			if( libvhdi_image_header_free(
-			     &image_header,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free second image header.",
-				 function );
-
-				goto on_error;
-			}
-		}
-/* TODO */
-		if( libvhdi_region_table_initialize(
-		     &region_table,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create first region table.",
-			 function );
-
-			goto on_error;
-		}
-		if( libvhdi_region_table_read_file_io_handle(
-		     region_table,
+		if( libvhdi_internal_file_open_read_metadata_values(
+		     internal_file,
 		     file_io_handle,
-		     3 * 64 * 1024,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read first region table.",
-			 function );
-
-			goto on_error;
-		}
-		if( libvhdi_region_table_free(
-		     &region_table,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free first region table.",
-			 function );
-
-			goto on_error;
-		}
-/* TODO */
-		if( libvhdi_region_table_initialize(
-		     &region_table,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create second region table.",
-			 function );
-
-			goto on_error;
-		}
-		if( libvhdi_region_table_read_file_io_handle(
-		     region_table,
-		     file_io_handle,
-		     4 * 64 * 1024,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read second region table.",
-			 function );
-
-			goto on_error;
-		}
-		if( libvhdi_region_table_free(
-		     &region_table,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free second region table.",
-			 function );
-
-			goto on_error;
-		}
-/* TODO
- * Get metadata region table entry
- */
-		if( libvhdi_metadata_values_initialize(
-		     &( internal_file->metadata_values ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create metadata values.",
-			 function );
-
-			goto on_error;
-		}
-		if( libvhdi_metadata_values_read_file_io_handle(
-		     internal_file->metadata_values,
-		     file_io_handle,
-		     0x00200000,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1534,106 +1262,17 @@ int libvhdi_internal_file_open_read(
 
 			goto on_error;
 		}
-		internal_file->io_handle->media_size = internal_file->metadata_values->virtual_disk_size;
 	}
-	if( ( internal_file->file_footer != NULL )
-	 && ( internal_file->file_footer->disk_type != LIBVHDI_DISK_TYPE_FIXED ) )
-	{
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "Reading block table:\n" );
-		}
-#endif
-		if( libvhdi_block_table_initialize(
-		     &( internal_file->block_table ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create block table.",
-			 function );
-
-			goto on_error;
-		}
-		if( libvhdi_block_table_read(
-		     internal_file->block_table,
-		     file_io_handle,
-		     internal_file->dynamic_disk_header->block_table_offset,
-		     internal_file->dynamic_disk_header->number_of_blocks,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read block table.",
-			 function );
-
-			goto on_error;
-		}
-		internal_file->io_handle->block_data_offset = internal_file->dynamic_disk_header->block_table_offset
-							    + internal_file->block_table->size;
-
-		if( ( internal_file->io_handle->block_data_offset % 512 ) != 0 )
-		{
-			internal_file->io_handle->block_data_offset /= 512;
-			internal_file->io_handle->block_data_offset += 1;
-			internal_file->io_handle->block_data_offset *= 512;
-		}
-	}
-/* TODO clone function ? */
-	if( libfdata_vector_initialize(
-	     &( internal_file->data_block_vector ),
-	     (size64_t) 512,
-	     (intptr_t *) internal_file->io_handle,
-	     NULL,
-	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfdata_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libvhdi_io_handle_read_data_block,
-	     NULL,
-	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
+	if( libvhdi_internal_file_open_read_block_allocation_table(
+	     internal_file,
+	     file_io_handle,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create data block vector.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfdata_vector_append_segment(
-	     internal_file->data_block_vector,
-	     &segment_index,
-	     0,
-	     internal_file->io_handle->block_data_offset,
-	     file_size - internal_file->io_handle->block_data_offset - 512,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append segment to data block vector.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfcache_cache_initialize(
-	     &( internal_file->data_block_cache ),
-	     LIBVHDI_MAXIMUM_CACHE_ENTRIES_DATA_BLOCKS,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create data block cache.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read block allocation table.",
 		 function );
 
 		goto on_error;
@@ -1641,22 +1280,10 @@ int libvhdi_internal_file_open_read(
 	return( 1 );
 
 on_error:
-	if( internal_file->data_block_cache != NULL )
+	if( internal_file->block_allocation_table != NULL )
 	{
-		libfcache_cache_free(
-		 &( internal_file->data_block_cache ),
-		 NULL );
-	}
-	if( internal_file->data_block_vector != NULL )
-	{
-		libfdata_vector_free(
-		 &( internal_file->data_block_vector ),
-		 NULL );
-	}
-	if( internal_file->block_table != NULL )
-	{
-		libvhdi_block_table_free(
-		 &( internal_file->block_table ),
+		libvhdi_block_allocation_table_free(
+		 &( internal_file->block_allocation_table ),
 		 NULL );
 	}
 	if( internal_file->metadata_values != NULL )
@@ -1665,16 +1292,10 @@ on_error:
 		 &( internal_file->metadata_values ),
 		 NULL );
 	}
-	if( region_table != NULL )
+	if( internal_file->region_table != NULL )
 	{
 		libvhdi_region_table_free(
-		 &region_table,
-		 NULL );
-	}
-	if( image_header != NULL )
-	{
-		libvhdi_image_header_free(
-		 &image_header,
+		 &( internal_file->region_table ),
 		 NULL );
 	}
 	if( internal_file->image_header != NULL )
@@ -1704,29 +1325,15 @@ on_error:
 	return( -1 );
 }
 
-/* Reads (media) data from the current offset into a buffer using a Basic File IO (bfio) handle
- * This function is not multi-thread safe acquire write lock before call
- * Returns the number of bytes read or -1 on error
+/* Reads the VHD dynamic disk header on open
+ * Returns 1 if successful or -1 on error
  */
-ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
-         libvhdi_internal_file_t *internal_file,
-         libbfio_handle_t *file_io_handle,
-         void *buffer,
-         size_t buffer_size,
-         libcerror_error_t **error )
+int libvhdi_internal_file_open_read_dynamic_disk_header(
+     libvhdi_internal_file_t *internal_file,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error )
 {
-	libvhdi_data_block_t *data_block = NULL;
-	static char *function            = "libvhdi_internal_file_read_buffer_from_file_io_handle";
-	off64_t block_file_offset        = 0;
-	off64_t element_data_offset      = 0;
-	size_t buffer_offset             = 0;
-	size_t read_size                 = 0;
-	ssize_t read_count               = 0;
-	uint64_t block_offset            = 0;
-	uint64_t block_sector_offset     = 0;
-	uint64_t block_table_index       = 0;
-	uint32_t block_table_entry       = 0;
-	uint8_t block_is_sparse          = 0;
+	static char *function = "libvhdi_internal_file_open_read_dynamic_disk_header";
 
 	if( internal_file == NULL )
 	{
@@ -1750,42 +1357,707 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 
 		return( -1 );
 	}
-	if( internal_file->file_footer == NULL )
+	if( internal_file->dynamic_disk_header != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - dynamic disk header already set.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "Reading dynamic disk header:\n" );
+	}
+#endif
+	if( libvhdi_dynamic_disk_header_initialize(
+	     &( internal_file->dynamic_disk_header ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create dynamic disk header.",
+		 function );
+
+		goto on_error;
+	}
+	if( libvhdi_dynamic_disk_header_read_file_io_handle(
+	     internal_file->dynamic_disk_header,
+	     file_io_handle,
+	     internal_file->file_footer->next_offset,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read dynamic disk header.",
+		 function );
+
+		goto on_error;
+	}
+	internal_file->io_handle->block_size = internal_file->dynamic_disk_header->block_size;
+
+	return( 1 );
+
+on_error:
+	if( internal_file->dynamic_disk_header != NULL )
+	{
+		libvhdi_dynamic_disk_header_free(
+		 &( internal_file->dynamic_disk_header ),
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Reads the VHDX image header on open
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_internal_file_open_read_image_header(
+     libvhdi_internal_file_t *internal_file,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error )
+{
+	libvhdi_image_header_t *image_header = NULL;
+	static char *function                = "libvhdi_internal_file_open_read_image_header";
+
+	if( internal_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->image_header != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - image header already set.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "Reading first image header:\n" );
+	}
+#endif
+	if( libvhdi_image_header_initialize(
+	     &( internal_file->image_header ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create first image header.",
+		 function );
+
+		goto on_error;
+	}
+	if( libvhdi_image_header_read_file_io_handle(
+	     internal_file->image_header,
+	     file_io_handle,
+	     64 * 1024,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read first image header.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "Reading second image header:\n" );
+	}
+#endif
+	if( libvhdi_image_header_initialize(
+	     &image_header,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create second image header.",
+		 function );
+
+		goto on_error;
+	}
+	if( libvhdi_image_header_read_file_io_handle(
+	     image_header,
+	     file_io_handle,
+	     2 * 64 * 1024,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read second image header.",
+		 function );
+
+		goto on_error;
+	}
+	if( image_header->sequence_number > internal_file->image_header->sequence_number )
+	{
+		if( libvhdi_image_header_free(
+		     &( internal_file->image_header ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free primary image header.",
+			 function );
+
+			goto on_error;
+		}
+		internal_file->image_header = image_header;
+		image_header                = NULL;
+	}
+	else
+	{
+		if( libvhdi_image_header_free(
+		     &image_header,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free second image header.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	return( 1 );
+
+on_error:
+	if( image_header != NULL )
+	{
+		libvhdi_image_header_free(
+		 &image_header,
+		 NULL );
+	}
+	if( internal_file->image_header != NULL )
+	{
+		libvhdi_image_header_free(
+		 &( internal_file->image_header ),
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Reads the VHDX region table on open
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_internal_file_open_read_region_table(
+     libvhdi_internal_file_t *internal_file,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error )
+{
+	libvhdi_region_table_t *region_table = NULL;
+	static char *function                = "libvhdi_internal_file_open_read_region_table";
+
+	if( internal_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->region_table != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - region table already set.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "Reading first region table:\n" );
+	}
+#endif
+	if( libvhdi_region_table_initialize(
+	     &( internal_file->region_table ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create first region table.",
+		 function );
+
+		goto on_error;
+	}
+	if( libvhdi_region_table_read_file_io_handle(
+	     internal_file->region_table,
+	     file_io_handle,
+	     3 * 64 * 1024,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read first region table.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "Reading second region table:\n" );
+	}
+#endif
+	if( libvhdi_region_table_initialize(
+	     &region_table,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create second region table.",
+		 function );
+
+		goto on_error;
+	}
+	if( libvhdi_region_table_read_file_io_handle(
+	     region_table,
+	     file_io_handle,
+	     4 * 64 * 1024,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read second region table.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO compare first region table with second */
+
+	if( libvhdi_region_table_free(
+	     &region_table,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free second region table.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( region_table != NULL )
+	{
+		libvhdi_region_table_free(
+		 &region_table,
+		 NULL );
+	}
+	if( internal_file->region_table != NULL )
+	{
+		libvhdi_region_table_free(
+		 &( internal_file->region_table ),
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Reads the VHDX metadata values on open
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_internal_file_open_read_metadata_values(
+     libvhdi_internal_file_t *internal_file,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error )
+{
+	libvhdi_region_table_entry_t *region_table_entry = NULL;
+	static char *function                            = "libvhdi_internal_file_open_read_metadata_values";
+
+	if( internal_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing file footer.",
+		 "%s: invalid file - missing IO handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DYNAMIC )
-	 || ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
+	if( internal_file->metadata_values != NULL )
 	{
-		if( internal_file->dynamic_disk_header == NULL )
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - metadata values already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( libvhdi_region_table_get_entry_by_type_identifier(
+	     internal_file->region_table,
+	     libvhdi_region_type_identifier_metadata_table,
+	     &region_table_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve metadata region table entry.",
+		 function );
+
+		goto on_error;
+	}
+	if( region_table_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing metadata region table entry.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "Reading metadata values:\n" );
+	}
+#endif
+	if( libvhdi_metadata_values_initialize(
+	     &( internal_file->metadata_values ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create metadata values.",
+		 function );
+
+		goto on_error;
+	}
+	if( libvhdi_metadata_values_read_file_io_handle(
+	     internal_file->metadata_values,
+	     file_io_handle,
+	     region_table_entry->data_offset,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read metadata values.",
+		 function );
+
+		goto on_error;
+	}
+	internal_file->io_handle->media_size = internal_file->metadata_values->virtual_disk_size;
+	internal_file->io_handle->block_size = internal_file->metadata_values->block_size;
+
+	return( 1 );
+
+on_error:
+	if( internal_file->metadata_values != NULL )
+	{
+		libvhdi_metadata_values_free(
+		 &( internal_file->metadata_values ),
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Reads the VHD or VHDX block allocation table on open
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_internal_file_open_read_block_allocation_table(
+     libvhdi_internal_file_t *internal_file,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error )
+{
+	libvhdi_region_table_entry_t *region_table_entry = NULL;
+	static char *function                            = "libvhdi_internal_file_open_read_block_allocation_table";
+	off64_t block_allocation_table_offset            = 0;
+	uint32_t number_of_entries                       = 0;
+
+	if( internal_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->block_allocation_table != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - block allocation table already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( internal_file->file_footer != NULL )
+	 && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_FIXED ) )
+	{
+		return( 1 );
+	}
+	if( internal_file->io_handle->block_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - invalid IO handle - missing block size.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->dynamic_disk_header != NULL )
+	{
+		block_allocation_table_offset = internal_file->dynamic_disk_header->block_table_offset;
+		number_of_entries             = internal_file->dynamic_disk_header->number_of_blocks;
+	}
+	else
+	{
+		if( libvhdi_region_table_get_entry_by_type_identifier(
+		     internal_file->region_table,
+		     libvhdi_region_type_identifier_block_allocation_table,
+		     &region_table_entry,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve block allocation table (BAT) region table entry.",
+			 function );
+
+			goto on_error;
+		}
+		if( region_table_entry == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid file - missing dynamic disk header.",
+			 "%s: missing metadata region table entry.",
+			 function );
+
+			goto on_error;
+		}
+		block_allocation_table_offset = region_table_entry->data_offset;
+
+		number_of_entries = internal_file->io_handle->media_size / internal_file->io_handle->block_size;
+
+		if( ( internal_file->io_handle->media_size % internal_file->io_handle->block_size ) != 0 )
+		{
+			number_of_entries++;
+		}
+	}
+	if( libvhdi_block_allocation_table_initialize(
+	     &( internal_file->block_allocation_table ),
+	     internal_file->io_handle->file_type,
+	     block_allocation_table_offset,
+	     internal_file->io_handle->block_size,
+	     number_of_entries,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create block allocation table.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( internal_file->block_allocation_table != NULL )
+	{
+		libvhdi_block_allocation_table_free(
+		 &( internal_file->block_allocation_table ),
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Reads (media) data from the current offset into a buffer using a Basic File IO (bfio) handle
+ * This function is not multi-thread safe acquire write lock before call
+ * Returns the number of bytes read or -1 on error
+ */
+ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
+         libvhdi_internal_file_t *internal_file,
+         libbfio_handle_t *file_io_handle,
+         void *buffer,
+         size_t buffer_size,
+         libcerror_error_t **error )
+{
+	static char *function       = "libvhdi_internal_file_read_buffer_from_file_io_handle";
+	size_t buffer_offset        = 0;
+	size_t read_size            = 0;
+	ssize_t read_count          = 0;
+	off64_t block_file_offset   = 0;
+	uint64_t block_number       = 0;
+	uint64_t sector_file_offset = 0;
+	uint32_t block_data_offset  = 0;
+	uint32_t block_flags        = 0;
+	uint32_t sector_data_offset = 0;
+
+	if( internal_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->io_handle->sector_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - invalid IO handle - missing sector size.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->block_allocation_table != NULL )
+	{
+		if( internal_file->io_handle->block_size == 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid file - invalid IO handle - missing block size.",
 			 function );
 
 			return( -1 );
 		}
-		if( ( internal_file->dynamic_disk_header->parent_filename != NULL )
-		 && ( internal_file->parent_file == NULL ) )
+	}
+	if( internal_file->file_footer != NULL )
+	{
+		if( ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DYNAMIC )
+		 || ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid file - invalid IO handle - missing parent file.",
-			 function );
+			if( internal_file->dynamic_disk_header == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: invalid file - missing dynamic disk header.",
+				 function );
 
-			return( -1 );
+				return( -1 );
+			}
+			if( ( internal_file->dynamic_disk_header->parent_filename != NULL )
+			 && ( internal_file->parent_file == NULL ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: invalid file - invalid IO handle - missing parent file.",
+				 function );
+
+				return( -1 );
+			}
 		}
 	}
 	if( internal_file->current_offset < 0 )
@@ -1827,187 +2099,120 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 	}
 	while( buffer_offset < buffer_size )
 	{
+		read_size = buffer_size - buffer_offset;
+
+		if( internal_file->block_allocation_table == NULL )
+		{
+			sector_file_offset = internal_file->current_offset;
+			block_flags        = 0;
+		}
+		else
+		{
+			block_number       = internal_file->current_offset / internal_file->io_handle->block_size;
+			block_data_offset  = (uint32_t) ( internal_file->current_offset % internal_file->io_handle->block_size );
+
+			if( libvhdi_block_allocation_table_get_block_values(
+			     internal_file->block_allocation_table,
+			     file_io_handle,
+			     block_number,
+			     &block_file_offset,
+			     &block_flags,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve block: %" PRIu64 " values from block table.",
+				 function,
+				 block_number );
+
+				return( -1 );
+			}
+			sector_file_offset = block_file_offset;
+
+			if( ( block_flags & LIBFDATA_BLOCK_FLAG_IS_SPARSE ) == 0 )
+			{
+				sector_data_offset  = (uint32_t) ( internal_file->current_offset % internal_file->io_handle->sector_size );
+				sector_file_offset += block_data_offset + sector_data_offset;
+			}
+			if( read_size > ( internal_file->io_handle->block_size - block_data_offset ) )
+			{
+				read_size = (size_t) ( internal_file->io_handle->block_size - block_data_offset );
+			}
+		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: requested offset\t\t\t: 0x%08" PRIx64 "\n",
+			 "%s: requested offset\t\t: 0x%08" PRIx64 "\n",
 			 function,
 			 internal_file->current_offset );
+
+			libcnotify_printf(
+			 "%s: sector file offset\t: 0x%08" PRIx64 "\n",
+			 function,
+			 sector_file_offset );
+
+			libcnotify_printf(
+			 "\n" );
 		}
 #endif
-		if( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_FIXED )
-		{
-			block_offset      = internal_file->current_offset;
-			block_file_offset = ( block_offset / 512 ) * 512;
-			block_offset     -= block_file_offset;
-			read_size         = (size_t) ( 512 - block_offset );
-			block_is_sparse   = 0;
-		}
-		else if( ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DYNAMIC )
-		      || ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
-		{
-			block_table_index = internal_file->current_offset
-					  / internal_file->dynamic_disk_header->block_size;
-
-			if( block_table_index > (uint64_t) INT_MAX )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid block table index value out of bounds.",
-				 function );
-
-				return( -1 );
-			}
-			if( libvhdi_block_table_get_reference_by_index(
-			     internal_file->block_table,
-			     (int) block_table_index,
-			     &block_table_entry,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve entry: %" PRIu64 " from block table.",
-				 function,
-				 block_table_index );
-
-				return( -1 );
-			}
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: block table index\t\t\t: %" PRIu64 "\n",
-				 function,
-				 block_table_index );
-
-				libcnotify_printf(
-				 "%s: block table entry\t\t\t: 0x%08" PRIx64 "\n",
-				 function,
-				 block_table_entry );
-			}
-#endif
-			block_offset = internal_file->current_offset
-				     % internal_file->dynamic_disk_header->block_size;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: block offset\t\t\t\t: 0x%08" PRIx64 "\n",
-				 function,
-				 block_offset );
-			}
-#endif
-			block_sector_offset = ( block_offset / 512 ) * 512;
-			block_offset       -= block_sector_offset;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: block sector offset\t\t\t: 0x%08" PRIx64 "\n",
-				 function,
-				 block_sector_offset );
-			}
-#endif
-			if( block_table_entry == 0xffffffffUL )
-			{
-				block_is_sparse = 1;
-			}
-/* TODO read per block make sure to correct initial offset ? */
-			else
-			{
-				block_file_offset = (off64_t) block_table_entry * 512
-						  + block_sector_offset
-						  - internal_file->io_handle->block_data_offset
-						  + internal_file->io_handle->block_bitmap_size;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-				if( libcnotify_verbose != 0 )
-				{
-					libcnotify_printf(
-					 "%s: block file offset\t\t\t: 0x%08" PRIx64 " (base: 0x%08" PRIx64 ", bitmap size: %" PRIu32 ")\n",
-					 function,
-					 block_file_offset,
-					 internal_file->io_handle->block_data_offset,
-					 internal_file->io_handle->block_bitmap_size );
-
-					libcnotify_printf(
-					 "\n" );
-				}
-#endif
-			}
-/* TODO optimize read ? */
-			read_size = 512 - (size_t) block_offset;
-		}
 		if( ( (size64_t) internal_file->current_offset + read_size ) > internal_file->io_handle->media_size )
 		{
 			read_size = (size_t) ( internal_file->io_handle->media_size - internal_file->current_offset );
 		}
-		if( ( buffer_offset + read_size ) > buffer_size )
+		if( ( block_flags & LIBFDATA_BLOCK_FLAG_IS_SPARSE ) == 0 )
 		{
-			read_size = buffer_size - buffer_offset;
-		}
-		if( block_is_sparse == 0 )
-		{
-			if( libfdata_vector_get_element_value_at_offset(
-			     internal_file->data_block_vector,
-			     (intptr_t *) file_io_handle,
-			     (libfdata_cache_t *) internal_file->data_block_cache,
-			     block_file_offset,
-			     &element_data_offset,
-			     (intptr_t **) &data_block,
-			     0,
-			     error ) != 1 )
+			if( libbfio_handle_seek_offset(
+			     file_io_handle,
+			     sector_file_offset,
+			     SEEK_SET,
+			     error ) == -1 )
 			{
 				libcerror_error_set(
 				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve block at offset: %" PRIu32 ".",
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_SEEK_FAILED,
+				 "%s: unable to seek sector offset: %" PRIi64 " (0x%08" PRIx64 ").",
 				 function,
-				 block_file_offset );
+				 sector_file_offset,
+				 sector_file_offset );
 
 				return( -1 );
 			}
-/* TODO */
-			if( data_block == NULL )
+			read_count = libbfio_handle_read_buffer(
+			              file_io_handle,
+			              &( ( (uint8_t *) buffer )[ buffer_offset ] ),
+			              read_size,
+			              error );
+
+			if( read_count != (ssize_t) read_size )
 			{
 				libcerror_error_set(
 				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid data block.",
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read sector data.",
 				 function );
 
 				return( -1 );
 			}
-			if( data_block->data == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid data block - missing data.",
-				 function );
-
-				return( -1 );
-			}
-			if( memory_copy(
+		}
+		else if( internal_file->parent_file == NULL )
+		{
+			/* Sparse block
+			 */
+			if( memory_set(
 			     &( ( (uint8_t *) buffer )[ buffer_offset ] ),
-			     &( data_block->data[ block_offset ] ),
+			     0,
 			     read_size ) == NULL )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-				 "%s: unable to copy block data to buffer.",
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to set sparse data in buffer.",
 				 function );
 
 				return( -1 );
@@ -2015,67 +2220,23 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 		}
 		else
 		{
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
+			read_count = libvhdi_file_read_buffer_at_offset(
+			              internal_file->parent_file,
+			              &( ( (uint8_t *) buffer )[ buffer_offset ] ),
+			              read_size,
+			              internal_file->current_offset,
+			              error );
+
+			if( read_count != (ssize_t) read_size )
 			{
-				libcnotify_printf(
-				 "\n" );
-			}
-#endif
-			if( internal_file->parent_file == NULL )
-			{
-				/* Handle sparse block
-				 */
-				if( memory_set(
-				     &( ( (uint8_t *) buffer )[ buffer_offset ] ),
-				     0,
-				     read_size ) == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set sparse data in buffer.",
-					 function );
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read data from parent file.",
+				 function );
 
-					return( -1 );
-				}
-			}
-			else
-			{
-				if( libvhdi_file_seek_offset(
-				     internal_file->parent_file,
-				     internal_file->current_offset,
-				     SEEK_SET,
-				     error ) == -1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_IO,
-					 LIBCERROR_IO_ERROR_SEEK_FAILED,
-					 "%s: unable to seek offset: %" PRIi64 " in parent.",
-					 function,
-					 internal_file->current_offset );
-
-					return( -1 );
-				}
-				read_count = libvhdi_file_read_buffer(
-					      internal_file->parent_file,
-					      &( ( (uint8_t *) buffer )[ buffer_offset ] ),
-					      read_size,
-					      error );
-
-				if( read_count != (ssize_t) read_size )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_IO,
-					 LIBCERROR_IO_ERROR_READ_FAILED,
-					 "%s: unable to read grain data from parent.",
-					 function );
-
-					return( -1 );
-				}
+				return( -1 );
 			}
 		}
 		internal_file->current_offset += read_size;
@@ -2319,42 +2480,34 @@ off64_t libvhdi_internal_file_seek_offset(
 
 		return( -1 );
 	}
-	if( internal_file->file_footer == NULL )
+	if( internal_file->file_footer != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing file footer.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DYNAMIC )
-	 || ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
-	{
-		if( internal_file->dynamic_disk_header == NULL )
+		if( ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DYNAMIC )
+		 || ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid file - missing dynamic disk header.",
-			 function );
+			if( internal_file->dynamic_disk_header == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: invalid file - missing dynamic disk header.",
+				 function );
 
-			return( -1 );
-		}
-		if( ( internal_file->dynamic_disk_header->parent_filename != NULL )
-		 && ( internal_file->parent_file == NULL ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid file - invalid IO handle - missing parent file.",
-			 function );
+				return( -1 );
+			}
+			if( ( internal_file->dynamic_disk_header->parent_filename != NULL )
+			 && ( internal_file->parent_file == NULL ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: invalid file - invalid IO handle - missing parent file.",
+				 function );
 
-			return( -1 );
+				return( -1 );
+			}
 		}
 	}
 	if( ( whence != SEEK_CUR )

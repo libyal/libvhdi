@@ -6,7 +6,7 @@ $ExitSuccess = 0
 $ExitFailure = 1
 $ExitIgnore = 77
 
-$LibraryTests = "block_table checksum data_block dynamic_disk_header error file_footer file_information image_header io_handle metadata_table metadata_table_entry metadata_table_header metadata_values notify region_table region_table_entry region_table_header"
+$LibraryTests = "block_allocation_table checksum dynamic_disk_header error file_footer file_information image_header io_handle metadata_table metadata_table_entry metadata_table_header metadata_values notify region_table region_table_entry region_table_header"
 $LibraryTestsWithInput = "file support"
 $OptionSets = ""
 

@@ -263,12 +263,12 @@ int libvhdi_file_footer_read_data(
 		 ( (vhdi_file_footer_t *) data )->features,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: features\t\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: features\t\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 value_32bit );
 
 		libcnotify_printf(
-		 "%s: format version\t\t\t: %" PRIu16 ".%" PRIu16 "\n",
+		 "%s: format version\t\t\t\t: %" PRIu16 ".%" PRIu16 "\n",
 		 function,
 		 file_footer->format_version >> 16,
 		 file_footer->format_version & 0x0000ffffUL );
@@ -290,7 +290,7 @@ int libvhdi_file_footer_read_data(
 		 ( (vhdi_file_footer_t *) data )->creator_application,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: creators application\t\t: 0x%08" PRIx32 "\n",
+		 "%s: creators application\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 value_32bit );
 
@@ -298,7 +298,7 @@ int libvhdi_file_footer_read_data(
 		 ( (vhdi_file_footer_t *) data )->creator_version,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: creators version\t\t\t: %" PRIu16 ".%" PRIu16 "\n",
+		 "%s: creators version\t\t\t\t: %" PRIu16 ".%" PRIu16 "\n",
 		 function,
 		 value_32bit >> 16,
 		 value_32bit & 0x0000ffffUL );
@@ -328,7 +328,7 @@ int libvhdi_file_footer_read_data(
 		 ( (vhdi_file_footer_t *) data )->disk_geometry,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: disk geometry\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: disk geometry\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 value_32bit );
 
@@ -341,7 +341,7 @@ int libvhdi_file_footer_read_data(
 		 ( (vhdi_file_footer_t *) data )->checksum,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: checksum\t\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 value_32bit );
 

@@ -130,7 +130,7 @@ stamp-h[1-9]
 /tests/*.exe
 /tests/input
 /tests/tmp*
-/tests/vhdi_test_block_table
+/tests/vhdi_test_block_allocation_table
 /tests/vhdi_test_checksum
 /tests/vhdi_test_data_block
 /tests/vhdi_test_dynamic_disk_header

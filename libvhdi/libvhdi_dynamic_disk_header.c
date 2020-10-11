@@ -343,7 +343,7 @@ int libvhdi_dynamic_disk_header_read_data(
 		 ( (vhdi_dynamic_disk_header_t *) data )->signature[ 7 ] );
 
 		libcnotify_printf(
-		 "%s: format version\t\t: %" PRIu16 ".%" PRIu16 "\n",
+		 "%s: format version\t\t\t: %" PRIu16 ".%" PRIu16 "\n",
 		 function,
 		 dynamic_disk_header->format_version >> 16,
 		 dynamic_disk_header->format_version & 0x0000ffffUL );
@@ -364,7 +364,7 @@ int libvhdi_dynamic_disk_header_read_data(
 		 dynamic_disk_header->block_size );
 
 		libcnotify_printf(
-		 "%s: number of blocks\t\t: %" PRIu64 "\n",
+		 "%s: number of blocks\t\t\t: %" PRIu64 "\n",
 		 function,
 		 dynamic_disk_header->number_of_blocks );
 
@@ -372,7 +372,7 @@ int libvhdi_dynamic_disk_header_read_data(
 		 ( (vhdi_dynamic_disk_header_t *) data )->checksum,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: checksum\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: checksum\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 value_32bit );
 
@@ -398,7 +398,7 @@ int libvhdi_dynamic_disk_header_read_data(
 		 ( (vhdi_dynamic_disk_header_t *) data )->parent_modification_time,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: parent modification time\t: 0x%08" PRIx32 "\n",
+		 "%s: parent modification time\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 value_32bit );
 
@@ -460,6 +460,18 @@ int libvhdi_dynamic_disk_header_read_data(
 
 		goto on_error;
 	}
+	if( dynamic_disk_header->block_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid block size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO check if block size is power of 2 */
 	if( ( dynamic_disk_header->block_size % 512 ) != 0 )
 	{
 		libcerror_error_set(

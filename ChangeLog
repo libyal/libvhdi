@@ -1,4 +1,8 @@
 TODO
+* remove fdata and fcache if no longer used
+* read BAT on demand
+** BAT block vector?
+* validated checksums
 * add VHDX log (journal) support
 * fix info_handle_file_fprint: unable to retrieve parent filename string size.
 * complete differential images support

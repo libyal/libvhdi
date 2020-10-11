@@ -334,11 +334,11 @@ The block allocation table (BAT) entry is 64 bits of size and consists of:
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
-| 0.0 | 44 bits | | Block offset +
-Contains the offset relative from the start of the file as a multitude of 1 MiB
-| 5.4 | 17 bits | 0 | [yellow-background]*Unknown (reserved)* +
+| 0.0 | 3 bits | | Block state
+| 0.3 | 17 bits | 0 | [yellow-background]*Unknown (reserved)* +
 According to `[MS-VHDX]` this value must be set to 0
-| 7.5 | 3 bits | | Block state
+| 2.4 | 44 bits | | Block offset +
+Contains the offset relative from the start of the file as a multitude of 1 MiB
 |===
 
 === Block states
@@ -348,13 +348,13 @@ According to `[MS-VHDX]` this value must be set to 0
 [cols="1,1,5",options="header"]
 |===
 | Value | Identifier | Description
-| 0 | PAYLOAD_BLOCK_NOT_PRESENT
-| 1 | PAYLOAD_BLOCK_UNDEFINED
-| 2 | PAYLOAD_BLOCK_ZERO
-| 3 | PAYLOAD_BLOCK_UNMAPPED
+| 0 | PAYLOAD_BLOCK_NOT_PRESENT | Block is new and therefore not (yet) stored in the file
+| 1 | PAYLOAD_BLOCK_UNDEFINED | Block is not stored in the file
+| 2 | PAYLOAD_BLOCK_ZERO | Block is sparse and therefore filled with 0-byte values
+| 3 | PAYLOAD_BLOCK_UNMAPPED | Block has been unmapped
 3+|
-| 6 | PAYLOAD_BLOCK_FULLY_PRESENT
-| 7 | PAYLOAD_BLOCK_PARTIALLY_PRESENT
+| 6 | PAYLOAD_BLOCK_FULLY_PRESENT | Block is stored in the file
+| 7 | PAYLOAD_BLOCK_PARTIALLY_PRESENT | Block is stored in the parent
 |===
 
 ==== Sector bitmap block states
@@ -362,9 +362,9 @@ According to `[MS-VHDX]` this value must be set to 0
 [cols="1,1,5",options="header"]
 |===
 | Value | Identifier | Description
-| 0 | SB_BLOCK_NOT_PRESENT
+| 0 | SB_BLOCK_NOT_PRESENT |
 3+|
-| 6 | SB_BLOCK_PRESENT
+| 6 | SB_BLOCK_PRESENT |
 |===
 
 == Log (metadata journal)

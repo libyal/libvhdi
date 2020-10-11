@@ -28,6 +28,7 @@
 #include "libvhdi_libbfio.h"
 #include "libvhdi_libcdata.h"
 #include "libvhdi_libcerror.h"
+#include "libvhdi_region_table_entry.h"
 #include "libvhdi_region_table_header.h"
 
 #if defined( __cplusplus )
@@ -59,6 +60,17 @@ int libvhdi_region_table_read_file_io_handle(
      libvhdi_region_table_t *region_table,
      libbfio_handle_t *file_io_handle,
      off64_t file_offset,
+     libcerror_error_t **error );
+
+int libvhdi_region_table_get_number_of_entries(
+     libvhdi_region_table_t *region_table,
+     int *number_of_entries,
+     libcerror_error_t **error );
+
+int libvhdi_region_table_get_entry_by_type_identifier(
+     libvhdi_region_table_t *region_table,
+     const uint8_t *region_type_identifier,
+     libvhdi_region_table_entry_t **entry,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

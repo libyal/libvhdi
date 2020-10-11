@@ -44,9 +44,8 @@ EXTRA_DIST = \
 	$(check_SCRIPTS)
 
 check_PROGRAMS = \
-	vhdi_test_block_table \
+	vhdi_test_block_allocation_table \
 	vhdi_test_checksum \
-	vhdi_test_data_block \
 	vhdi_test_dynamic_disk_header \
 	vhdi_test_error \
 	vhdi_test_file \
@@ -66,15 +65,15 @@ check_PROGRAMS = \
 	vhdi_test_tools_output \
 	vhdi_test_tools_signal
 
-vhdi_test_block_table_SOURCES = \
-	vhdi_test_block_table.c \
+vhdi_test_block_allocation_table_SOURCES = \
+	vhdi_test_block_allocation_table.c \
 	vhdi_test_libcerror.h \
 	vhdi_test_libvhdi.h \
 	vhdi_test_macros.h \
 	vhdi_test_memory.c vhdi_test_memory.h \
 	vhdi_test_unused.h
 
-vhdi_test_block_table_LDADD = \
+vhdi_test_block_allocation_table_LDADD = \
 	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@
 
@@ -86,18 +85,6 @@ vhdi_test_checksum_SOURCES = \
 	vhdi_test_unused.h
 
 vhdi_test_checksum_LDADD = \
-	../libvhdi/libvhdi.la \
-	@LIBCERROR_LIBADD@
-
-vhdi_test_data_block_SOURCES = \
-	vhdi_test_data_block.c \
-	vhdi_test_libcerror.h \
-	vhdi_test_libvhdi.h \
-	vhdi_test_macros.h \
-	vhdi_test_memory.c vhdi_test_memory.h \
-	vhdi_test_unused.h
-
-vhdi_test_data_block_LDADD = \
 	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@
 

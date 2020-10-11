@@ -37,6 +37,10 @@ typedef struct libvhdi_metadata_values libvhdi_metadata_values_t;
 
 struct libvhdi_metadata_values
 {
+	/* The block size
+	 */
+	uint32_t block_size;
+
 	/* The logical sector size
 	 */
 	uint32_t logical_sector_size;
@@ -62,7 +66,14 @@ int libvhdi_metadata_values_free(
      libvhdi_metadata_values_t **metadata_values,
      libcerror_error_t **error );
 
-int libvhdi_metadata_values_read_item(
+int libvhdi_metadata_values_read_item_data(
+     libvhdi_metadata_values_t *metadata_values,
+     libvhdi_metadata_table_entry_t *metadata_table_entry,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
+
+int libvhdi_metadata_values_read_item_file_io_handle(
      libvhdi_metadata_values_t *metadata_values,
      libvhdi_metadata_table_entry_t *metadata_table_entry,
      libbfio_handle_t *file_io_handle,

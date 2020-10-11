@@ -174,15 +174,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libvhdi\libvhdi_block_table.c"
+				RelativePath="..\..\libvhdi\libvhdi_block_allocation_table.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libvhdi\libvhdi_checksum.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_data_block.c"
 				>
 			</File>
 			<File
@@ -272,7 +268,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\libvhdi\libvhdi_block_table.h"
+				RelativePath="..\..\libvhdi\libvhdi_allocation_block_table.h"
 				>
 			</File>
 			<File
@@ -281,10 +277,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libvhdi\libvhdi_codepage.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libvhdi\libvhdi_data_block.h"
 				>
 			</File>
 			<File

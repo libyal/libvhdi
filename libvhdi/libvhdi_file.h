@@ -25,7 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include "libvhdi_block_table.h"
+#include "libvhdi_block_allocation_table.h"
 #include "libvhdi_dynamic_disk_header.h"
 #include "libvhdi_extern.h"
 #include "libvhdi_file_footer.h"
@@ -35,9 +35,8 @@
 #include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcthreads.h"
-#include "libvhdi_libfcache.h"
-#include "libvhdi_libfdata.h"
 #include "libvhdi_metadata_values.h"
+#include "libvhdi_region_table.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -83,21 +82,17 @@ struct libvhdi_internal_file
 	 */
 	libvhdi_image_header_t *image_header;
 
+	/* The region table
+	 */
+	libvhdi_region_table_t *region_table;
+
 	/* The metadata values
 	 */
 	libvhdi_metadata_values_t *metadata_values;
 
-	/* The block table
+	/* The block allocation table
 	 */
-	libvhdi_block_table_t *block_table;
-
-	/* The data block vector
-	 */
-	libfdata_vector_t *data_block_vector;
-
-	/* The data block cache
-	 */
-	libfcache_cache_t *data_block_cache;
+	libvhdi_block_allocation_table_t *block_allocation_table;
 
 	/* The parent file
 	 */
@@ -156,6 +151,31 @@ int libvhdi_file_close(
      libcerror_error_t **error );
 
 int libvhdi_internal_file_open_read(
+     libvhdi_internal_file_t *internal_file,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
+int libvhdi_internal_file_open_read_dynamic_disk_header(
+     libvhdi_internal_file_t *internal_file,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
+int libvhdi_internal_file_open_read_image_header(
+     libvhdi_internal_file_t *internal_file,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
+int libvhdi_internal_file_open_read_region_table(
+     libvhdi_internal_file_t *internal_file,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
+int libvhdi_internal_file_open_read_metadata_values(
+     libvhdi_internal_file_t *internal_file,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
+int libvhdi_internal_file_open_read_block_allocation_table(
      libvhdi_internal_file_t *internal_file,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );

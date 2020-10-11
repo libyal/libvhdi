@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="vhdi_test_block_table"
-	ProjectGUID="{CEF840FD-FB2D-4711-B991-CC5C0D7FC1ED}"
-	RootNamespace="vhdi_test_block_table"
+	Name="vhdi_test_block_allocation_table"
+	ProjectGUID="{681024A5-D38B-4A14-886F-FAF20A484A69}"
+	RootNamespace="vhdi_test_block_allocation_table"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\vhdi_test_block_table.c"
+				RelativePath="..\..\tests\vhdi_test_block_allocation_table.c"
 				>
 			</File>
 			<File

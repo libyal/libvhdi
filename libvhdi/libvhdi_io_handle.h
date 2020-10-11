@@ -25,10 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
-#include "libvhdi_libfdata.h"
-#include "libvhdi_types.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -46,13 +43,13 @@ struct libvhdi_io_handle
 	 */
 	size64_t media_size;
 
-	/* The block data offset
- 	 */
-	off64_t block_data_offset;
-
-	/* The block bitmap size
+	/* The sector size
 	 */
-	uint32_t block_bitmap_size;
+	uint32_t sector_size;
+
+	/* The block size
+	 */
+	uint32_t block_size;
 
 	/* Value to indicate if abort was signalled
 	 */
@@ -69,19 +66,6 @@ int libvhdi_io_handle_free(
 
 int libvhdi_io_handle_clear(
      libvhdi_io_handle_t *io_handle,
-     libcerror_error_t **error );
-
-int libvhdi_io_handle_read_data_block(
-     libvhdi_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     libfdata_vector_t *vector,
-     libfdata_cache_t *cache,
-     int element_index,
-     int element_data_file_index,
-     off64_t element_data_offset,
-     size64_t element_data_size,
-     uint32_t element_data_flags,
-     uint8_t read_flags,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

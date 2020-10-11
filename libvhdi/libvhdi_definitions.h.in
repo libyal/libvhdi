@@ -85,9 +85,14 @@ enum LIBVHDI_DISK_TYPES
 
 #endif /* !defined( HAVE_LOCAL_LIBVHDI ) */
 
-/* The maximum number of cache entries defintions
+/* The block flag definitions
  */
-#define LIBVHDI_MAXIMUM_CACHE_ENTRIES_DATA_BLOCKS		1024
+enum LIBFDATA_BLOCK_FLAGS
+{
+	/* The block is sparse
+	 */
+        LIBFDATA_BLOCK_FLAG_IS_SPARSE				= 0x00000001UL
+};
 
 #endif /* !defined( _LIBVHDI_INTERNAL_DEFINITIONS_H ) */
 

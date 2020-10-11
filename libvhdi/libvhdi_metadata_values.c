@@ -139,7 +139,338 @@ int libvhdi_metadata_values_free(
 /* Reads a metadata item
  * Returns 1 if successful or -1 on error
  */
-int libvhdi_metadata_values_read_item(
+int libvhdi_metadata_values_read_item_data(
+     libvhdi_metadata_values_t *metadata_values,
+     libvhdi_metadata_table_entry_t *metadata_table_entry,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libvhdi_metadata_values_read_item_data";
+
+	if( metadata_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid metadata values.",
+		 function );
+
+		return( -1 );
+	}
+	if( metadata_table_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid metadata table entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( data_size == 0 )
+	 || ( data_size > (size_t) SSIZE_MAX ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		if( libvhdi_debug_print_guid_value(
+		     function,
+		     "metadata item identifier\t",
+		     metadata_table_entry->item_identifier,
+		     16,
+		     LIBFGUID_ENDIAN_LITTLE,
+		     LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print GUID value.",
+			 function );
+
+			return( -1 );
+		}
+		libcnotify_printf(
+		 "%s: metadata item description\t: %s\n",
+		 function,
+		 libvhdi_metadata_item_identifier_get_description(
+		  metadata_table_entry->item_identifier ) );
+
+		libcnotify_printf(
+		 "%s: metadata item data:\n",
+		 function );
+		libcnotify_print_data(
+		 data,
+		 (size_t) metadata_table_entry->item_size,
+		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
+	}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+	if( memory_compare(
+	     metadata_table_entry->item_identifier,
+	     libvhdi_metadata_item_identifier_file_parameters,
+	     16 ) == 0 )
+	{
+		if( metadata_table_entry->item_size != 8 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported file parameters size item data size.",
+			 function );
+
+			return( -1 );
+		}
+		byte_stream_copy_to_uint32_little_endian(
+		 data,
+		 metadata_values->block_size );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: block size\t\t\t: %" PRIu32 "\n",
+			 function,
+			 metadata_values->block_size );
+		}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+		if( ( metadata_values->block_size < ( 1024 * 1024 ) )
+		 || ( metadata_values->block_size > ( 256 * 1024 * 1024 ) ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid block size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+/* TODO check if block size is power of 2 */
+		if( ( metadata_values->block_size % 512 ) != 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported block size: %" PRIu32 ".",
+			 function,
+			 metadata_values->block_size );
+
+			return( -1 );
+		}
+	}
+	else if( memory_compare(
+	          metadata_table_entry->item_identifier,
+	          libvhdi_metadata_item_identifier_logical_sector_size,
+	          16 ) == 0 )
+	{
+		if( metadata_table_entry->item_size != 4 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported logical sector size item data size.",
+			 function );
+
+			return( -1 );
+		}
+		byte_stream_copy_to_uint32_little_endian(
+		 data,
+		 metadata_values->logical_sector_size );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: logical sector size\t\t: %" PRIu32 "\n",
+			 function,
+			 metadata_values->logical_sector_size );
+		}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+		if( ( metadata_values->logical_sector_size != 512 )
+		 && ( metadata_values->logical_sector_size != 4096 ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid logical sector size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else if( memory_compare(
+	          metadata_table_entry->item_identifier,
+	          libvhdi_metadata_item_identifier_physical_sector_size,
+	          16 ) == 0 )
+	{
+		if( metadata_table_entry->item_size != 4 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported physical sector size item data size.",
+			 function );
+
+			return( -1 );
+		}
+		byte_stream_copy_to_uint32_little_endian(
+		 data,
+		 metadata_values->physical_sector_size );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: physical sector size\t\t: %" PRIu32 "\n",
+			 function,
+			 metadata_values->physical_sector_size );
+		}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+		if( ( metadata_values->physical_sector_size != 512 )
+		 && ( metadata_values->physical_sector_size != 4096 ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid physical sector size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else if( memory_compare(
+	          metadata_table_entry->item_identifier,
+	          libvhdi_metadata_item_identifier_virtual_disk_identifier,
+	          16 ) == 0 )
+	{
+		if( metadata_table_entry->item_size != 16 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported virtual disk identifier item data size.",
+			 function );
+
+			return( -1 );
+		}
+		if( memory_copy(
+		     metadata_values->virtual_disk_identifier,
+		     data,
+		     16 ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy virtual disk identifier.",
+			 function );
+
+			return( -1 );
+		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			if( libvhdi_debug_print_guid_value(
+			     function,
+			     "virtual disk identifier\t",
+			     metadata_values->virtual_disk_identifier,
+			     16,
+			     LIBFGUID_ENDIAN_LITTLE,
+			     LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print GUID value.",
+				 function );
+
+				return( -1 );
+			}
+		}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+	}
+	else if( memory_compare(
+	          metadata_table_entry->item_identifier,
+	          libvhdi_metadata_item_identifier_virtual_disk_size,
+	          16 ) == 0 )
+	{
+		if( metadata_table_entry->item_size != 8 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported virtual disk size item data size.",
+			 function );
+
+			return( -1 );
+		}
+		byte_stream_copy_to_uint64_little_endian(
+		 data,
+		 metadata_values->virtual_disk_size );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: virtual disk size\t\t: %" PRIu64 "\n",
+			 function,
+			 metadata_values->virtual_disk_size );
+		}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "\n" );
+	}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+	return( 1 );
+}
+
+/* Reads a metadata item
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_metadata_values_read_item_file_io_handle(
      libvhdi_metadata_values_t *metadata_values,
      libvhdi_metadata_table_entry_t *metadata_table_entry,
      libbfio_handle_t *file_io_handle,
@@ -147,7 +478,7 @@ int libvhdi_metadata_values_read_item(
      libcerror_error_t **error )
 {
 	uint8_t *data                = NULL;
-	static char *function        = "libvhdi_metadata_values_read_item";
+	static char *function        = "libvhdi_metadata_values_read_item_file_io_handle";
 	ssize_t read_count           = 0;
 	off64_t metadata_item_offset = 0;
 
@@ -245,223 +576,24 @@ int libvhdi_metadata_values_read_item(
 
 		goto on_error;
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
+	if( libvhdi_metadata_values_read_item_data(
+	     metadata_values,
+	     metadata_table_entry,
+	     data,
+	     (size_t) metadata_table_entry->item_size,
+	     error ) != 1 )
 	{
-		if( libvhdi_debug_print_guid_value(
-		     function,
-		     "metadata item identifier\t\t",
-		     metadata_table_entry->item_identifier,
-		     16,
-		     LIBFGUID_ENDIAN_LITTLE,
-		     LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print GUID value.",
-			 function );
-
-			goto on_error;
-		}
-		libcnotify_printf(
-		 "%s: metadata item description\t\t: %s\n",
-		 function,
-		 libvhdi_metadata_item_identifier_get_description(
-		  metadata_table_entry->item_identifier ) );
-
-		libcnotify_printf(
-		 "%s: metadata item data:\n",
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read metadata item.",
 		 function );
-		libcnotify_print_data(
-		 data,
-		 (size_t) metadata_table_entry->item_size,
-		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
-	}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
-	if( memory_compare(
-	     metadata_table_entry->item_identifier,
-	     libvhdi_metadata_item_identifier_logical_sector_size,
-	     16 ) == 0 )
-	{
-		if( metadata_table_entry->item_size != 4 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported logical sector size item data size.",
-			 function );
-
-			goto on_error;
-		}
-		byte_stream_copy_to_uint32_little_endian(
-		 data,
-		 metadata_values->logical_sector_size );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: logical sector size\t\t\t: %" PRIu32 "\n",
-			 function,
-			 metadata_values->logical_sector_size );
-		}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
-
-		if( ( metadata_values->logical_sector_size != 512 )
-		 && ( metadata_values->logical_sector_size != 4096 ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid logical sector size value out of bounds.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	else if( memory_compare(
-	          metadata_table_entry->item_identifier,
-	          libvhdi_metadata_item_identifier_physical_sector_size,
-	          16 ) == 0 )
-	{
-		if( metadata_table_entry->item_size != 4 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported physical sector size item data size.",
-			 function );
-
-			goto on_error;
-		}
-		byte_stream_copy_to_uint32_little_endian(
-		 data,
-		 metadata_values->physical_sector_size );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: physical sector size\t\t\t: %" PRIu32 "\n",
-			 function,
-			 metadata_values->physical_sector_size );
-		}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
-
-		if( ( metadata_values->physical_sector_size != 512 )
-		 && ( metadata_values->physical_sector_size != 4096 ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid physical sector size value out of bounds.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	else if( memory_compare(
-	          metadata_table_entry->item_identifier,
-	          libvhdi_metadata_item_identifier_virtual_disk_identifier,
-	          16 ) == 0 )
-	{
-		if( metadata_table_entry->item_size != 16 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported virtual disk identifier item data size.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_copy(
-		     metadata_values->virtual_disk_identifier,
-		     data,
-		     16 ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy virtual disk identifier.",
-			 function );
-
-			goto on_error;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			if( libvhdi_debug_print_guid_value(
-			     function,
-			     "virtual disk identifier\t\t",
-			     metadata_values->virtual_disk_identifier,
-			     16,
-			     LIBFGUID_ENDIAN_LITTLE,
-			     LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-				 "%s: unable to print GUID value.",
-				 function );
-
-				goto on_error;
-			}
-		}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
-	}
-	else if( memory_compare(
-	          metadata_table_entry->item_identifier,
-	          libvhdi_metadata_item_identifier_virtual_disk_size,
-	          16 ) == 0 )
-	{
-		if( metadata_table_entry->item_size != 8 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported virtual disk size item data size.",
-			 function );
-
-			goto on_error;
-		}
-		byte_stream_copy_to_uint64_little_endian(
-		 data,
-		 metadata_values->virtual_disk_size );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: virtual disk size\t\t\t: %" PRIu64 "\n",
-			 function,
-			 metadata_values->virtual_disk_size );
-		}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+		goto on_error;
 	}
 	memory_free(
 	 data );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "\n" );
-	}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
 	return( 1 );
 
@@ -574,7 +706,7 @@ int libvhdi_metadata_values_read_file_io_handle(
 
 			goto on_error;
 		}
-		if( libvhdi_metadata_values_read_item(
+		if( libvhdi_metadata_values_read_item_file_io_handle(
 		     metadata_values,
 		     entry,
 		     file_io_handle,

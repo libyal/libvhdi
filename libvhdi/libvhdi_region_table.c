@@ -420,3 +420,150 @@ on_error:
 	return( -1 );
 }
 
+/* Retrieves the number of entries
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_region_table_get_number_of_entries(
+     libvhdi_region_table_t *region_table,
+     int *number_of_entries,
+     libcerror_error_t **error )
+{
+	static char *function = "libvhdi_region_table_get_number_of_entries";
+
+	if( region_table == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid region table.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_number_of_entries(
+	     region_table->entries_array,
+	     number_of_entries,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of entries from array.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the entry of a specific type identifier
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libvhdi_region_table_get_entry_by_type_identifier(
+     libvhdi_region_table_t *region_table,
+     const uint8_t *region_type_identifier,
+     libvhdi_region_table_entry_t **entry,
+     libcerror_error_t **error )
+{
+	libvhdi_region_table_entry_t *safe_entry = NULL;
+	static char *function                    = "libvhdi_region_table_get_entry_by_type_identifier";
+	int entry_index                          = 0;
+	int number_of_entries                    = 0;
+
+	if( region_table == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid region table.",
+		 function );
+
+		return( -1 );
+	}
+	if( region_type_identifier == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid region type identifier.",
+		 function );
+
+		return( -1 );
+	}
+	if( entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid entry.",
+		 function );
+
+		return( -1 );
+	}
+	*entry = NULL;
+
+	if( libcdata_array_get_number_of_entries(
+	     region_table->entries_array,
+	     &number_of_entries,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of entries from array.",
+		 function );
+
+		return( -1 );
+	}
+	for( entry_index = 0;
+	     entry_index < number_of_entries;
+	     entry_index++ )
+	{
+		if( libcdata_array_get_entry_by_index(
+		     region_table->entries_array,
+		     entry_index,
+		     (intptr_t **) &safe_entry,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve entry: %d from array.",
+			 function,
+			 entry_index );
+
+			return( -1 );
+		}
+/* TODO move compare into function */
+		if( safe_entry == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing entry: %d.",
+			 function,
+			 entry_index );
+
+			return( -1 );
+		}
+		if( memory_compare(
+		     safe_entry->type_identifier,
+		     region_type_identifier,
+		     16 ) == 0 )
+		{
+			*entry = safe_entry;
+
+			return( 1 );
+		}
+	}
+	return( 0 );
+}
+
