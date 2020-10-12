@@ -230,6 +230,10 @@ int libvhdi_file_footer_read_data(
 	 ( (vhdi_file_footer_t *) data )->disk_type,
 	 file_footer->disk_type );
 
+	byte_stream_copy_to_uint32_big_endian(
+	 ( (vhdi_file_footer_t *) data )->checksum,
+	 file_footer->checksum );
+
 	if( memory_copy(
 	     file_footer->identifier,
 	     ( (vhdi_file_footer_t *) data )->identifier,
@@ -266,6 +270,10 @@ int libvhdi_file_footer_read_data(
 		 "%s: features\t\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 value_32bit );
+		libvhdi_debug_print_feature_flags(
+		 value_32bit );
+		libcnotify_printf(
+		 "\n" );
 
 		libcnotify_printf(
 		 "%s: format version\t\t\t\t: %" PRIu16 ".%" PRIu16 "\n",
@@ -333,17 +341,16 @@ int libvhdi_file_footer_read_data(
 		 value_32bit );
 
 		libcnotify_printf(
-		 "%s: disk type\t\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: disk type\t\t\t\t: 0x%08" PRIx32 " (%s)\n",
 		 function,
-		 file_footer->disk_type );
+		 file_footer->disk_type,
+		 libvhdi_debug_print_disk_type(
+		  file_footer->disk_type ) );
 
-		byte_stream_copy_to_uint32_big_endian(
-		 ( (vhdi_file_footer_t *) data )->checksum,
-		 value_32bit );
 		libcnotify_printf(
 		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
-		 value_32bit );
+		 file_footer->checksum );
 
 		if( libvhdi_debug_print_guid_value(
 		     function,

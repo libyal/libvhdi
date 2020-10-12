@@ -1,5 +1,5 @@
 /*
- * Region table header functions
+ * Region table functions
  *
  * Copyright (C) 2012-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -25,6 +25,7 @@
 #include <types.h>
 
 #include "libvhdi_checksum.h"
+#include "libvhdi_libbfio.h"
 #include "libvhdi_libcdata.h"
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcnotify.h"
@@ -199,8 +200,8 @@ int libvhdi_region_table_read_file_io_handle(
 	libvhdi_region_table_entry_t *region_table_entry = NULL;
 	uint8_t *data                                    = NULL;
 	static char *function                            = "libvhdi_region_table_read_file_io_handle";
+	size_t data_offset                               = 0;
 	size_t data_size                                 = 64 * 1024;
-	ssize_t data_offset                              = 0;
 	ssize_t read_count                               = 0;
 	uint32_t calculated_checksum                     = 0;
 	uint32_t region_table_entry_index                = 0;
@@ -418,44 +419,6 @@ on_error:
 		 data );
 	}
 	return( -1 );
-}
-
-/* Retrieves the number of entries
- * Returns 1 if successful or -1 on error
- */
-int libvhdi_region_table_get_number_of_entries(
-     libvhdi_region_table_t *region_table,
-     int *number_of_entries,
-     libcerror_error_t **error )
-{
-	static char *function = "libvhdi_region_table_get_number_of_entries";
-
-	if( region_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid region table.",
-		 function );
-
-		return( -1 );
-	}
-	if( libcdata_array_get_number_of_entries(
-	     region_table->entries_array,
-	     number_of_entries,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of entries from array.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
 }
 
 /* Retrieves the entry of a specific type identifier

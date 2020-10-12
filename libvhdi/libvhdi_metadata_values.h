@@ -45,6 +45,18 @@ struct libvhdi_metadata_values
 	 */
 	uint32_t logical_sector_size;
 
+	/* The parent identifier
+	 */
+	uint8_t parent_identifier[ 16 ];
+
+	/* The parent filename
+	 */
+	uint8_t *parent_filename;
+
+	/* The parent filename size
+	 */
+	size_t parent_filename_size;
+
 	/* The physical sector size
 	 */
 	uint32_t physical_sector_size;
@@ -64,6 +76,12 @@ int libvhdi_metadata_values_initialize(
 
 int libvhdi_metadata_values_free(
      libvhdi_metadata_values_t **metadata_values,
+     libcerror_error_t **error );
+
+int libvhdi_metadata_values_read_parent_locator_item_data(
+     libvhdi_metadata_values_t *metadata_values,
+     const uint8_t *data,
+     size_t data_size,
      libcerror_error_t **error );
 
 int libvhdi_metadata_values_read_item_data(
@@ -90,6 +108,34 @@ int libvhdi_metadata_values_get_virtual_disk_identifier(
      libvhdi_metadata_values_t *metadata_values,
      uint8_t *guid_data,
      size_t guid_data_size,
+     libcerror_error_t **error );
+
+int libvhdi_metadata_values_get_parent_identifier(
+     libvhdi_metadata_values_t *metadata_values,
+     uint8_t *guid_data,
+     size_t guid_data_size,
+     libcerror_error_t **error );
+
+int libvhdi_metadata_values_get_utf8_parent_filename_size(
+     libvhdi_metadata_values_t *metadata_values,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+int libvhdi_metadata_values_get_utf8_parent_filename(
+     libvhdi_metadata_values_t *metadata_values,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+int libvhdi_metadata_values_get_utf16_parent_filename_size(
+     libvhdi_metadata_values_t *metadata_values,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+int libvhdi_metadata_values_get_utf16_parent_filename(
+     libvhdi_metadata_values_t *metadata_values,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

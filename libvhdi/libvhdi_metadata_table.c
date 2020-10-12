@@ -1,5 +1,5 @@
 /*
- * Metadata table header functions
+ * Metadata table functions
  *
  * Copyright (C) 2012-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -20,10 +20,10 @@
  */
 
 #include <common.h>
-#include <byte_stream.h>
 #include <memory.h>
 #include <types.h>
 
+#include "libvhdi_libbfio.h"
 #include "libvhdi_libcdata.h"
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcnotify.h"
@@ -198,8 +198,8 @@ int libvhdi_metadata_table_read_file_io_handle(
 	libvhdi_metadata_table_entry_t *metadata_table_entry = NULL;
 	uint8_t *data                                        = NULL;
 	static char *function                                = "libvhdi_metadata_table_read_file_io_handle";
+	size_t data_offset                                   = 0;
 	size_t data_size                                     = 64 * 1024;
-	ssize_t data_offset                                  = 0;
 	ssize_t read_count                                   = 0;
 	uint32_t metadata_table_entry_index                  = 0;
 	int entry_index                                      = 0;
@@ -313,10 +313,6 @@ int libvhdi_metadata_table_read_file_io_handle(
 		goto on_error;
 	}
 	data_offset = sizeof( vhdi_metadata_table_header_t );
-
-	byte_stream_copy_from_uint32_little_endian(
-	 &( data[ 4 ] ),
-	 0 );
 
 	for( metadata_table_entry_index = 0;
 	     metadata_table_entry_index < metadata_table->header->number_of_entries;

@@ -278,16 +278,55 @@ The parent locator metadata item is variable of size and conssits of:
 
 * parent locator header
 * 0 or more parent locator entry
+* parent locator key and value data
 
 [yellow-background]*TODO: determine if 0 entries is actually supported*
 
 ===== Parent locator header
 
-[yellow-background]*TODO: complete this section*
+The parent locator header is 20 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 16 | | Parent locator type indicator +
+Contains the GUID: b04aefb7-d19e-4a81-b789-25b8e9445913
+| 16 | 2 | 0 | [yellow-background]*Unknown (reserved)* +
+According to `[MS-VHDX]` this value must be set to 0
+| 18 | 2 | | Number of entries (or key-value pairs)
+|===
 
 ===== Parent locator entry
 
-[yellow-background]*TODO: complete this section*
+The parent locator entry is 12 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Key data offset +
+Contains the offset relative from the start of the parent locator header
+| 4 | 4 | | Value data offset +
+Contains the offset relative from the start of the parent locator header
+| 8 | 2 | | Key data size
+| 10 | 2 | | Value data size
+|===
+
+===== Parent locator key and value data
+
+A parent locator key or value is stored as UTF-16 little-endian string without
+end-of-string character.
+
+Known keys are:
+
+[cols="1,5",options="header"]
+|===
+| Value | Description
+| absolute_win32_path | The value contains an absolute drive Windows path "\\?\c:\file.vhdx"
+| parent_linkage2 | The value contains a string of a GUID
+| parent_linkage | The value contains a string of a GUID
+| relative_path | The value contains a relative Windows path "..\file.vhdx"
+| volume_path | The value contains an absolute volume Windows path with "\\?\Volume{%GUID%}\file.vhdx"
+|===
 
 ==== Physical sector size metadata item
 

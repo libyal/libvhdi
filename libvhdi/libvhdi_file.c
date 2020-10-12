@@ -26,6 +26,7 @@
 #include <wide_string.h>
 
 #include "libvhdi_block_allocation_table.h"
+#include "libvhdi_block_descriptor.h"
 #include "libvhdi_debug.h"
 #include "libvhdi_definitions.h"
 #include "libvhdi_file.h"
@@ -38,9 +39,12 @@
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcnotify.h"
 #include "libvhdi_libcthreads.h"
+#include "libvhdi_libfcache.h"
+#include "libvhdi_libfdata.h"
 #include "libvhdi_metadata_values.h"
 #include "libvhdi_region_table.h"
 #include "libvhdi_region_type_identifier.h"
+#include "libvhdi_sector_range_descriptor.h"
 
 /* Creates a file
  * Make sure the value file is referencing, is set to NULL
@@ -1013,6 +1017,38 @@ int libvhdi_file_close(
 			result = -1;
 		}
 	}
+	if( internal_file->block_descriptors_vector != NULL )
+	{
+		if( libfdata_vector_free(
+		     &( internal_file->block_descriptors_vector ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free block descriptors vector.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_file->block_descriptors_cache != NULL )
+	{
+		if( libfcache_cache_free(
+		     &( internal_file->block_descriptors_cache ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free block descriptors cache.",
+			 function );
+
+			result = -1;
+		}
+	}
 #if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_file->read_write_lock,
@@ -1280,12 +1316,6 @@ int libvhdi_internal_file_open_read(
 	return( 1 );
 
 on_error:
-	if( internal_file->block_allocation_table != NULL )
-	{
-		libvhdi_block_allocation_table_free(
-		 &( internal_file->block_allocation_table ),
-		 NULL );
-	}
 	if( internal_file->metadata_values != NULL )
 	{
 		libvhdi_metadata_values_free(
@@ -1840,6 +1870,7 @@ int libvhdi_internal_file_open_read_block_allocation_table(
 	static char *function                            = "libvhdi_internal_file_open_read_block_allocation_table";
 	off64_t block_allocation_table_offset            = 0;
 	uint32_t number_of_entries                       = 0;
+	int segment_index                                = 0;
 
 	if( internal_file == NULL )
 	{
@@ -1870,6 +1901,28 @@ int libvhdi_internal_file_open_read_block_allocation_table(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid file - block allocation table already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->block_descriptors_vector != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - block descriptors vector already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->block_descriptors_cache != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - block descriptors cache already set.",
 		 function );
 
 		return( -1 );
@@ -1949,9 +2002,67 @@ int libvhdi_internal_file_open_read_block_allocation_table(
 
 		goto on_error;
 	}
+	if( libfdata_vector_initialize(
+	     &( internal_file->block_descriptors_vector ),
+	     (size64_t) internal_file->io_handle->block_size,
+	     (intptr_t *) internal_file->block_allocation_table,
+	     NULL,
+	     NULL,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfdata_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libvhdi_block_allocation_table_read_element_data,
+	     NULL,
+	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create block descriptors vector.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfdata_vector_append_segment(
+	     internal_file->block_descriptors_vector,
+	     &segment_index,
+	     0,
+	     0,
+	     internal_file->io_handle->media_size,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to append segment to data block descriptors vector.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfcache_cache_initialize(
+	     &( internal_file->block_descriptors_cache ),
+	     8,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create block descriptors cache.",
+		 function );
+
+		goto on_error;
+	}
 	return( 1 );
 
 on_error:
+	if( internal_file->block_descriptors_vector != NULL )
+	{
+		libfdata_vector_free(
+		 &( internal_file->block_descriptors_vector ),
+		 NULL );
+	}
 	if( internal_file->block_allocation_table != NULL )
 	{
 		libvhdi_block_allocation_table_free(
@@ -1972,16 +2083,17 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
          size_t buffer_size,
          libcerror_error_t **error )
 {
-	static char *function       = "libvhdi_internal_file_read_buffer_from_file_io_handle";
-	size_t buffer_offset        = 0;
-	size_t read_size            = 0;
-	ssize_t read_count          = 0;
-	off64_t block_file_offset   = 0;
-	uint64_t block_number       = 0;
-	uint64_t sector_file_offset = 0;
-	uint32_t block_data_offset  = 0;
-	uint32_t block_flags        = 0;
-	uint32_t sector_data_offset = 0;
+	libvhdi_block_descriptor_t *block_descriptor               = NULL;
+	libvhdi_sector_range_descriptor_t *sector_range_descriptor = NULL;
+	static char *function                                      = "libvhdi_internal_file_read_buffer_from_file_io_handle";
+	size_t buffer_offset                                       = 0;
+	size_t read_size                                           = 0;
+	ssize_t read_count                                         = 0;
+	off64_t sector_file_offset                                 = 0;
+	uint64_t block_number                                      = 0;
+	uint32_t block_data_offset                                 = 0;
+	uint32_t sector_range_flags                                = 0;
+	uint32_t sector_data_offset                                = 0;
 
 	if( internal_file == NULL )
 	{
@@ -2104,65 +2216,119 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 		if( internal_file->block_allocation_table == NULL )
 		{
 			sector_file_offset = internal_file->current_offset;
-			block_flags        = 0;
+			sector_range_flags = 0;
 		}
 		else
 		{
 			block_number       = internal_file->current_offset / internal_file->io_handle->block_size;
 			block_data_offset  = (uint32_t) ( internal_file->current_offset % internal_file->io_handle->block_size );
 
-			if( libvhdi_block_allocation_table_get_block_values(
-			     internal_file->block_allocation_table,
-			     file_io_handle,
+			if( libfdata_vector_get_element_value_by_index(
+			     internal_file->block_descriptors_vector,
+			     (intptr_t *) file_io_handle,
+			     (libfdata_cache_t *) internal_file->block_descriptors_cache,
 			     block_number,
-			     &block_file_offset,
-			     &block_flags,
+			     (intptr_t **) &block_descriptor,
+			     0,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve block: %" PRIu64 " values from block table.",
+				 "%s: unable to retrieve block descriptor: %" PRIu64 ".",
 				 function,
 				 block_number );
 
 				return( -1 );
 			}
-			sector_file_offset = block_file_offset;
-
-			if( ( block_flags & LIBFDATA_BLOCK_FLAG_IS_SPARSE ) == 0 )
+			if( block_descriptor == NULL )
 			{
-				sector_data_offset  = (uint32_t) ( internal_file->current_offset % internal_file->io_handle->sector_size );
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: missing block descriptor: %" PRIu64 ".",
+				 function,
+				 block_number );
+
+				return( -1 );
+			}
+			if( libvhdi_block_descriptor_get_sector_range_descriptor_at_offset(
+			     block_descriptor,
+			     block_data_offset,
+			     &sector_range_descriptor,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve sector range for offset: %" PRIi64 " (0x%08" PRIx64 ").",
+				 function,
+				 block_data_offset,
+				 block_data_offset );
+
+				return( -1 );
+			}
+			if( sector_range_descriptor == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: missing sector range descriptor for offset: %" PRIi64 " (0x%08" PRIx64 ").",
+				 function,
+				 function,
+				 block_data_offset,
+				 block_data_offset );
+
+				return( -1 );
+			}
+			sector_file_offset = block_descriptor->file_offset;
+			sector_data_offset = (uint32_t) ( internal_file->current_offset % internal_file->io_handle->sector_size );
+			sector_range_flags = sector_range_descriptor->flags;
+
+			if( sector_file_offset > -1 )
+			{
 				sector_file_offset += block_data_offset + sector_data_offset;
 			}
-			if( read_size > ( internal_file->io_handle->block_size - block_data_offset ) )
+			if( (off64_t) read_size > ( sector_range_descriptor->end_offset - block_data_offset ) )
 			{
-				read_size = (size_t) ( internal_file->io_handle->block_size - block_data_offset );
+				read_size = (size_t) ( sector_range_descriptor->end_offset - block_data_offset );
 			}
+		}
+		if( ( (size64_t) read_size > internal_file->io_handle->media_size )
+		 || ( (size64_t) internal_file->current_offset > ( internal_file->io_handle->media_size - read_size ) ) )
+		{
+			read_size = (size_t) ( internal_file->io_handle->media_size - internal_file->current_offset );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: requested offset\t\t: 0x%08" PRIx64 "\n",
+			 "%s: requested offset\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
 			 function,
+			 internal_file->current_offset,
 			 internal_file->current_offset );
 
 			libcnotify_printf(
-			 "%s: sector file offset\t: 0x%08" PRIx64 "\n",
+			 "%s: sector file offset\t: %" PRIi64 " (0x%08" PRIx64 ") %s\n",
 			 function,
-			 sector_file_offset );
+			 sector_file_offset,
+			 sector_file_offset,
+			 ( sector_range_flags & LIBFDATA_SECTOR_RANGE_FLAG_IS_UNALLOCATED ) == 0 ? "allocated" : "unallocated" );
+
+			libcnotify_printf(
+			 "%s: read size\t\t: %" PRIzd "\n",
+			 function,
+			 read_size );
 
 			libcnotify_printf(
 			 "\n" );
 		}
 #endif
-		if( ( (size64_t) internal_file->current_offset + read_size ) > internal_file->io_handle->media_size )
-		{
-			read_size = (size_t) ( internal_file->io_handle->media_size - internal_file->current_offset );
-		}
-		if( ( block_flags & LIBFDATA_BLOCK_FLAG_IS_SPARSE ) == 0 )
+		if( ( sector_range_flags & LIBFDATA_SECTOR_RANGE_FLAG_IS_UNALLOCATED ) == 0 )
 		{
 			if( libbfio_handle_seek_offset(
 			     file_io_handle,
@@ -3338,8 +3504,28 @@ int libvhdi_file_get_parent_identifier(
 		return( -1 );
 	}
 #endif
-	if( ( internal_file->file_footer != NULL )
-	 && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
+	if( internal_file->metadata_values != NULL )
+	{
+		result = libvhdi_metadata_values_get_parent_identifier(
+		          internal_file->metadata_values,
+		          guid_data,
+		          guid_data_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve parent identifier.",
+			 function );
+
+			result = -1;
+		}
+	}
+	else if( ( internal_file->file_footer != NULL )
+	      && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 	{
 		result = libvhdi_dynamic_disk_header_get_parent_identifier(
 			  internal_file->dynamic_disk_header,
@@ -3418,8 +3604,27 @@ int libvhdi_file_get_utf8_parent_filename_size(
 		return( -1 );
 	}
 #endif
-	if( ( internal_file->file_footer != NULL )
-	 && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
+	if( internal_file->metadata_values != NULL )
+	{
+		result = libvhdi_metadata_values_get_utf8_parent_filename_size(
+		          internal_file->metadata_values,
+			  utf8_string_size,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 parent filename size.",
+			 function );
+
+			result = -1;
+		}
+	}
+	else if( ( internal_file->file_footer != NULL )
+	      && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 	{
 		result = libvhdi_dynamic_disk_header_get_utf8_parent_filename_size(
 			  internal_file->dynamic_disk_header,
@@ -3498,8 +3703,28 @@ int libvhdi_file_get_utf8_parent_filename(
 		return( -1 );
 	}
 #endif
-	if( ( internal_file->file_footer != NULL )
-	 && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
+	if( internal_file->metadata_values != NULL )
+	{
+		result = libvhdi_metadata_values_get_utf8_parent_filename(
+		          internal_file->metadata_values,
+			  utf8_string,
+			  utf8_string_size,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 parent filename.",
+			 function );
+
+			result = -1;
+		}
+	}
+	else if( ( internal_file->file_footer != NULL )
+	      && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 	{
 		result = libvhdi_dynamic_disk_header_get_utf8_parent_filename(
 			  internal_file->dynamic_disk_header,
@@ -3578,8 +3803,27 @@ int libvhdi_file_get_utf16_parent_filename_size(
 		return( -1 );
 	}
 #endif
-	if( ( internal_file->file_footer != NULL )
-	 && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
+	if( internal_file->metadata_values != NULL )
+	{
+		result = libvhdi_metadata_values_get_utf16_parent_filename_size(
+		          internal_file->metadata_values,
+			  utf16_string_size,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-16 parent filename size.",
+			 function );
+
+			result = -1;
+		}
+	}
+	else if( ( internal_file->file_footer != NULL )
+	      && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 	{
 		result = libvhdi_dynamic_disk_header_get_utf16_parent_filename_size(
 			  internal_file->dynamic_disk_header,
@@ -3658,8 +3902,28 @@ int libvhdi_file_get_utf16_parent_filename(
 		return( -1 );
 	}
 #endif
-	if( ( internal_file->file_footer != NULL )
-	 && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
+	if( internal_file->metadata_values != NULL )
+	{
+		result = libvhdi_metadata_values_get_utf16_parent_filename(
+		          internal_file->metadata_values,
+			  utf16_string,
+			  utf16_string_size,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-16 parent filename.",
+			 function );
+
+			result = -1;
+		}
+	}
+	else if( ( internal_file->file_footer != NULL )
+	      && ( internal_file->file_footer->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
 	{
 		result = libvhdi_dynamic_disk_header_get_utf16_parent_filename(
 			  internal_file->dynamic_disk_header,

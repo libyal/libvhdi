@@ -1,5 +1,5 @@
 /*
- * Library block_allocation_table type test program
+ * Library sector_range_descriptor type test program
  *
  * Copyright (C) 2012-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <byte_stream.h>
 #include <file_stream.h>
 #include <types.h>
 
@@ -33,34 +34,30 @@
 #include "vhdi_test_memory.h"
 #include "vhdi_test_unused.h"
 
-#include "../libvhdi/libvhdi_block_allocation_table.h"
+#include "../libvhdi/libvhdi_sector_range_descriptor.h"
 
 #if defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT )
 
-/* Tests the libvhdi_block_allocation_table_initialize function
+/* Tests the libvhdi_sector_range_descriptor_initialize function
  * Returns 1 if successful or 0 if not
  */
-int vhdi_test_block_allocation_table_initialize(
+int vhdi_test_sector_range_descriptor_initialize(
      void )
 {
-	libcerror_error_t *error                                 = NULL;
-	libvhdi_block_allocation_table_t *block_allocation_table = NULL;
-	int result                                               = 0;
+	libcerror_error_t *error                                   = NULL;
+	libvhdi_sector_range_descriptor_t *sector_range_descriptor = NULL;
+	int result                                                 = 0;
 
 #if defined( HAVE_VHDI_TEST_MEMORY )
-	int number_of_malloc_fail_tests                          = 1;
-	int number_of_memset_fail_tests                          = 1;
-	int test_number                                          = 0;
+	int number_of_malloc_fail_tests                            = 1;
+	int number_of_memset_fail_tests                            = 1;
+	int test_number                                            = 0;
 #endif
 
 	/* Test regular cases
 	 */
-	result = libvhdi_block_allocation_table_initialize(
-	          &block_allocation_table,
-	          LIBVHDI_FILE_TYPE_VHD,
-	          0,
-	          2097152,
-	          1,
+	result = libvhdi_sector_range_descriptor_initialize(
+	          &sector_range_descriptor,
 	          &error );
 
 	VHDI_TEST_ASSERT_EQUAL_INT(
@@ -69,15 +66,15 @@ int vhdi_test_block_allocation_table_initialize(
 	 1 );
 
 	VHDI_TEST_ASSERT_IS_NOT_NULL(
-	 "block_allocation_table",
-	 block_allocation_table );
+	 "sector_range_descriptor",
+	 sector_range_descriptor );
 
 	VHDI_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-	result = libvhdi_block_allocation_table_free(
-	          &block_allocation_table,
+	result = libvhdi_sector_range_descriptor_free(
+	          &sector_range_descriptor,
 	          &error );
 
 	VHDI_TEST_ASSERT_EQUAL_INT(
@@ -86,8 +83,8 @@ int vhdi_test_block_allocation_table_initialize(
 	 1 );
 
 	VHDI_TEST_ASSERT_IS_NULL(
-	 "block_allocation_table",
-	 block_allocation_table );
+	 "sector_range_descriptor",
+	 sector_range_descriptor );
 
 	VHDI_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -95,12 +92,8 @@ int vhdi_test_block_allocation_table_initialize(
 
 	/* Test error cases
 	 */
-	result = libvhdi_block_allocation_table_initialize(
+	result = libvhdi_sector_range_descriptor_initialize(
 	          NULL,
-	          LIBVHDI_FILE_TYPE_VHD,
-	          0,
-	          2097152,
-	          1,
 	          &error );
 
 	VHDI_TEST_ASSERT_EQUAL_INT(
@@ -115,17 +108,13 @@ int vhdi_test_block_allocation_table_initialize(
 	libcerror_error_free(
 	 &error );
 
-	block_allocation_table = (libvhdi_block_allocation_table_t *) 0x12345678UL;
+	sector_range_descriptor = (libvhdi_sector_range_descriptor_t *) 0x12345678UL;
 
-	result = libvhdi_block_allocation_table_initialize(
-	          &block_allocation_table,
-	          LIBVHDI_FILE_TYPE_VHD,
-	          0,
-	          2097152,
-	          1,
+	result = libvhdi_sector_range_descriptor_initialize(
+	          &sector_range_descriptor,
 	          &error );
 
-	block_allocation_table = NULL;
+	sector_range_descriptor = NULL;
 
 	VHDI_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -145,26 +134,22 @@ int vhdi_test_block_allocation_table_initialize(
 	     test_number < number_of_malloc_fail_tests;
 	     test_number++ )
 	{
-		/* Test libvhdi_block_allocation_table_initialize with malloc failing
+		/* Test libvhdi_sector_range_descriptor_initialize with malloc failing
 		 */
 		vhdi_test_malloc_attempts_before_fail = test_number;
 
-		result = libvhdi_block_allocation_table_initialize(
-		          &block_allocation_table,
-		          LIBVHDI_FILE_TYPE_VHD,
-		          0,
-		          2097152,
-		          1,
+		result = libvhdi_sector_range_descriptor_initialize(
+		          &sector_range_descriptor,
 		          &error );
 
 		if( vhdi_test_malloc_attempts_before_fail != -1 )
 		{
 			vhdi_test_malloc_attempts_before_fail = -1;
 
-			if( block_allocation_table != NULL )
+			if( sector_range_descriptor != NULL )
 			{
-				libvhdi_block_allocation_table_free(
-				 &block_allocation_table,
+				libvhdi_sector_range_descriptor_free(
+				 &sector_range_descriptor,
 				 NULL );
 			}
 		}
@@ -176,8 +161,8 @@ int vhdi_test_block_allocation_table_initialize(
 			 -1 );
 
 			VHDI_TEST_ASSERT_IS_NULL(
-			 "block_allocation_table",
-			 block_allocation_table );
+			 "sector_range_descriptor",
+			 sector_range_descriptor );
 
 			VHDI_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -191,26 +176,22 @@ int vhdi_test_block_allocation_table_initialize(
 	     test_number < number_of_memset_fail_tests;
 	     test_number++ )
 	{
-		/* Test libvhdi_block_allocation_table_initialize with memset failing
+		/* Test libvhdi_sector_range_descriptor_initialize with memset failing
 		 */
 		vhdi_test_memset_attempts_before_fail = test_number;
 
-		result = libvhdi_block_allocation_table_initialize(
-		          &block_allocation_table,
-		          LIBVHDI_FILE_TYPE_VHD,
-		          0,
-		          2097152,
-		          1,
+		result = libvhdi_sector_range_descriptor_initialize(
+		          &sector_range_descriptor,
 		          &error );
 
 		if( vhdi_test_memset_attempts_before_fail != -1 )
 		{
 			vhdi_test_memset_attempts_before_fail = -1;
 
-			if( block_allocation_table != NULL )
+			if( sector_range_descriptor != NULL )
 			{
-				libvhdi_block_allocation_table_free(
-				 &block_allocation_table,
+				libvhdi_sector_range_descriptor_free(
+				 &sector_range_descriptor,
 				 NULL );
 			}
 		}
@@ -222,8 +203,8 @@ int vhdi_test_block_allocation_table_initialize(
 			 -1 );
 
 			VHDI_TEST_ASSERT_IS_NULL(
-			 "block_allocation_table",
-			 block_allocation_table );
+			 "sector_range_descriptor",
+			 sector_range_descriptor );
 
 			VHDI_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -243,19 +224,19 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( block_allocation_table != NULL )
+	if( sector_range_descriptor != NULL )
 	{
-		libvhdi_block_allocation_table_free(
-		 &block_allocation_table,
+		libvhdi_sector_range_descriptor_free(
+		 &sector_range_descriptor,
 		 NULL );
 	}
 	return( 0 );
 }
 
-/* Tests the libvhdi_block_allocation_table_free function
+/* Tests the libvhdi_sector_range_descriptor_free function
  * Returns 1 if successful or 0 if not
  */
-int vhdi_test_block_allocation_table_free(
+int vhdi_test_sector_range_descriptor_free(
      void )
 {
 	libcerror_error_t *error = NULL;
@@ -263,7 +244,7 @@ int vhdi_test_block_allocation_table_free(
 
 	/* Test error cases
 	 */
-	result = libvhdi_block_allocation_table_free(
+	result = libvhdi_sector_range_descriptor_free(
 	          NULL,
 	          &error );
 
@@ -310,20 +291,22 @@ int main(
 #if defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT )
 
 	VHDI_TEST_RUN(
-	 "libvhdi_block_allocation_table_initialize",
-	 vhdi_test_block_allocation_table_initialize );
+	 "libvhdi_sector_range_descriptor_initialize",
+	 vhdi_test_sector_range_descriptor_initialize );
 
 	VHDI_TEST_RUN(
-	 "libvhdi_block_allocation_table_free",
-	 vhdi_test_block_allocation_table_free );
-
-	/* TODO: add tests for libvhdi_block_allocation_table_read_element_data */
+	 "libvhdi_sector_range_descriptor_free",
+	 vhdi_test_sector_range_descriptor_free );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT ) */
 }
 

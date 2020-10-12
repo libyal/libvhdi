@@ -22,7 +22,8 @@ lib_LTLIBRARIES = libvhdi.la
 
 libvhdi_la_SOURCES = \
 	libvhdi.c \
-	libvhdi_block_allocation_table.c libvhdi_allocation_block_table.h \
+	libvhdi_block_allocation_table.c libvhdi_block_allocation_table.h \
+	libvhdi_block_descriptor.c libvhdi_block_descriptor.h \
 	libvhdi_checksum.c libvhdi_checksum.h \
 	libvhdi_codepage.h \
 	libvhdi_debug.c libvhdi_debug.h \
@@ -52,10 +53,14 @@ libvhdi_la_SOURCES = \
 	libvhdi_metadata_table_header.c libvhdi_metadata_table_header.h \
 	libvhdi_metadata_values.c libvhdi_metadata_values.h \
 	libvhdi_notify.c libvhdi_notify.h \
+	libvhdi_parent_locator.c libvhdi_parent_locator.h \
+	libvhdi_parent_locator_entry.c libvhdi_parent_locator_entry.h \
+	libvhdi_parent_locator_header.c libvhdi_parent_locator_header.h \
 	libvhdi_region_table.c libvhdi_region_table.h \
 	libvhdi_region_table_entry.c libvhdi_region_table_entry.h \
 	libvhdi_region_table_header.c libvhdi_region_table_header.h \
 	libvhdi_region_type_identifier.c libvhdi_region_type_identifier.h \
+	libvhdi_sector_range_descriptor.c libvhdi_sector_range_descriptor.h \
 	libvhdi_support.c libvhdi_support.h \
 	libvhdi_types.h \
 	libvhdi_unused.h \
@@ -64,6 +69,7 @@ libvhdi_la_SOURCES = \
 	vhdi_file_information.h \
 	vhdi_image_header.h \
 	vhdi_metadata_table.h \
+	vhdi_parent_locator.h \
 	vhdi_region_table.h
 
 libvhdi_la_LIBADD = \

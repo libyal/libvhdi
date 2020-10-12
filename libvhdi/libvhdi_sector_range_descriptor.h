@@ -1,5 +1,5 @@
 /*
- * Debug functions
+ * Sector range descriptor functions
  *
  * Copyright (C) 2012-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,53 +19,46 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBVHDI_DEBUG_H )
-#define _LIBVHDI_DEBUG_H
+#if !defined( _LIBVHDI_SECTOR_RANGE_DESCRIPTOR_H )
+#define _LIBVHDI_SECTOR_RANGE_DESCRIPTOR_H
 
 #include <common.h>
 #include <types.h>
 
-#include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if defined( HAVE_DEBUG_OUTPUT )
+typedef struct libvhdi_sector_range_descriptor libvhdi_sector_range_descriptor_t;
 
-void libvhdi_debug_print_feature_flags(
-      uint32_t feature_flags );
+struct libvhdi_sector_range_descriptor
+{
+	/* The start offset
+	 */
+	off64_t start_offset;
 
-const char *libvhdi_debug_print_disk_type(
-             uint32_t disk_type );
+	/* The end offset
+	 */
+	off64_t end_offset;
 
-int libvhdi_debug_print_guid_value(
-     const char *function_name,
-     const char *value_name,
-     const uint8_t *byte_stream,
-     size_t byte_stream_size,
-     int byte_order,
-     uint32_t string_format_flags,
+	/* The flags
+	 */
+	uint32_t flags;
+};
+
+int libvhdi_sector_range_descriptor_initialize(
+     libvhdi_sector_range_descriptor_t **sector_range_descriptor,
      libcerror_error_t **error );
 
-int libvhdi_debug_print_utf16_string_value(
-     const char *function_name,
-     const char *value_name,
-     const uint8_t *byte_stream,
-     size_t byte_stream_size,
-     int byte_order,
+int libvhdi_sector_range_descriptor_free(
+     libvhdi_sector_range_descriptor_t **sector_range_descriptor,
      libcerror_error_t **error );
-
-int libvhdi_debug_print_read_offsets(
-     libbfio_handle_t *file_io_handle,
-     libcerror_error_t **error );
-
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBVHDI_DEBUG_H ) */
+#endif /* !defined( _LIBVHDI_SECTOR_RANGE_DESCRIPTOR_H ) */
 

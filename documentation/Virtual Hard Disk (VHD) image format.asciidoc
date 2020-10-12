@@ -350,6 +350,9 @@ stored within the image (bit set to 1) or in the parent (bit set to 0).
 
 The bitmap is padded to a 512-byte sector boundary.
 
+The bitmap is stored on a per-byte basis with the LSB represents the first bit
+in the bitmap.
+
 == Notes
 
 Virtual PC fixed disk image, repeated data after initialization:

@@ -52,6 +52,10 @@ struct libvhdi_file_footer
 	 */
 	uint32_t disk_type;
 
+	/* The checksum
+	 */
+	uint32_t checksum;
+
 	/* The identifier
 	 */
 	uint8_t identifier[ 16 ];

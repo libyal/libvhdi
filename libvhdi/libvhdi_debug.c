@@ -26,6 +26,7 @@
 #include <wide_string.h>
 
 #include "libvhdi_debug.h"
+#include "libvhdi_definitions.h"
 #include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcnotify.h"
@@ -33,6 +34,37 @@
 #include "libvhdi_libuna.h"
 
 #if defined( HAVE_DEBUG_OUTPUT )
+
+/* Prints the feature flags
+ */
+void libvhdi_debug_print_feature_flags(
+      uint32_t feature_flags )
+{
+	if( ( feature_flags & 0x00000001UL ) != 0 )
+	{
+		libcnotify_printf(
+		 "\tIs temporary disk\n" );
+	}
+}
+
+/* Prints the disk type
+ */
+const char *libvhdi_debug_print_disk_type(
+             uint32_t disk_type )
+{
+	switch( disk_type )
+	{
+		case LIBVHDI_DISK_TYPE_FIXED:
+			return( "Fixed" );
+
+		case LIBVHDI_DISK_TYPE_DYNAMIC:
+			return( "Dynamic" );
+
+		case LIBVHDI_DISK_TYPE_DIFFERENTIAL:
+			return( "Differential" );
+	}
+	return( "_UNKNOWN_" );
+}
 
 /* Prints a GUID/UUID value
  * Returns 1 if successful or -1 on error

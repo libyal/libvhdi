@@ -292,7 +292,7 @@ int libvhdi_dynamic_disk_header_read_data(
 			 "%s: invalid parent filename size value exceeds maximum allocation size.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		parent_filename_size += 2;
 
@@ -414,7 +414,7 @@ int libvhdi_dynamic_disk_header_read_data(
 		{
 			if( libvhdi_debug_print_utf16_string_value(
 			     function,
-			     "parent filename\t\t",
+			     "parent filename\t\t\t",
 			     dynamic_disk_header->parent_filename,
 			     dynamic_disk_header->parent_filename_size,
 			     LIBUNA_ENDIAN_BIG,
@@ -469,7 +469,7 @@ int libvhdi_dynamic_disk_header_read_data(
 		 "%s: invalid block size value out of bounds.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 /* TODO check if block size is power of 2 */
 	if( ( dynamic_disk_header->block_size % 512 ) != 0 )

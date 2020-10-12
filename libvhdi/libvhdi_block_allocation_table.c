@@ -25,10 +25,13 @@
 #include <types.h>
 
 #include "libvhdi_block_allocation_table.h"
+#include "libvhdi_block_descriptor.h"
 #include "libvhdi_definitions.h"
 #include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcnotify.h"
+#include "libvhdi_libfdata.h"
+#include "libvhdi_unused.h"
 
 /* Creates a block allocation table
  * Make sure the value block_allocation_table is referencing, is set to NULL
@@ -152,11 +155,12 @@ int libvhdi_block_allocation_table_initialize(
 			sector_bitmap_size *= 512;
 		}
 		( *block_allocation_table )->sector_bitmap_size = sector_bitmap_size;
-		( *block_allocation_table )->table_entry_size   = 4;
+
+		( *block_allocation_table )->table_entry_size = 4;
 	}
 	else if( file_type == LIBVHDI_FILE_TYPE_VHDX )
 	{
-		( *block_allocation_table )->table_entry_size   = 8;
+		( *block_allocation_table )->table_entry_size = 8;
 	}
 	return( 1 );
 
@@ -201,25 +205,32 @@ int libvhdi_block_allocation_table_free(
 	return( 1 );
 }
 
-/* Retrieves the values of a specific block
+/* Reads a block allocation table entry
+ * Callback function for the data block vector
  * Returns 1 if successful or -1 on error
  */
-int libvhdi_block_allocation_table_get_block_values(
+int libvhdi_block_allocation_table_read_element_data(
      libvhdi_block_allocation_table_t *block_allocation_table,
      libbfio_handle_t *file_io_handle,
-     uint64_t block_number,
-     off64_t *block_file_offset,
-     uint32_t *block_flags,
+     libfdata_vector_t *vector,
+     libfdata_cache_t *cache,
+     int element_index,
+     int element_data_file_index LIBVHDI_ATTRIBUTE_UNUSED,
+     off64_t element_data_offset LIBVHDI_ATTRIBUTE_UNUSED,
+     size64_t element_data_size LIBVHDI_ATTRIBUTE_UNUSED,
+     uint32_t element_data_flags LIBVHDI_ATTRIBUTE_UNUSED,
+     uint8_t read_flags LIBVHDI_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
-	uint8_t table_entry_data[ 8 ];
+	libvhdi_block_descriptor_t *block_descriptor = NULL;
+	static char *function                        = "libvhdi_block_allocation_table_read_element_data";
+	off64_t table_entry_offset                   = 0;
 
-	static char *function          = "libvhdi_block_allocation_table_get_block_values";
-	ssize_t read_count             = 0;
-	off64_t file_offset            = 0;
-	off64_t safe_block_file_offset = 0;
-	uint64_t table_entry           = 0;
-	uint32_t safe_block_flags      = 0;
+	LIBVHDI_UNREFERENCED_PARAMETER( element_data_file_index );
+	LIBVHDI_UNREFERENCED_PARAMETER( element_data_offset );
+	LIBVHDI_UNREFERENCED_PARAMETER( element_data_size );
+	LIBVHDI_UNREFERENCED_PARAMETER( element_data_flags );
+	LIBVHDI_UNREFERENCED_PARAMETER( read_flags );
 
 	if( block_allocation_table == NULL )
 	{
@@ -232,175 +243,68 @@ int libvhdi_block_allocation_table_get_block_values(
 
 		return( -1 );
 	}
-	if( block_number >= (uint64_t) block_allocation_table->number_of_entries )
+	if( libvhdi_block_descriptor_initialize(
+	     &block_descriptor,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid block number value out of bounds.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create block descriptor.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( block_file_offset == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid block file offset.",
-		 function );
+	table_entry_offset = block_allocation_table->file_offset + ( element_index * block_allocation_table->table_entry_size );
 
-		return( -1 );
-	}
-	if( block_flags == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid block flags.",
-		 function );
-
-		return( -1 );
-	}
-/* TODO read table entries 64 at a time ? */
-
-	file_offset = block_allocation_table->file_offset + ( (off64_t) block_number * (off64_t) block_allocation_table->table_entry_size );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: reading block allocation table entry at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
-		 function,
-		 file_offset,
-		 file_offset );
-	}
-#endif
-	if( libbfio_handle_seek_offset(
+	if( libvhdi_block_descriptor_read_table_entry(
+	     block_descriptor,
 	     file_io_handle,
-	     file_offset,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek block allocation table entry: %" PRIu64 " offset: %" PRIi64 " (0x%08" PRIx64 ").",
-		 function,
-		 block_number,
-		 file_offset,
-		 file_offset );
-
-		return( -1 );
-	}
-	read_count = libbfio_handle_read_buffer(
-	              file_io_handle,
-	              table_entry_data,
-	              block_allocation_table->table_entry_size,
-	              error );
-
-	if( read_count != (ssize_t) block_allocation_table->table_entry_size )
+	     block_allocation_table->file_type,
+	     table_entry_offset,
+	     block_allocation_table->block_size,
+	     block_allocation_table->sector_bitmap_size,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read block allocation table entry: %" PRIu64 ".",
+		 "%s: unable to read block allocation table entry: %d.",
 		 function,
-		 block_number );
+		 element_index );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( block_allocation_table->file_type == LIBVHDI_FILE_TYPE_VHD )
+	if( libfdata_vector_set_element_value_by_index(
+	     vector,
+	     (intptr_t *) file_io_handle,
+	     cache,
+	     element_index,
+	     (intptr_t *) block_descriptor,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libvhdi_block_descriptor_free,
+	     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
+	     error ) != 1 )
 	{
-		byte_stream_copy_to_uint32_big_endian(
-		 table_entry_data,
-		 table_entry );
-	}
-	else if( block_allocation_table->file_type == LIBVHDI_FILE_TYPE_VHDX )
-	{
-		byte_stream_copy_to_uint64_little_endian(
-		 table_entry_data,
-		 table_entry );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: block number\t\t\t: %" PRIu64 "\n",
-		 function,
-		 block_number );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set block descriptor as element value.",
+		 function );
 
-		libcnotify_printf(
-		 "%s: entry\t\t\t\t: 0x%08" PRIx64 "\n",
-		 function,
-		 table_entry );
+		goto on_error;
 	}
-#endif
-	if( block_allocation_table->file_type == LIBVHDI_FILE_TYPE_VHD )
-	{
-		if( table_entry == 0xffffffffUL )
-		{
-			safe_block_file_offset = -1;
-			safe_block_flags       = LIBFDATA_BLOCK_FLAG_IS_SPARSE;
-		}
-		else
-		{
-			safe_block_file_offset = table_entry * 512 + block_allocation_table->sector_bitmap_size;
-		}
-	}
-	else if( block_allocation_table->file_type == LIBVHDI_FILE_TYPE_VHDX )
-	{
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: block state\t\t\t: %" PRIu64 "\n",
-			 function,
-			 table_entry & 0x7 );
+	return( 1 );
 
-			libcnotify_printf(
-			 "%s: unknown1\t\t\t: 0x%04" PRIx64 "\n",
-			 function,
-			 ( table_entry >> 3 ) & 0x1ffff );
-		}
-#endif
-/* TODO check for supported block states
- */
-		if( ( table_entry & 0x7 ) <= 3 )
-		{
-			safe_block_flags = LIBFDATA_BLOCK_FLAG_IS_SPARSE;
-		}
-		safe_block_file_offset = ( table_entry >> 20 ) * 1024 * 1024;
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
+on_error:
+	if( block_descriptor != NULL )
 	{
-		if( ( safe_block_flags & LIBFDATA_BLOCK_FLAG_IS_SPARSE ) != 0 )
-		{
-			libcnotify_printf(
-			 "%s: is sparse or stored in parent.\n",
-			 function );
-		}
-		else
-		{
-			libcnotify_printf(
-			 "%s: block offset\t\t\t: 0x%08" PRIx64 ".\n",
-			 function,
-			 safe_block_file_offset );
-		}
-		libcnotify_printf(
-		 "\n" );
+		libvhdi_block_descriptor_free(
+		 &block_descriptor,
+		 NULL );
 	}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
-
-	*block_file_offset = safe_block_file_offset;
-	*block_flags       = safe_block_flags;
-
 	return( 1 );
 }
 

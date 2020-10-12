@@ -27,6 +27,7 @@
 
 #include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
+#include "libvhdi_libfdata.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -48,10 +49,6 @@ struct libvhdi_block_allocation_table
 	 */
 	uint32_t block_size;
 
-	/* The sector bitmap size
-	 */
-	uint32_t sector_bitmap_size;
-
 	/* The number of entries
 	 */
 	uint32_t number_of_entries;
@@ -59,6 +56,10 @@ struct libvhdi_block_allocation_table
 	/* The table entry size
 	 */
 	size_t table_entry_size;
+
+	/* The sector bitmap size
+	 */
+	uint32_t sector_bitmap_size;
 };
 
 int libvhdi_block_allocation_table_initialize(
@@ -73,12 +74,17 @@ int libvhdi_block_allocation_table_free(
      libvhdi_block_allocation_table_t **block_allocation_table,
      libcerror_error_t **error );
 
-int libvhdi_block_allocation_table_get_block_values(
+int libvhdi_block_allocation_table_read_element_data(
      libvhdi_block_allocation_table_t *block_allocation_table,
      libbfio_handle_t *file_io_handle,
-     uint64_t block_number,
-     off64_t *block_file_offset,
-     uint32_t *block_flags,
+     libfdata_vector_t *vector,
+     libfdata_cache_t *cache,
+     int element_index,
+     int element_data_file_index,
+     off64_t element_data_offset,
+     size64_t element_data_size,
+     uint32_t element_data_flags,
+     uint8_t read_flags,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

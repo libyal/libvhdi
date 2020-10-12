@@ -7,7 +7,7 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-LIBRARY_TESTS="block_allocation_table checksum dynamic_disk_header error file_footer file_information image_header io_handle metadata_table metadata_table_entry metadata_table_header metadata_values notify region_table region_table_entry region_table_header";
+LIBRARY_TESTS="block_allocation_table block_descriptor checksum dynamic_disk_header error file_footer file_information image_header io_handle metadata_table metadata_table_entry metadata_table_header metadata_values notify parent_locator parent_locator_entry parent_locator_header region_table region_table_entry region_table_header sector_range_descriptor";
 LIBRARY_TESTS_WITH_INPUT="file support";
 OPTION_SETS="";
 

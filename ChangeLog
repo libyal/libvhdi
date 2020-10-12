@@ -1,26 +1,23 @@
 TODO
-* remove fdata and fcache if no longer used
-* read BAT on demand
-** BAT block vector?
+* complete VHDX differential images support
+** read sector bitmap
+** read "disk type" from file parameters
+
 * validated checksums
 * add VHDX log (journal) support
-* fix info_handle_file_fprint: unable to retrieve parent filename string size.
-* complete differential images support
 * debug print timestamps
+* impreove test coverage
 
 Tests:
 * Test concurrent read from diff image and parent
 * Add verify test
 
 * debug
-  - print disk type
-  - print feature flags
   - print creator application
   - print creator host system
   - print disk geometry
 * what about geomerty and disk size calculation
-* read data block + bitmap at once
-* read backup file footer ?
+* read backup file footer of dynamic disk
 
 20130922
 * updated msvscpp files

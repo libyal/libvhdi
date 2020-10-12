@@ -45,6 +45,7 @@ EXTRA_DIST = \
 
 check_PROGRAMS = \
 	vhdi_test_block_allocation_table \
+	vhdi_test_block_descriptor \
 	vhdi_test_checksum \
 	vhdi_test_dynamic_disk_header \
 	vhdi_test_error \
@@ -58,9 +59,13 @@ check_PROGRAMS = \
 	vhdi_test_metadata_table_header \
 	vhdi_test_metadata_values \
 	vhdi_test_notify \
+	vhdi_test_parent_locator \
+	vhdi_test_parent_locator_entry \
+	vhdi_test_parent_locator_header \
 	vhdi_test_region_table \
 	vhdi_test_region_table_entry \
 	vhdi_test_region_table_header \
+	vhdi_test_sector_range_descriptor \
 	vhdi_test_support \
 	vhdi_test_tools_output \
 	vhdi_test_tools_signal
@@ -74,6 +79,18 @@ vhdi_test_block_allocation_table_SOURCES = \
 	vhdi_test_unused.h
 
 vhdi_test_block_allocation_table_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_block_descriptor_SOURCES = \
+	vhdi_test_block_descriptor.c \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_unused.h
+
+vhdi_test_block_descriptor_LDADD = \
 	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@
 
@@ -286,6 +303,42 @@ vhdi_test_notify_LDADD = \
 	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@
 
+vhdi_test_parent_locator_SOURCES = \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_parent_locator.c \
+	vhdi_test_unused.h
+
+vhdi_test_parent_locator_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_parent_locator_entry_SOURCES = \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_parent_locator_entry.c \
+	vhdi_test_unused.h
+
+vhdi_test_parent_locator_entry_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_parent_locator_header_SOURCES = \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_parent_locator_header.c \
+	vhdi_test_unused.h
+
+vhdi_test_parent_locator_header_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
 vhdi_test_region_table_SOURCES = \
 	vhdi_test_libcerror.h \
 	vhdi_test_libvhdi.h \
@@ -319,6 +372,18 @@ vhdi_test_region_table_header_SOURCES = \
 	vhdi_test_unused.h
 
 vhdi_test_region_table_header_LDADD = \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_sector_range_descriptor_SOURCES = \
+	vhdi_test_libcerror.h \
+	vhdi_test_libvhdi.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_sector_range_descriptor.c \
+	vhdi_test_unused.h
+
+vhdi_test_sector_range_descriptor_LDADD = \
 	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@
 

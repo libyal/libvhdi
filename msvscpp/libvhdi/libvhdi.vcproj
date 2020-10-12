@@ -178,6 +178,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libvhdi\libvhdi_block_descriptor.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libvhdi\libvhdi_checksum.c"
 				>
 			</File>
@@ -242,6 +246,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libvhdi\libvhdi_parent_locator.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_parent_locator_entry.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_parent_locator_header.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libvhdi\libvhdi_region_table.c"
 				>
 			</File>
@@ -258,6 +274,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libvhdi\libvhdi_sector_range_descriptor.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libvhdi\libvhdi_support.c"
 				>
 			</File>
@@ -268,7 +288,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\libvhdi\libvhdi_allocation_block_table.h"
+				RelativePath="..\..\libvhdi\libvhdi_block_allocation_table.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_block_descriptor.h"
 				>
 			</File>
 			<File
@@ -388,6 +412,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libvhdi\libvhdi_parent_locator.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_parent_locator_entry.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_parent_locator_header.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libvhdi\libvhdi_region_table.h"
 				>
 			</File>
@@ -401,6 +437,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libvhdi\libvhdi_region_type_identifier.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\libvhdi_sector_range_descriptor.h"
 				>
 			</File>
 			<File
@@ -433,6 +473,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libvhdi\vhdi_metadata_table.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libvhdi\vhdi_parent_locator.h"
 				>
 			</File>
 			<File

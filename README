@@ -11,9 +11,9 @@ Read supported formats:
 
 Supported image types:
 
-* Version 1 fixed-size hard disk image
-* Version 1 dynamic-size (or sparse) hard disk image
-* Version 1 differential (or differencing) hard disk image
+* Fixed-size hard disk image
+* Dynamic-size (or sparse) hard disk image
+* Differential (or differencing) hard disk image
   * Note that an undo disk image (.vud) is also a differential image
 
 Work in progress:

@@ -35,6 +35,8 @@
 #include "libvhdi_libbfio.h"
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcthreads.h"
+#include "libvhdi_libfcache.h"
+#include "libvhdi_libfdata.h"
 #include "libvhdi_metadata_values.h"
 #include "libvhdi_region_table.h"
 
@@ -93,6 +95,14 @@ struct libvhdi_internal_file
 	/* The block allocation table
 	 */
 	libvhdi_block_allocation_table_t *block_allocation_table;
+
+	/* The block descriptors vector
+	 */
+	libfdata_vector_t *block_descriptors_vector;
+
+	/* The block descriptors cache
+	 */
+	libfcache_cache_t *block_descriptors_cache;
 
 	/* The parent file
 	 */

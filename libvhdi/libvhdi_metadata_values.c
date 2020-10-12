@@ -28,10 +28,12 @@
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcnotify.h"
 #include "libvhdi_libfguid.h"
+#include "libvhdi_libuna.h"
 #include "libvhdi_metadata_item_identifier.h"
 #include "libvhdi_metadata_table.h"
 #include "libvhdi_metadata_table_entry.h"
 #include "libvhdi_metadata_values.h"
+#include "libvhdi_parent_locator.h"
 
 /* Creates metadata values
  * Make sure the value metadata_values is referencing, is set to NULL
@@ -128,12 +130,230 @@ int libvhdi_metadata_values_free(
 	}
 	if( *metadata_values != NULL )
 	{
+		if( ( *metadata_values )->parent_filename != NULL )
+		{
+			memory_free(
+			 ( *metadata_values )->parent_filename );
+		}
 		memory_free(
 		 *metadata_values );
 
 		*metadata_values = NULL;
 	}
 	return( 1 );
+}
+
+/* Reads a parent locator metadata item
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_metadata_values_read_parent_locator_item_data(
+     libvhdi_metadata_values_t *metadata_values,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error )
+{
+	libvhdi_parent_locator_t *parent_locator             = NULL;
+	libvhdi_parent_locator_entry_t *parent_locator_entry = NULL;
+	static char *function                                = "libvhdi_metadata_values_read_parent_locator_item_data";
+	int result                                           = 0;
+
+	if( metadata_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid metadata values.",
+		 function );
+
+		return( -1 );
+	}
+	if( metadata_values->parent_filename != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid metadata values - parent filename value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( libvhdi_parent_locator_initialize(
+	     &parent_locator,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create parent locator.",
+		 function );
+
+		goto on_error;
+	}
+	if( libvhdi_parent_locator_read_data(
+	     parent_locator,
+	     data,
+	     data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read parent locator.",
+		 function );
+
+		goto on_error;
+	}
+	result = libvhdi_parent_locator_get_entry_by_utf8_key(
+	          parent_locator,
+	          (uint8_t *) "parent_linkage",
+	          14,
+	          &parent_locator_entry,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent linkage entry.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		if( libvhdi_parent_locator_get_value_as_guid(
+		     parent_locator_entry,
+		     metadata_values->parent_identifier,
+		     16,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve parent linkage value as big-endian GUID.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	result = libvhdi_parent_locator_get_entry_by_utf8_key(
+	          parent_locator,
+	          (uint8_t *) "absolute_win32_path",
+	          19,
+	          &parent_locator_entry,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve absolute WIN32 path entry.",
+		 function );
+
+		goto on_error;
+	}
+	if( result == 0 )
+	{
+		result = libvhdi_parent_locator_get_entry_by_utf8_key(
+		          parent_locator,
+		          (uint8_t *) "volume_path",
+		          11,
+		          &parent_locator_entry,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve volume path entry.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( result == 0 )
+	{
+		result = libvhdi_parent_locator_get_entry_by_utf8_key(
+		          parent_locator,
+		          (uint8_t *) "relative_path",
+		          12,
+		          &parent_locator_entry,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve volume path entry.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( result != 0 )
+	{
+		if( parent_locator_entry == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing path entry.",
+			 function );
+
+			goto on_error;
+		}
+		metadata_values->parent_filename      = parent_locator_entry->value_data;
+		metadata_values->parent_filename_size = parent_locator_entry->value_data_size;
+
+		parent_locator_entry->value_data      = NULL;
+		parent_locator_entry->value_data_size = 0;
+	}
+	if( libvhdi_parent_locator_free(
+	     &parent_locator,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free parent locator.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( parent_locator != NULL )
+	{
+		libvhdi_parent_locator_free(
+		 &parent_locator,
+		 NULL );
+	}
+	if( metadata_values->parent_filename != NULL )
+	{
+		memory_free(
+		 metadata_values->parent_filename );
+
+		metadata_values->parent_filename = NULL;
+	}
+	metadata_values->parent_filename_size = 0;
+
+	return( -1 );
 }
 
 /* Reads a metadata item
@@ -212,7 +432,7 @@ int libvhdi_metadata_values_read_item_data(
 			 "%s: unable to print GUID value.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		libcnotify_printf(
 		 "%s: metadata item description\t: %s\n",
@@ -244,7 +464,7 @@ int libvhdi_metadata_values_read_item_data(
 			 "%s: unsupported file parameters size item data size.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		byte_stream_copy_to_uint32_little_endian(
 		 data,
@@ -270,7 +490,7 @@ int libvhdi_metadata_values_read_item_data(
 			 "%s: invalid block size value out of bounds.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 /* TODO check if block size is power of 2 */
 		if( ( metadata_values->block_size % 512 ) != 0 )
@@ -283,7 +503,7 @@ int libvhdi_metadata_values_read_item_data(
 			 function,
 			 metadata_values->block_size );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	else if( memory_compare(
@@ -300,7 +520,7 @@ int libvhdi_metadata_values_read_item_data(
 			 "%s: unsupported logical sector size item data size.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		byte_stream_copy_to_uint32_little_endian(
 		 data,
@@ -326,7 +546,28 @@ int libvhdi_metadata_values_read_item_data(
 			 "%s: invalid logical sector size value out of bounds.",
 			 function );
 
-			return( -1 );
+			goto on_error;
+		}
+	}
+	else if( memory_compare(
+	          metadata_table_entry->item_identifier,
+	          libvhdi_metadata_item_identifier_parent_locator,
+	          16 ) == 0 )
+	{
+		if( libvhdi_metadata_values_read_parent_locator_item_data(
+		     metadata_values,
+		     data,
+		     (size_t) metadata_table_entry->item_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read parent locator metadata item.",
+			 function );
+
+			goto on_error;
 		}
 	}
 	else if( memory_compare(
@@ -343,7 +584,7 @@ int libvhdi_metadata_values_read_item_data(
 			 "%s: unsupported physical sector size item data size.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		byte_stream_copy_to_uint32_little_endian(
 		 data,
@@ -369,7 +610,7 @@ int libvhdi_metadata_values_read_item_data(
 			 "%s: invalid physical sector size value out of bounds.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	else if( memory_compare(
@@ -386,7 +627,7 @@ int libvhdi_metadata_values_read_item_data(
 			 "%s: unsupported virtual disk identifier item data size.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( memory_copy(
 		     metadata_values->virtual_disk_identifier,
@@ -400,14 +641,14 @@ int libvhdi_metadata_values_read_item_data(
 			 "%s: unable to copy virtual disk identifier.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
 			if( libvhdi_debug_print_guid_value(
 			     function,
-			     "virtual disk identifier\t",
+			     "virtual disk identifier\t\t",
 			     metadata_values->virtual_disk_identifier,
 			     16,
 			     LIBFGUID_ENDIAN_LITTLE,
@@ -421,7 +662,7 @@ int libvhdi_metadata_values_read_item_data(
 				 "%s: unable to print GUID value.",
 				 function );
 
-				return( -1 );
+				goto on_error;
 			}
 		}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
@@ -440,7 +681,7 @@ int libvhdi_metadata_values_read_item_data(
 			 "%s: unsupported virtual disk size item data size.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		byte_stream_copy_to_uint64_little_endian(
 		 data,
@@ -465,6 +706,18 @@ int libvhdi_metadata_values_read_item_data(
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
 	return( 1 );
+
+on_error:
+	if( metadata_values->parent_filename != NULL )
+	{
+		memory_free(
+		 metadata_values->parent_filename );
+
+		metadata_values->parent_filename = NULL;
+	}
+	metadata_values->parent_filename_size = 0;
+
+	return( -1 );
 }
 
 /* Reads a metadata item
@@ -821,5 +1074,264 @@ int libvhdi_metadata_values_get_virtual_disk_identifier(
 		return( -1 );
 	}
 	return( 1 );
+}
+
+/* Retrieves the parent identifier
+ * The identifier is a big-endian GUID and is 16 bytes of size
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_metadata_values_get_parent_identifier(
+     libvhdi_metadata_values_t *metadata_values,
+     uint8_t *guid_data,
+     size_t guid_data_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libvhdi_metadata_values_get_parent_identifier";
+
+	if( metadata_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid metadata values.",
+		 function );
+
+		return( -1 );
+	}
+	if( guid_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid GUID data.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( guid_data_size < 16 )
+	 || ( guid_data_size > SSIZE_MAX ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid GUID data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_copy(
+	     guid_data,
+	     metadata_values->parent_identifier,
+	     16 ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy parent identifier.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-8 encoded parent filename
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libvhdi_metadata_values_get_utf8_parent_filename_size(
+     libvhdi_metadata_values_t *metadata_values,
+     size_t *utf8_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libvhdi_metadata_values_get_utf8_parent_filename_size";
+	int result            = 0;
+
+	if( metadata_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid dynamic disk header.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( metadata_values->parent_filename != NULL )
+	 && ( metadata_values->parent_filename_size > 0 ) )
+	{
+		result = libuna_utf8_string_size_from_utf16_stream(
+		          metadata_values->parent_filename,
+		          metadata_values->parent_filename_size,
+		          LIBUNA_ENDIAN_LITTLE,
+		          utf8_string_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 string size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( result );
+}
+
+/* Retrieves the UTF-8 encoded parent filename
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libvhdi_metadata_values_get_utf8_parent_filename(
+     libvhdi_metadata_values_t *metadata_values,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libvhdi_metadata_values_get_utf8_parent_filename";
+	int result            = 0;
+
+	if( metadata_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid dynamic disk header.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( metadata_values->parent_filename != NULL )
+	 && ( metadata_values->parent_filename_size > 0 ) )
+	{
+		result = libuna_utf8_string_copy_from_utf16_stream(
+		          utf8_string,
+		          utf8_string_size,
+		          metadata_values->parent_filename,
+		          metadata_values->parent_filename_size,
+		          LIBUNA_ENDIAN_LITTLE,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy parent filename to UTF-8 string.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( result );
+}
+
+/* Retrieves the size of the UTF-16 encoded parent filename
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libvhdi_metadata_values_get_utf16_parent_filename_size(
+     libvhdi_metadata_values_t *metadata_values,
+     size_t *utf16_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libvhdi_metadata_values_get_utf16_parent_filename_size";
+	int result            = 0;
+
+	if( metadata_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid dynamic disk header.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( metadata_values->parent_filename != NULL )
+	 && ( metadata_values->parent_filename_size > 0 ) )
+	{
+		result = libuna_utf16_string_size_from_utf16_stream(
+		          metadata_values->parent_filename,
+		          metadata_values->parent_filename_size,
+		          LIBUNA_ENDIAN_LITTLE,
+		          utf16_string_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-16 string size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( result );
+}
+
+/* Retrieves the UTF-16 encoded parent filename
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libvhdi_metadata_values_get_utf16_parent_filename(
+     libvhdi_metadata_values_t *metadata_values,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libvhdi_metadata_values_get_utf16_parent_filename";
+	int result            = 0;
+
+	if( metadata_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid dynamic disk header.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( metadata_values->parent_filename != NULL )
+	 && ( metadata_values->parent_filename_size > 0 ) )
+	{
+		result = libuna_utf16_string_copy_from_utf16_stream(
+		          utf16_string,
+		          utf16_string_size,
+		          metadata_values->parent_filename,
+		          metadata_values->parent_filename_size,
+		          LIBUNA_ENDIAN_LITTLE,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy parent filename to UTF-16 string.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( result );
 }
 
