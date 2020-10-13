@@ -337,27 +337,7 @@ int libvhdi_block_descriptor_read_table_entry(
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
-	if( sector_bitmap_offset > 0 )
-	{
-		if( libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
-		     block_descriptor,
-		     file_io_handle,
-		     file_type,
-		     sector_bitmap_offset,
-		     sector_bitmap_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read sector bitmap.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	else
+	if( file_type == LIBVHDI_FILE_TYPE_VHDX )
 	{
 		if( libvhdi_sector_range_descriptor_initialize(
 		     &sector_range_descriptor,
@@ -372,13 +352,9 @@ int libvhdi_block_descriptor_read_table_entry(
 
 			goto on_error;
 		}
-		sector_range_descriptor->start_offset = block_offset;
-		sector_range_descriptor->end_offset   = block_offset + block_size;
+		sector_range_descriptor->start_offset = 0;
+		sector_range_descriptor->end_offset   = block_size;
 
-		if( sector_bitmap_offset == -1 )
-		{
-			sector_range_descriptor->flags = LIBFDATA_SECTOR_RANGE_FLAG_IS_UNALLOCATED;
-		}
 		if( libcdata_array_append_entry(
 		     block_descriptor->sector_ranges_array,
 		     &entry_index,
@@ -650,12 +626,15 @@ int libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
      libbfio_handle_t *file_io_handle,
      int file_type,
      off64_t file_offset,
+     uint32_t block_size,
      uint32_t sector_bitmap_size,
      libcerror_error_t **error )
 {
-	uint8_t *data         = NULL;
-	static char *function = "libvhdi_block_descriptor_read_sector_bitmap_file_io_handle";
-	ssize_t read_count    = 0;
+	libvhdi_sector_range_descriptor_t *sector_range_descriptor = NULL;
+	uint8_t *data                                              = NULL;
+	static char *function                                      = "libvhdi_block_descriptor_read_sector_bitmap_file_io_handle";
+	ssize_t read_count                                         = 0;
+	int entry_index                                            = 0;
 
 	if( block_descriptor == NULL )
 	{
@@ -680,82 +659,120 @@ int libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
 
 		return( -1 );
 	}
+	if( file_offset == -1 )
+	{
+		if( libvhdi_sector_range_descriptor_initialize(
+		     &sector_range_descriptor,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create sector range descriptor.",
+			 function );
+
+			goto on_error;
+		}
+		sector_range_descriptor->start_offset = 0;
+		sector_range_descriptor->end_offset   = block_size;
+		sector_range_descriptor->flags        = LIBFDATA_SECTOR_RANGE_FLAG_IS_UNALLOCATED;
+
+		if( libcdata_array_append_entry(
+		     block_descriptor->sector_ranges_array,
+		     &entry_index,
+		     (intptr_t *) sector_range_descriptor,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to append sector range to array.",
+			 function );
+
+			goto on_error;
+		}
+		sector_range_descriptor = NULL;
+	}
+	else
+	{
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: reading sector bitmap at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
-		 function,
-		 file_offset,
-		 file_offset );
-	}
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: reading sector bitmap at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
+			 function,
+			 file_offset,
+			 file_offset );
+		}
 #endif
-	if( libbfio_handle_seek_offset(
-	     file_io_handle,
-	     file_offset,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek sector bitmap at offset: %" PRIi64 " (0x%08" PRIx64 ").",
-		 function,
-		 file_offset,
-		 file_offset );
+		if( libbfio_handle_seek_offset(
+		     file_io_handle,
+		     file_offset,
+		     SEEK_SET,
+		     error ) == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek sector bitmap at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+			 function,
+			 file_offset,
+			 file_offset );
 
-		goto on_error;
+			goto on_error;
+		}
+		data = (uint8_t *) memory_allocate(
+		                    sizeof( uint8_t ) * sector_bitmap_size );
+
+		if( data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create sector bitmap data.",
+			 function );
+
+			goto on_error;
+		}
+		read_count = libbfio_handle_read_buffer(
+		              file_io_handle,
+		              data,
+		              (size_t) sector_bitmap_size,
+		              error );
+
+		if( read_count != (ssize_t) sector_bitmap_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read sector bitmap data.",
+			 function );
+
+			goto on_error;
+		}
+		if( libvhdi_block_descriptor_read_sector_bitmap_data(
+		     block_descriptor,
+		     data,
+		     (size_t) sector_bitmap_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read sector bitmap.",
+			 function );
+
+			goto on_error;
+		}
+		memory_free(
+		 data );
 	}
-	data = (uint8_t *) memory_allocate(
-	                    sizeof( uint8_t ) * sector_bitmap_size );
-
-	if( data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create sector bitmap data.",
-		 function );
-
-		goto on_error;
-	}
-	read_count = libbfio_handle_read_buffer(
-	              file_io_handle,
-	              data,
-	              (size_t) sector_bitmap_size,
-	              error );
-
-	if( read_count != (ssize_t) sector_bitmap_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read sector bitmap data.",
-		 function );
-
-		goto on_error;
-	}
-	if( libvhdi_block_descriptor_read_sector_bitmap_data(
-	     block_descriptor,
-	     data,
-	     (size_t) sector_bitmap_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read sector bitmap.",
-		 function );
-
-		goto on_error;
-	}
-	memory_free(
-	 data );
-
 	return( 1 );
 
 on_error:
@@ -763,6 +780,12 @@ on_error:
 	{
 		memory_free(
 		 data );
+	}
+	if( sector_range_descriptor != NULL )
+	{
+		libvhdi_sector_range_descriptor_free(
+		 &sector_range_descriptor,
+		 NULL );
 	}
 	return( -1 );
 }

@@ -47,6 +47,10 @@ struct libvhdi_image_header
 	/* The format version
 	 */
 	uint16_t format_version;
+
+	/* The data write identifier
+	 */
+	uint8_t data_write_identifier[ 16 ];
 };
 
 int libvhdi_image_header_initialize(
@@ -72,6 +76,12 @@ int libvhdi_image_header_read_file_io_handle(
 int libvhdi_image_header_get_format_version(
      libvhdi_image_header_t *image_header,
      uint16_t *major_version,
+     libcerror_error_t **error );
+
+int libvhdi_image_header_get_data_write_identifier(
+     libvhdi_image_header_t *image_header,
+     uint8_t *guid_data,
+     size_t guid_data_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

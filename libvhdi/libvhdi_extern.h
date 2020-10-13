@@ -30,7 +30,11 @@
 
 #include <libvhdi/extern.h>
 
+#if defined( __CYGWIN__ )
+#define LIBVHDI_EXTERN_VARIABLE	extern
+#else
 #define LIBVHDI_EXTERN_VARIABLE	LIBVHDI_EXTERN
+#endif
 
 #else
 #define LIBVHDI_EXTERN		/* extern */

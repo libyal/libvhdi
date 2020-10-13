@@ -911,79 +911,6 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libvhdi_file_footer_get_disk_type function
- * Returns 1 if successful or 0 if not
- */
-int vhdi_test_file_footer_get_disk_type(
-     libvhdi_file_footer_t *file_footer )
-{
-	libcerror_error_t *error = NULL;
-	uint32_t disk_type       = 0;
-	int result               = 0;
-
-	/* Test regular cases
-	 */
-	result = libvhdi_file_footer_get_disk_type(
-	          file_footer,
-	          &disk_type,
-	          &error );
-
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	VHDI_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libvhdi_file_footer_get_disk_type(
-	          NULL,
-	          &disk_type,
-	          &error );
-
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	VHDI_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libvhdi_file_footer_get_disk_type(
-	          file_footer,
-	          NULL,
-	          &error );
-
-	VHDI_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	VHDI_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	return( 0 );
-}
-
 /* Tests the libvhdi_file_footer_get_identifier function
  * Returns 1 if successful or 0 if not
  */
@@ -1215,11 +1142,6 @@ int main(
 	VHDI_TEST_RUN_WITH_ARGS(
 	 "libvhdi_file_footer_get_format_version",
 	 vhdi_test_file_footer_get_format_version,
-	 file_footer );
-
-	VHDI_TEST_RUN_WITH_ARGS(
-	 "libvhdi_file_footer_get_disk_type",
-	 vhdi_test_file_footer_get_disk_type,
 	 file_footer );
 
 	VHDI_TEST_RUN_WITH_ARGS(

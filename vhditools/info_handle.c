@@ -306,16 +306,17 @@ int info_handle_input_fprint(
 	system_character_t guid_string[ 48 ];
 	uint8_t guid_data[ 16 ];
 
-	libfguid_identifier_t *guid      = NULL;
-	system_character_t *value_string = NULL;
-	static char *function            = "info_handle_input_fprint";
-	size64_t media_size              = 0;
-	size_t value_string_size         = 0;
-	uint32_t disk_type               = 0;
-	uint16_t major_version           = 0;
-	uint16_t minor_version           = 0;
-	int file_type                    = 0;
-	int result                       = 0;
+	libfguid_identifier_t *guid          = NULL;
+	system_character_t *disk_type_string = NULL;
+	system_character_t *value_string     = NULL;
+	static char *function                = "info_handle_input_fprint";
+	size64_t media_size                  = 0;
+	size_t value_string_size             = 0;
+	uint32_t disk_type                   = 0;
+	uint16_t major_version               = 0;
+	uint16_t minor_version               = 0;
+	int file_type                        = 0;
+	int result                           = 0;
 
 	if( info_handle == NULL )
 	{
@@ -412,56 +413,43 @@ int info_handle_input_fprint(
 	 info_handle->notify_stream,
 	 "\n" );
 
-	if( file_type == LIBVHDI_FILE_TYPE_VHD )
+	if( libvhdi_file_get_disk_type(
+	     info_handle->input,
+	     &disk_type,
+	     error ) != 1 )
 	{
-		if( libvhdi_file_get_disk_type(
-		     info_handle->input,
-		     &disk_type,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve disk type.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve disk type.",
+		 function );
 
-			goto on_error;
-		}
-		fprintf(
-		 info_handle->notify_stream,
-		 "\tDisk type\t\t: " );
-
-		switch( disk_type )
-		{
-			case LIBVHDI_DISK_TYPE_FIXED:
-				fprintf(
-				 info_handle->notify_stream,
-				 "Fixed" );
-				break;
-
-			case LIBVHDI_DISK_TYPE_DYNAMIC:
-				fprintf(
-				 info_handle->notify_stream,
-				 "Dynamic" );
-				break;
-
-			case LIBVHDI_DISK_TYPE_DIFFERENTIAL:
-				fprintf(
-				 info_handle->notify_stream,
-				 "Differential" );
-				break;
-
-			default:
-				fprintf(
-				 info_handle->notify_stream,
-				 "Unknown" );
-				break;
-		}
-		fprintf(
-		 info_handle->notify_stream,
-		 "\n" );
+		goto on_error;
 	}
+	switch( disk_type )
+	{
+		case LIBVHDI_DISK_TYPE_FIXED:
+			disk_type_string = "Fixed";
+			break;
+
+		case LIBVHDI_DISK_TYPE_DYNAMIC:
+			disk_type_string = "Dynamic";
+			break;
+
+		case LIBVHDI_DISK_TYPE_DIFFERENTIAL:
+			disk_type_string = "Differential";
+			break;
+
+		default:
+			disk_type_string = "Unknown";
+			break;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tDisk type\t\t: %" PRIs_SYSTEM "\n",
+	 disk_type_string );
+
 	if( libvhdi_file_get_media_size(
 	     info_handle->input,
 	     &media_size,

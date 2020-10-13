@@ -23,7 +23,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libvhdi_libcerror.h"
 #include "libvhdi_region_type_identifier.h"
 
 uint8_t libvhdi_region_type_identifier_block_allocation_table[ 16 ] = {

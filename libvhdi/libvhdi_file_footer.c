@@ -581,43 +581,6 @@ int libvhdi_file_footer_get_format_version(
 	return( 1 );
 }
 
-/* Retrieves the disk type
- * Returns 1 if successful or -1 on error
- */
-int libvhdi_file_footer_get_disk_type(
-     libvhdi_file_footer_t *file_footer,
-     uint32_t *disk_type,
-     libcerror_error_t **error )
-{
-	static char *function = "libvhdi_file_footer_get_disk_type";
-
-	if( file_footer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file footer.",
-		 function );
-
-		return( -1 );
-	}
-	if( disk_type == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid disk type.",
-		 function );
-
-		return( -1 );
-	}
-	*disk_type = file_footer->disk_type;
-
-	return( 1 );
-}
-
 /* Retrieves the identifier
  * The identifier is a big-endian GUID and is 16 bytes of size
  * Returns 1 if successful or -1 on error

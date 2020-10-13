@@ -37,9 +37,17 @@ typedef struct libvhdi_block_allocation_table libvhdi_block_allocation_table_t;
 
 struct libvhdi_block_allocation_table
 {
+	/* The number of entries
+	 */
+	uint32_t number_of_entries;
+
 	/* The file type
 	 */
 	int file_type;
+
+	/* The disk type
+	 */
+	uint32_t disk_type;
 
 	/* The file offset
 	 */
@@ -49,10 +57,6 @@ struct libvhdi_block_allocation_table
 	 */
 	uint32_t block_size;
 
-	/* The number of entries
-	 */
-	uint32_t number_of_entries;
-
 	/* The table entry size
 	 */
 	size_t table_entry_size;
@@ -60,18 +64,29 @@ struct libvhdi_block_allocation_table
 	/* The sector bitmap size
 	 */
 	uint32_t sector_bitmap_size;
+
+	/* The number of entries per chunk
+	 */
+	uint32_t entries_per_chunk;
 };
 
 int libvhdi_block_allocation_table_initialize(
      libvhdi_block_allocation_table_t **block_allocation_table,
-     int file_type,
-     off64_t file_offset,
-     uint32_t block_size,
      uint32_t number_of_entries,
      libcerror_error_t **error );
 
 int libvhdi_block_allocation_table_free(
      libvhdi_block_allocation_table_t **block_allocation_table,
+     libcerror_error_t **error );
+
+int libvhdi_block_allocation_table_read_file_io_handle(
+     libvhdi_block_allocation_table_t *block_allocation_table,
+     libbfio_handle_t *file_io_handle,
+     int file_type,
+     uint32_t disk_type,
+     off64_t file_offset,
+     uint32_t block_size,
+     uint32_t sector_size,
      libcerror_error_t **error );
 
 int libvhdi_block_allocation_table_read_element_data(

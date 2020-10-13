@@ -173,3 +173,40 @@ int libvhdi_io_handle_clear(
 	return( 1 );
 }
 
+/* Retrieves the disk type
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_io_handle_get_disk_type(
+     libvhdi_io_handle_t *io_handle,
+     uint32_t *disk_type,
+     libcerror_error_t **error )
+{
+	static char *function = "libvhdi_io_handle_get_disk_type";
+
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( disk_type == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid disk type.",
+		 function );
+
+		return( -1 );
+	}
+	*disk_type = io_handle->disk_type;
+
+	return( 1 );
+}
+

@@ -26,7 +26,6 @@
 #include <types.h>
 
 #include "libvhdi_extern.h"
-#include "libvhdi_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {

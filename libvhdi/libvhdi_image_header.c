@@ -226,6 +226,45 @@ int libvhdi_image_header_read_data(
 	 ( (vhdi_image_header_t *) data )->format_version,
 	 image_header->format_version );
 
+	if( memory_copy(
+	     image_header->data_write_identifier,
+	     ( (vhdi_image_header_t *) data )->data_write_identifier,
+	     16 ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy data write identifier.",
+		 function );
+
+		return( -1 );
+	}
+	image_header->data_write_identifier[ 0 ] = ( (vhdi_image_header_t *) data )->data_write_identifier[ 3 ];
+	image_header->data_write_identifier[ 1 ] = ( (vhdi_image_header_t *) data )->data_write_identifier[ 2 ];
+	image_header->data_write_identifier[ 2 ] = ( (vhdi_image_header_t *) data )->data_write_identifier[ 1 ];
+	image_header->data_write_identifier[ 3 ] = ( (vhdi_image_header_t *) data )->data_write_identifier[ 0 ];
+
+	image_header->data_write_identifier[ 4 ] = ( (vhdi_image_header_t *) data )->data_write_identifier[ 5 ];
+	image_header->data_write_identifier[ 5 ] = ( (vhdi_image_header_t *) data )->data_write_identifier[ 4 ];
+
+	image_header->data_write_identifier[ 6 ] = ( (vhdi_image_header_t *) data )->data_write_identifier[ 7 ];
+	image_header->data_write_identifier[ 7 ] = ( (vhdi_image_header_t *) data )->data_write_identifier[ 6 ];
+
+	if( memory_copy(
+	     &( image_header->data_write_identifier[ 8 ] ),
+	     &( ( (vhdi_image_header_t *) data )->data_write_identifier[ 8 ] ),
+	     8 ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy data write identifier.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -477,6 +516,69 @@ int libvhdi_image_header_get_format_version(
 	}
 	*major_version = image_header->format_version;
 
+	return( 1 );
+}
+
+/* Retrieves the data write identifier
+ * The identifier is a big-endian GUID and is 16 bytes of size
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_image_header_get_data_write_identifier(
+     libvhdi_image_header_t *image_header,
+     uint8_t *guid_data,
+     size_t guid_data_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libvhdi_image_header_get_data_write_identifier";
+
+	if( image_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid metadata values.",
+		 function );
+
+		return( -1 );
+	}
+	if( guid_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid GUID data.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( guid_data_size < 16 )
+	 || ( guid_data_size > SSIZE_MAX ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid GUID data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_copy(
+	     guid_data,
+	     image_header->data_write_identifier,
+	     16 ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy data write identifier.",
+		 function );
+
+		return( -1 );
+	}
 	return( 1 );
 }
 

@@ -361,8 +361,9 @@ int libvhdi_file_get_media_size(
      size64_t *media_size,
      libvhdi_error_t **error );
 
-/* Retrieves the (virtual disk) identifier
+/* Retrieves the identifier
  * The identifier is a big-endian GUID and is 16 bytes of size
+ * For VHDX this value is obtained from the data write identifier
  * Returns 1 if successful or -1 on error
  */
 LIBVHDI_EXTERN \

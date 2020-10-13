@@ -39,6 +39,10 @@ struct libvhdi_io_handle
  	 */
 	int file_type;
 
+	/* The disk type
+	 */
+	uint32_t disk_type;
+
 	/* The (storage) media size
 	 */
 	size64_t media_size;
@@ -66,6 +70,11 @@ int libvhdi_io_handle_free(
 
 int libvhdi_io_handle_clear(
      libvhdi_io_handle_t *io_handle,
+     libcerror_error_t **error );
+
+int libvhdi_io_handle_get_disk_type(
+     libvhdi_io_handle_t *io_handle,
+     uint32_t *disk_type,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

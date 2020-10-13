@@ -23,7 +23,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libvhdi_libcerror.h"
 #include "libvhdi_metadata_item_identifier.h"
 
 uint8_t libvhdi_metadata_item_identifier_file_parameters[ 16 ] = {

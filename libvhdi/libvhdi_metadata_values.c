@@ -25,6 +25,7 @@
 #include <types.h>
 
 #include "libvhdi_debug.h"
+#include "libvhdi_definitions.h"
 #include "libvhdi_libcerror.h"
 #include "libvhdi_libcnotify.h"
 #include "libvhdi_libfguid.h"
@@ -366,7 +367,8 @@ int libvhdi_metadata_values_read_item_data(
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function = "libvhdi_metadata_values_read_item_data";
+	static char *function          = "libvhdi_metadata_values_read_item_data";
+	uint32_t file_parameters_flags = 0;
 
 	if( metadata_values == NULL )
 	{
@@ -470,6 +472,10 @@ int libvhdi_metadata_values_read_item_data(
 		 data,
 		 metadata_values->block_size );
 
+		byte_stream_copy_to_uint32_little_endian(
+		 &( data[ 4 ] ),
+		 file_parameters_flags );
+
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
@@ -477,6 +483,11 @@ int libvhdi_metadata_values_read_item_data(
 			 "%s: block size\t\t\t: %" PRIu32 "\n",
 			 function,
 			 metadata_values->block_size );
+
+			libcnotify_printf(
+			 "%s: flags\t\t\t\t: 0x%08" PRIx32 "\n",
+			 function,
+			 file_parameters_flags );
 		}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
@@ -504,6 +515,33 @@ int libvhdi_metadata_values_read_item_data(
 			 metadata_values->block_size );
 
 			goto on_error;
+		}
+		file_parameters_flags &= 0x00000003UL;
+
+		switch( file_parameters_flags )
+		{
+			case 0:
+				metadata_values->disk_type = LIBVHDI_DISK_TYPE_DYNAMIC;
+				break;
+
+			case 1:
+				metadata_values->disk_type = LIBVHDI_DISK_TYPE_FIXED;
+				break;
+
+			case 2:
+				metadata_values->disk_type = LIBVHDI_DISK_TYPE_DIFFERENTIAL;
+				break;
+
+			default:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+				 "%s: unsupported file parameters flags: 0x%02" PRIx32 ".",
+				 function,
+				 file_parameters_flags );
+
+				goto on_error;
 		}
 	}
 	else if( memory_compare(
@@ -629,10 +667,21 @@ int libvhdi_metadata_values_read_item_data(
 
 			goto on_error;
 		}
+		metadata_values->virtual_disk_identifier[ 0 ] = data[ 3 ];
+		metadata_values->virtual_disk_identifier[ 1 ] = data[ 2 ];
+		metadata_values->virtual_disk_identifier[ 2 ] = data[ 1 ];
+		metadata_values->virtual_disk_identifier[ 3 ] = data[ 0 ];
+
+		metadata_values->virtual_disk_identifier[ 4 ] = data[ 5 ];
+		metadata_values->virtual_disk_identifier[ 5 ] = data[ 4 ];
+
+		metadata_values->virtual_disk_identifier[ 6 ] = data[ 7 ];
+		metadata_values->virtual_disk_identifier[ 7 ] = data[ 6 ];
+
 		if( memory_copy(
-		     metadata_values->virtual_disk_identifier,
-		     data,
-		     16 ) == NULL )
+		     &( metadata_values->virtual_disk_identifier[ 8 ] ),
+		     &( data[ 8 ] ),
+		     8 ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
@@ -641,7 +690,7 @@ int libvhdi_metadata_values_read_item_data(
 			 "%s: unable to copy virtual disk identifier.",
 			 function );
 
-			goto on_error;
+			return( -1 );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -651,7 +700,7 @@ int libvhdi_metadata_values_read_item_data(
 			     "virtual disk identifier\t\t",
 			     metadata_values->virtual_disk_identifier,
 			     16,
-			     LIBFGUID_ENDIAN_LITTLE,
+			     LIBFGUID_ENDIAN_BIG,
 			     LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
 			     error ) != 1 )
 			{
@@ -1048,21 +1097,10 @@ int libvhdi_metadata_values_get_virtual_disk_identifier(
 
 		return( -1 );
 	}
-	guid_data[ 0 ] = metadata_values->virtual_disk_identifier[ 3 ];
-	guid_data[ 1 ] = metadata_values->virtual_disk_identifier[ 2 ];
-	guid_data[ 2 ] = metadata_values->virtual_disk_identifier[ 1 ];
-	guid_data[ 3 ] = metadata_values->virtual_disk_identifier[ 0 ];
-
-	guid_data[ 4 ] = metadata_values->virtual_disk_identifier[ 5 ];
-	guid_data[ 5 ] = metadata_values->virtual_disk_identifier[ 4 ];
-
-	guid_data[ 6 ] = metadata_values->virtual_disk_identifier[ 7 ];
-	guid_data[ 7 ] = metadata_values->virtual_disk_identifier[ 6 ];
-
 	if( memory_copy(
-	     &( guid_data[ 8 ] ),
-	     &( ( metadata_values->virtual_disk_identifier )[ 8 ] ),
-	     8 ) == NULL )
+	     guid_data,
+	     metadata_values->virtual_disk_identifier,
+	     16 ) == NULL )
 	{
 		libcerror_error_set(
 		 error,

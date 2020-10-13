@@ -87,11 +87,6 @@ int libvhdi_file_footer_get_format_version(
      uint16_t *minor_version,
      libcerror_error_t **error );
 
-int libvhdi_file_footer_get_disk_type(
-     libvhdi_file_footer_t *file_footer,
-     uint32_t *disk_type,
-     libcerror_error_t **error );
-
 int libvhdi_file_footer_get_identifier(
      libvhdi_file_footer_t *file_footer,
      uint8_t *guid_data,

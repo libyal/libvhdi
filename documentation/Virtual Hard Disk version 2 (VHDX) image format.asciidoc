@@ -254,7 +254,8 @@ The file parameters metadata item is 8 bytes of size and consists of:
 | Offset | Size | Value | Description
 | 0 | 4 | | Block size +
 According to `[MS-VHDX]` this value must be a power of 2 and greater than or equal to 1 MiB and not greater than 256 MiB
-| 4.0 | 1 bit | | [yellow-background]*Unknown (LeaveBlockAllocated)*
+| 4.0 | 1 bit | | Blocks remain allocated +
+This flag is used to indicate the file is a fixed-size image
 | 4.1 | 1 bit | | Has parent +
 Value that indicates if the VHDX file contains a differential image that has a parent
 | 4.2 | 30 bits | 0 | [yellow-background]*Unknown (reserved)* +
@@ -274,7 +275,7 @@ According to `[MS-VHDX]` this value must be either 512 or 4096
 
 ==== Parent locator metadata item
 
-The parent locator metadata item is variable of size and conssits of:
+The parent locator metadata item is variable of size and consits of:
 
 * parent locator header
 * 0 or more parent locator entry
@@ -322,8 +323,9 @@ Known keys are:
 |===
 | Value | Description
 | absolute_win32_path | The value contains an absolute drive Windows path "\\?\c:\file.vhdx"
+| parent_linkage | The value contains a string of a GUID +
+This GUID should correspond to the data write identifier of the parent file
 | parent_linkage2 | The value contains a string of a GUID
-| parent_linkage | The value contains a string of a GUID
 | relative_path | The value contains a relative Windows path "..\file.vhdx"
 | volume_path | The value contains an absolute volume Windows path with "\\?\Volume{%GUID%}\file.vhdx"
 |===
@@ -350,6 +352,11 @@ The virtual disk identifier metadata item is 16 bytes of size and consists of:
 Contains a GUID
 |===
 
+[NOTE]
+In contrast to VHD (version 1) the virtual disk identifier does not change
+between a differential image and its parent. The data write identifier seems
+to be used instead.
+
 ==== Virtual disk size metadata item
 
 The virtual disk size metadata item is 8 bytes of size and consists of:
@@ -362,9 +369,33 @@ The virtual disk size metadata item is 8 bytes of size and consists of:
 
 == Block allocation table (BAT) region
 
-[yellow-background]*TODO: complete this section*
+The block allocation table (BAT) region contains the block allocation table.
+The entries of this table describe the location of either blocks containing
+image content data (or payload blocks) or blocks containing a sector bitmap.
 
-array of payload and sector bitmap block allocation table (BAT) entries
+The size of an individual sector bitmap block is 1 MiB which allows for `2^23`
+sectors to be represented by the bitmap.
+
+Block allocation table (BAT) entries are grouped in chunks. The size of a chunk
+can be calculated as following:
+
+....
+number of entries per chunk = ( 2^23 * logical sector size ) / block size
+....
+
+The block allocation table (BAT) consists of:
+
+* one or more chunks containing:
+  * number of entries per chunk x BAT entry describing image content data
+  * 1 x BAT entry describing the a sector bitmap
+
+Unused BAT entries are filled with 0-byte values.
+
+The block allocation table (BAT) of:
+
+* a fixed-size image does not contain sector bitmap entries;
+* a dynamic-size image does contain sector bitmap entries, although according to `[MS-VHDX]` are not used;
+* a differential image does contain sector bitmap entries.
 
 === Block allocation table (BAT) entry
 

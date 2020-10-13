@@ -57,9 +57,6 @@ int vhdi_test_block_allocation_table_initialize(
 	 */
 	result = libvhdi_block_allocation_table_initialize(
 	          &block_allocation_table,
-	          LIBVHDI_FILE_TYPE_VHD,
-	          0,
-	          2097152,
 	          1,
 	          &error );
 
@@ -97,9 +94,6 @@ int vhdi_test_block_allocation_table_initialize(
 	 */
 	result = libvhdi_block_allocation_table_initialize(
 	          NULL,
-	          LIBVHDI_FILE_TYPE_VHD,
-	          0,
-	          2097152,
 	          1,
 	          &error );
 
@@ -119,9 +113,6 @@ int vhdi_test_block_allocation_table_initialize(
 
 	result = libvhdi_block_allocation_table_initialize(
 	          &block_allocation_table,
-	          LIBVHDI_FILE_TYPE_VHD,
-	          0,
-	          2097152,
 	          1,
 	          &error );
 
@@ -151,9 +142,6 @@ int vhdi_test_block_allocation_table_initialize(
 
 		result = libvhdi_block_allocation_table_initialize(
 		          &block_allocation_table,
-		          LIBVHDI_FILE_TYPE_VHD,
-		          0,
-		          2097152,
 		          1,
 		          &error );
 
@@ -197,9 +185,6 @@ int vhdi_test_block_allocation_table_initialize(
 
 		result = libvhdi_block_allocation_table_initialize(
 		          &block_allocation_table,
-		          LIBVHDI_FILE_TYPE_VHD,
-		          0,
-		          2097152,
 		          1,
 		          &error );
 

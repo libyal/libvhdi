@@ -41,6 +41,10 @@ struct libvhdi_metadata_values
 	 */
 	uint32_t block_size;
 
+	/* The disk type
+	 */
+	uint32_t disk_type;
+
 	/* The logical sector size
 	 */
 	uint32_t logical_sector_size;

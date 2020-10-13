@@ -75,6 +75,7 @@ int libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
      libbfio_handle_t *file_io_handle,
      int file_type,
      off64_t file_offset,
+     uint32_t block_size,
      uint32_t sector_bitmap_size,
      libcerror_error_t **error );
 
