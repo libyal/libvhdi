@@ -40,6 +40,9 @@ void libvhdi_debug_print_feature_flags(
 const char *libvhdi_debug_print_disk_type(
              uint32_t disk_type );
 
+const char *libvhdi_debug_print_block_state(
+             uint8_t block_state );
+
 int libvhdi_debug_print_guid_value(
      const char *function_name,
      const char *value_name,

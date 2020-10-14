@@ -66,6 +66,34 @@ const char *libvhdi_debug_print_disk_type(
 	return( "_UNKNOWN_" );
 }
 
+/* Prints the block state
+ */
+const char *libvhdi_debug_print_block_state(
+             uint8_t block_state )
+{
+	switch( block_state )
+	{
+		case 0:
+			return( "PAYLOAD_BLOCK_NOT_PRESENT / SB_BLOCK_NOT_PRESENT" );
+
+		case 1:
+			return( "PAYLOAD_BLOCK_UNDEFINED" );
+
+		case 2:
+			return( "PAYLOAD_BLOCK_ZERO" );
+
+		case 3:
+			return( "PAYLOAD_BLOCK_UNMAPPED" );
+
+		case 6:
+			return( "PAYLOAD_BLOCK_FULLY_PRESENT / SB_BLOCK_PRESENT" );
+
+		case 7:
+			return( "PAYLOAD_BLOCK_PARTIALLY_PRESENT" );
+	}
+	return( "_UNKNOWN_" );
+}
+
 /* Prints a GUID/UUID value
  * Returns 1 if successful or -1 on error
  */

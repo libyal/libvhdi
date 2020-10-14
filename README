@@ -8,6 +8,7 @@ Project information:
 Read supported formats:
 
 * Virtual Hard Disk version 1 (VHD)
+* Virtual Hard Disk version 2 (VHDX)
 
 Supported image types:
 
@@ -15,10 +16,6 @@ Supported image types:
 * Dynamic-size (or sparse) hard disk image
 * Differential (or differencing) hard disk image
   * Note that an undo disk image (.vud) is also a differential image
-
-Work in progress:
-
-* Virtual Hard Disk version 2 (VHDX)
 
 For more information see:
 

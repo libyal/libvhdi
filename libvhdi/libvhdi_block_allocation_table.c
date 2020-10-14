@@ -169,15 +169,20 @@ int libvhdi_block_allocation_table_read_file_io_handle(
      uint32_t sector_size,
      libcerror_error_t **error )
 {
-	static char *function       = "libvhdi_block_allocation_table_read_file_io_handle";
-	uint64_t entries_per_chunk  = 0;
-	uint32_t sector_bitmap_size = 0;
+	static char *function                        = "libvhdi_block_allocation_table_read_file_io_handle";
+	uint64_t entries_per_chunk                   = 0;
+	uint32_t sector_bitmap_size                  = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	uint8_t *data               = NULL;
-	size_t read_size            = 0;
-	ssize_t read_count          = 0;
-	uint64_t table_entries_size = 0;
+	uint8_t empty_table_entry_data[ 8 ] = {
+		0, 0, 0, 0, 0, 0, 0, 0 };
+
+	libvhdi_block_descriptor_t *block_descriptor = NULL;
+	uint8_t *data                                = NULL;
+	size_t data_offset                           = 0;
+	size_t read_size                             = 0;
+	ssize_t read_count                           = 0;
+	uint64_t table_entries_size                  = 0;
 #endif
 
 	if( block_allocation_table == NULL )
@@ -231,6 +236,7 @@ int libvhdi_block_allocation_table_read_file_io_handle(
 	block_allocation_table->disk_type   = disk_type;
 	block_allocation_table->file_offset = file_offset;
 	block_allocation_table->block_size  = block_size;
+	block_allocation_table->sector_size = sector_size;
 
 	if( file_type == LIBVHDI_FILE_TYPE_VHD )
 	{
@@ -242,15 +248,6 @@ int libvhdi_block_allocation_table_read_file_io_handle(
 			sector_bitmap_size += 1;
 			sector_bitmap_size *= 512;
 		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: sector bitmap size\t: %" PRIu32 "\n",
-			 function,
-			 sector_bitmap_size );
-		}
-#endif
 		block_allocation_table->sector_bitmap_size = sector_bitmap_size;
 	}
 	else if( file_type == LIBVHDI_FILE_TYPE_VHDX )
@@ -271,10 +268,29 @@ int libvhdi_block_allocation_table_read_file_io_handle(
 			 entries_per_chunk );
 		}
 #endif
-/* TODO check if entries_per_chunk is correct */
+		if( ( 1048576 % entries_per_chunk ) != 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported entries per chunk.",
+			 function );
 
-		block_allocation_table->entries_per_chunk = (uint32_t) entries_per_chunk;
+			return( -1 );
+		}
+		block_allocation_table->entries_per_chunk  = (uint32_t) entries_per_chunk;
+		block_allocation_table->sector_bitmap_size = 1048576 / entries_per_chunk;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: sector bitmap size\t: %" PRIu32 "\n",
+		 function,
+		 block_allocation_table->sector_bitmap_size );
+	}
+#endif
 	if( file_type == LIBVHDI_FILE_TYPE_VHD )
 	{
 		block_allocation_table->table_entry_size = 4;
@@ -359,6 +375,19 @@ int libvhdi_block_allocation_table_read_file_io_handle(
 
 			goto on_error;
 		}
+		if( libvhdi_block_descriptor_initialize(
+		     &block_descriptor,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create block descriptor.",
+			 function );
+
+			goto on_error;
+		}
 		while( table_entries_size > 0 )
 		{
 			read_size = 64 * 1024;
@@ -389,7 +418,49 @@ int libvhdi_block_allocation_table_read_file_io_handle(
 			 read_size,
 			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 
+			data_offset = 0;
+
+			while( data_offset < read_size )
+			{
+				if( memory_compare(
+				     &( data[ data_offset ] ),
+				     empty_table_entry_data,
+				     block_allocation_table->table_entry_size ) != 0 )
+				{
+					if( libvhdi_block_descriptor_read_table_entry_data(
+					     block_descriptor,
+					     &( data[ data_offset ] ),
+					     block_allocation_table->table_entry_size,
+					     file_type,
+					     block_allocation_table->sector_bitmap_size,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_READ_FAILED,
+						 "%s: unable to read allocation table entry.",
+						 function );
+
+						goto on_error;
+					}
+				}
+				data_offset += block_allocation_table->table_entry_size;
+			}
 			table_entries_size -= read_size;
+		}
+		if( libvhdi_block_descriptor_free(
+		     &block_descriptor,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free block descriptor.",
+			 function );
+
+			goto on_error;
 		}
 		memory_free(
 		 data );
@@ -401,6 +472,12 @@ int libvhdi_block_allocation_table_read_file_io_handle(
 #if defined( HAVE_DEBUG_OUTPUT )
 
 on_error:
+	if( block_descriptor != NULL )
+	{
+		libvhdi_block_descriptor_free(
+		 &block_descriptor,
+		 NULL );
+	}
 	if( data != NULL )
 	{
 		memory_free(
@@ -428,9 +505,11 @@ int libvhdi_block_allocation_table_read_element_data(
      uint8_t read_flags LIBVHDI_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
-	libvhdi_block_descriptor_t *block_descriptor = NULL;
-	static char *function                        = "libvhdi_block_allocation_table_read_element_data";
-	off64_t table_entry_offset                   = 0;
+	libvhdi_block_descriptor_t *block_descriptor               = NULL;
+	libvhdi_block_descriptor_t *sector_bitmap_block_descriptor = NULL;
+	static char *function                                      = "libvhdi_block_allocation_table_read_element_data";
+	off64_t sector_bitmap_offset                               = 0;
+	off64_t table_entry_offset                                 = 0;
 
 	LIBVHDI_UNREFERENCED_PARAMETER( element_data_file_index );
 	LIBVHDI_UNREFERENCED_PARAMETER( element_data_offset );
@@ -464,12 +543,11 @@ int libvhdi_block_allocation_table_read_element_data(
 	}
 	table_entry_offset = block_allocation_table->file_offset + ( element_index * block_allocation_table->table_entry_size );
 
-	if( libvhdi_block_descriptor_read_table_entry(
+	if( libvhdi_block_descriptor_read_table_entry_file_io_handle(
 	     block_descriptor,
 	     file_io_handle,
 	     block_allocation_table->file_type,
 	     table_entry_offset,
-	     block_allocation_table->block_size,
 	     block_allocation_table->sector_bitmap_size,
 	     error ) != 1 )
 	{
@@ -485,31 +563,139 @@ int libvhdi_block_allocation_table_read_element_data(
 	}
 	if( block_allocation_table->file_type == LIBVHDI_FILE_TYPE_VHD )
 	{
-		if( libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
-		     block_descriptor,
-		     file_io_handle,
-		     block_allocation_table->file_type,
-		     block_descriptor->file_offset,
-		     block_allocation_table->block_size,
-		     block_allocation_table->sector_bitmap_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read block: %d sector bitmap.",
-			 function,
-			 element_index );
+		sector_bitmap_offset = block_descriptor->file_offset;
 
-			goto on_error;
+		if( sector_bitmap_offset != -1 )
+		{
+			sector_bitmap_offset -= block_allocation_table->sector_bitmap_size;
 		}
 	}
-	else if( ( block_allocation_table->file_type == LIBVHDI_FILE_TYPE_VHD )
-	      && ( block_allocation_table->disk_type == LIBVHDI_DISK_TYPE_DIFFERENTIAL ) )
+	else if( block_allocation_table->file_type == LIBVHDI_FILE_TYPE_VHDX )
 	{
-/* TODO determine the offset of the sector bitmap */
-/* TODO read the relevant part of the sector bitmap */
+		if( block_allocation_table->disk_type != LIBVHDI_DISK_TYPE_DIFFERENTIAL )
+		{
+			sector_bitmap_offset = -1;
+		}
+		else
+		{
+			if( block_allocation_table->entries_per_chunk == 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: invalid block allocation table - missing entries per chunk.",
+				 function );
+
+				goto on_error;
+			}
+			if( libvhdi_block_descriptor_initialize(
+			     &sector_bitmap_block_descriptor,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create sector bitmap block descriptor.",
+				 function );
+
+				goto on_error;
+			}
+			table_entry_offset  = 1 + ( element_index / block_allocation_table->entries_per_chunk );
+			table_entry_offset *= block_allocation_table->entries_per_chunk + 1;
+			table_entry_offset -= 1;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: bitmap entry index\t: %" PRIi64 "\n",
+				 function,
+				 table_entry_offset );
+			}
+#endif
+			table_entry_offset *= block_allocation_table->table_entry_size;
+			table_entry_offset += block_allocation_table->file_offset;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: bitmap entry offset\t: %" PRIi64 "\n",
+				 function,
+				 table_entry_offset );
+
+				libcnotify_printf(
+				 "\n" );
+			}
+#endif
+			if( libvhdi_block_descriptor_read_table_entry_file_io_handle(
+			     sector_bitmap_block_descriptor,
+			     file_io_handle,
+			     block_allocation_table->file_type,
+			     table_entry_offset,
+			     block_allocation_table->sector_bitmap_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read sector bitmap block allocation table entry.",
+				 function );
+
+				goto on_error;
+			}
+			sector_bitmap_offset  = sector_bitmap_block_descriptor->file_offset;
+			sector_bitmap_offset += ( element_index % block_allocation_table->entries_per_chunk ) * block_allocation_table->sector_bitmap_size;
+
+			if( libvhdi_block_descriptor_free(
+			     &sector_bitmap_block_descriptor,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free sector bitmap block descriptor.",
+				 function );
+
+				goto on_error;
+			}
+		}
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: sector bitmap offset\t: %" PRIi64 "\n",
+		 function,
+		 sector_bitmap_offset );
+
+		libcnotify_printf(
+		 "\n" );
+	}
+#endif
+	if( libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
+	     block_descriptor,
+	     file_io_handle,
+	     block_allocation_table->file_type,
+	     sector_bitmap_offset,
+	     block_allocation_table->block_size,
+	     block_allocation_table->sector_bitmap_size,
+	     block_allocation_table->sector_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read block: %d sector bitmap.",
+		 function,
+		 element_index );
+
+		goto on_error;
 	}
 	if( libfdata_vector_set_element_value_by_index(
 	     vector,
@@ -533,6 +719,12 @@ int libvhdi_block_allocation_table_read_element_data(
 	return( 1 );
 
 on_error:
+	if( sector_bitmap_block_descriptor != NULL )
+	{
+		libvhdi_block_descriptor_free(
+		 &sector_bitmap_block_descriptor,
+		 NULL );
+	}
 	if( block_descriptor != NULL )
 	{
 		libvhdi_block_descriptor_free(

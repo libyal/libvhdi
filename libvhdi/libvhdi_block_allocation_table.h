@@ -65,6 +65,10 @@ struct libvhdi_block_allocation_table
 	 */
 	uint32_t sector_bitmap_size;
 
+	/* The sector size
+	 */
+	uint32_t sector_size;
+
 	/* The number of entries per chunk
 	 */
 	uint32_t entries_per_chunk;

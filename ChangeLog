@@ -1,8 +1,6 @@
 TODO
-* complete VHDX differential images support
-** read sector bitmap
+* add VHDX block state sanity checks
 * move parent identifier and filename to IO handle ?
-
 * validated checksums
 * add VHDX log (journal) support
 * debug print timestamps

@@ -340,17 +340,17 @@ size of bitmap (in bytes) = block size / ( 512 * 8 )
 
 The size of the bitmap is rounded up to the next multitude of the sector size.
 
-=== Data block sector bitmap
+=== Sector bitmap
 
 In dynamic disk images the sector bitmap indicates which sectors contain data
 (bit set to 1) or are sparse (bit set to 0).
 
-In differential disk images the sector bitmap indicates which sectors are
-stored within the image (bit set to 1) or in the parent (bit set to 0).
+In differential disk images the sector bitmap indicates which sectors are stored
+within the image (bit set to 1) or in the parent (bit set to 0).
 
 The bitmap is padded to a 512-byte sector boundary.
 
-The bitmap is stored on a per-byte basis with the LSB represents the first bit
+The bitmap is stored on a per-byte basis with the MSB represents the first bit
 in the bitmap.
 
 == Notes

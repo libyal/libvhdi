@@ -42,6 +42,10 @@ struct libvhdi_block_descriptor
 	 */
 	off64_t file_offset;
 
+	/* The block state
+	 */
+	uint8_t block_state;
+
 	/* The sector ranges array
 	 */
 	libcdata_array_t *sector_ranges_array;
@@ -55,12 +59,19 @@ int libvhdi_block_descriptor_free(
      libvhdi_block_descriptor_t **block_descriptor,
      libcerror_error_t **error );
 
-int libvhdi_block_descriptor_read_table_entry(
+int libvhdi_block_descriptor_read_table_entry_data(
+     libvhdi_block_descriptor_t *block_descriptor,
+     const uint8_t *data,
+     size_t data_size,
+     int file_type,
+     uint32_t sector_bitmap_size,
+     libcerror_error_t **error );
+
+int libvhdi_block_descriptor_read_table_entry_file_io_handle(
      libvhdi_block_descriptor_t *block_descriptor,
      libbfio_handle_t *file_io_handle,
      int file_type,
      off64_t file_offset,
-     uint32_t block_size,
      uint32_t sector_bitmap_size,
      libcerror_error_t **error );
 
@@ -68,6 +79,8 @@ int libvhdi_block_descriptor_read_sector_bitmap_data(
      libvhdi_block_descriptor_t *block_descriptor,
      const uint8_t *data,
      size_t data_size,
+     int file_type,
+     uint32_t sector_size,
      libcerror_error_t **error );
 
 int libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
@@ -77,6 +90,7 @@ int libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
      off64_t file_offset,
      uint32_t block_size,
      uint32_t sector_bitmap_size,
+     uint32_t sector_size,
      libcerror_error_t **error );
 
 int libvhdi_block_descriptor_get_sector_range_descriptor_at_offset(
