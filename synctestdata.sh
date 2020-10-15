@@ -5,7 +5,7 @@
 
 TEST_SET="public";
 TEST_INPUT_DIRECTORY="tests/input";
-TEST_FILES="ext2.vhd";
+TEST_FILES="ext2.vhd ext2.vhdx";
 
 mkdir -p "${TEST_INPUT_DIRECTORY}/${TEST_SET}";
 

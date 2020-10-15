@@ -133,7 +133,6 @@ stamp-h[1-9]
 /tests/vhdi_test_block_allocation_table
 /tests/vhdi_test_block_descriptor
 /tests/vhdi_test_checksum
-/tests/vhdi_test_data_block
 /tests/vhdi_test_dynamic_disk_header
 /tests/vhdi_test_error
 /tests/vhdi_test_file
