@@ -238,12 +238,6 @@ int libvhdi_file_set_parent_file(
      libcerror_error_t **error );
 
 LIBVHDI_EXTERN \
-int libvhdi_file_get_media_size(
-     libvhdi_file_t *file,
-     size64_t *media_size,
-     libcerror_error_t **error );
-
-LIBVHDI_EXTERN \
 int libvhdi_file_get_file_type(
      libvhdi_file_t *file,
      int *file_type,
@@ -260,6 +254,18 @@ LIBVHDI_EXTERN \
 int libvhdi_file_get_disk_type(
      libvhdi_file_t *file,
      uint32_t *disk_type,
+     libcerror_error_t **error );
+
+LIBVHDI_EXTERN \
+int libvhdi_file_get_media_size(
+     libvhdi_file_t *file,
+     size64_t *media_size,
+     libcerror_error_t **error );
+
+LIBVHDI_EXTERN \
+int libvhdi_file_get_bytes_per_sector(
+     libvhdi_file_t *file,
+     uint32_t *bytes_per_sector,
      libcerror_error_t **error );
 
 LIBVHDI_EXTERN \

@@ -136,8 +136,9 @@ class FileTypeTests(unittest.TestCase):
     if vhdi_file.parent_identifier:
       vhdi_parent_file = pyvhdi.file()
 
+      _, _, parent_filename = vhdi_file.parent_filename.rpartition('\\')
       parent_filename = os.path.join(
-        os.path.dirname(unittest.source), vhdi_file.parent_filename)
+        os.path.dirname(unittest.source), parent_filename)
       vhdi_parent_file.open(parent_filename, "r")
 
       vhdi_file.set_parent(vhdi_parent_file)
@@ -231,8 +232,9 @@ class FileTypeTests(unittest.TestCase):
       if vhdi_file.parent_identifier:
         vhdi_parent_file = pyvhdi.file()
 
+        _, _, parent_filename = vhdi_file.parent_filename.rpartition('\\')
         parent_filename = os.path.join(
-          os.path.dirname(unittest.source), vhdi_file.parent_filename)
+          os.path.dirname(unittest.source), parent_filename)
         vhdi_parent_file.open(parent_filename, "r")
 
         vhdi_file.set_parent(vhdi_parent_file)
@@ -263,8 +265,9 @@ class FileTypeTests(unittest.TestCase):
     if vhdi_file.parent_identifier:
       vhdi_parent_file = pyvhdi.file()
 
+      _, _, parent_filename = vhdi_file.parent_filename.rpartition('\\')
       parent_filename = os.path.join(
-        os.path.dirname(unittest.source), vhdi_file.parent_filename)
+        os.path.dirname(unittest.source), parent_filename)
       vhdi_parent_file.open(parent_filename, "r")
 
       vhdi_file.set_parent(vhdi_parent_file)
@@ -343,8 +346,9 @@ class FileTypeTests(unittest.TestCase):
     if vhdi_file.parent_identifier:
       vhdi_parent_file = pyvhdi.file()
 
+      _, _, parent_filename = vhdi_file.parent_filename.rpartition('\\')
       parent_filename = os.path.join(
-        os.path.dirname(unittest.source), vhdi_file.parent_filename)
+        os.path.dirname(unittest.source), parent_filename)
       vhdi_parent_file.open(parent_filename, "r")
 
       vhdi_file.set_parent(vhdi_parent_file)

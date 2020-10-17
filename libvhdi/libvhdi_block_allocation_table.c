@@ -166,7 +166,7 @@ int libvhdi_block_allocation_table_read_file_io_handle(
      uint32_t disk_type,
      off64_t file_offset,
      uint32_t block_size,
-     uint32_t sector_size,
+     uint32_t bytes_per_sector,
      libcerror_error_t **error )
 {
 	static char *function                        = "libvhdi_block_allocation_table_read_file_io_handle";
@@ -220,23 +220,23 @@ int libvhdi_block_allocation_table_read_file_io_handle(
 
 		return( -1 );
 	}
-	if( ( sector_size != 512 )
-	 && ( sector_size != 4096 ) )
+	if( ( bytes_per_sector != 512 )
+	 && ( bytes_per_sector != 4096 ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported sector size.",
+		 "%s: unsupported bytes per sector.",
 		 function );
 
 		return( -1 );
 	}
-	block_allocation_table->file_type   = file_type;
-	block_allocation_table->disk_type   = disk_type;
-	block_allocation_table->file_offset = file_offset;
-	block_allocation_table->block_size  = block_size;
-	block_allocation_table->sector_size = sector_size;
+	block_allocation_table->file_type        = file_type;
+	block_allocation_table->disk_type        = disk_type;
+	block_allocation_table->file_offset      = file_offset;
+	block_allocation_table->block_size       = block_size;
+	block_allocation_table->bytes_per_sector = bytes_per_sector;
 
 	if( file_type == LIBVHDI_FILE_TYPE_VHD )
 	{
@@ -252,15 +252,15 @@ int libvhdi_block_allocation_table_read_file_io_handle(
 	}
 	else if( file_type == LIBVHDI_FILE_TYPE_VHDX )
 	{
-		entries_per_chunk = ( ( (uint64_t) 1UL << 23 ) * sector_size ) / block_size;
+		entries_per_chunk = ( ( (uint64_t) 1UL << 23 ) * bytes_per_sector ) / block_size;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: sector size\t\t: %" PRIu32 "\n",
+			 "%s: bytes per sector\t: %" PRIu32 "\n",
 			 function,
-			 sector_size );
+			 bytes_per_sector );
 
 			libcnotify_printf(
 			 "%s: entries per chunk\t: %" PRIu64 "\n",
@@ -684,7 +684,7 @@ int libvhdi_block_allocation_table_read_element_data(
 	     sector_bitmap_offset,
 	     block_allocation_table->block_size,
 	     block_allocation_table->sector_bitmap_size,
-	     block_allocation_table->sector_size,
+	     block_allocation_table->bytes_per_sector,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

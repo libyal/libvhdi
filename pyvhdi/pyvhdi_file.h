@@ -101,15 +101,19 @@ PyObject *pyvhdi_file_set_parent(
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject *pyvhdi_file_get_media_size(
-           pyvhdi_file_t *pyvhdi_file,
-           PyObject *arguments );
-
 PyObject *pyvhdi_file_get_format_version(
            pyvhdi_file_t *pyvhdi_file,
            PyObject *arguments );
 
 PyObject *pyvhdi_file_get_disk_type(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments );
+
+PyObject *pyvhdi_file_get_media_size(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments );
+
+PyObject *pyvhdi_file_get_bytes_per_sector(
            pyvhdi_file_t *pyvhdi_file,
            PyObject *arguments );
 

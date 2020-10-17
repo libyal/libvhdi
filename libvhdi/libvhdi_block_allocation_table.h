@@ -65,9 +65,9 @@ struct libvhdi_block_allocation_table
 	 */
 	uint32_t sector_bitmap_size;
 
-	/* The sector size
+	/* The number of bytes per sector
 	 */
-	uint32_t sector_size;
+	uint32_t bytes_per_sector;
 
 	/* The number of entries per chunk
 	 */
@@ -90,7 +90,7 @@ int libvhdi_block_allocation_table_read_file_io_handle(
      uint32_t disk_type,
      off64_t file_offset,
      uint32_t block_size,
-     uint32_t sector_size,
+     uint32_t bytes_per_sector,
      libcerror_error_t **error );
 
 int libvhdi_block_allocation_table_read_element_data(

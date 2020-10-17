@@ -439,7 +439,7 @@ int libvhdi_block_descriptor_read_sector_bitmap_data(
      const uint8_t *data,
      size_t data_size,
      int file_type,
-     uint32_t sector_size,
+     uint32_t bytes_per_sector,
      libcerror_error_t **error )
 {
 	libvhdi_sector_range_descriptor_t *sector_range_descriptor = NULL;
@@ -493,14 +493,14 @@ int libvhdi_block_descriptor_read_sector_bitmap_data(
 
 		return( -1 );
 	}
-	if( ( sector_size != 512 )
-	 && ( sector_size != 4096 ) )
+	if( ( bytes_per_sector != 512 )
+	 && ( bytes_per_sector != 4096 ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported sector size.",
+		 "%s: unsupported bytes per sector.",
 		 function );
 
 		return( -1 );
@@ -546,8 +546,8 @@ int libvhdi_block_descriptor_read_sector_bitmap_data(
 			}
 			if( element_value != first_element_value )
 			{
-				range_offset = (off64_t) first_element_index * sector_size;
-				range_size   = ( (size64_t) element_index - first_element_index ) * sector_size;
+				range_offset = (off64_t) first_element_index * bytes_per_sector;
+				range_size   = ( (size64_t) element_index - first_element_index ) * bytes_per_sector;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 				if( libcnotify_verbose != 0 )
@@ -613,8 +613,8 @@ int libvhdi_block_descriptor_read_sector_bitmap_data(
 			element_index++;
 		}
 	}
-	range_offset = (off64_t) first_element_index * sector_size;
-	range_size   = ( (size64_t) element_index - first_element_index ) * sector_size;
+	range_offset = (off64_t) first_element_index * bytes_per_sector;
+	range_size   = ( (size64_t) element_index - first_element_index ) * bytes_per_sector;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -703,7 +703,7 @@ int libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
      off64_t file_offset,
      uint32_t block_size,
      uint32_t sector_bitmap_size,
-     uint32_t sector_size,
+     uint32_t bytes_per_sector,
      libcerror_error_t **error )
 {
 	libvhdi_sector_range_descriptor_t *sector_range_descriptor = NULL;
@@ -839,7 +839,7 @@ int libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
 		     data,
 		     (size_t) sector_bitmap_size,
 		     file_type,
-		     sector_size,
+		     bytes_per_sector,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>libvhdi</id>
-    <version>20201015</version>
+    <version>20201017</version>
     <authors>Joachim Metz</authors>
     <owners>joachimmetz</owners>
     <licenseUrl>https://raw.githubusercontent.com/libyal/libvhdi/master/COPYING.LESSER</licenseUrl>
@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <title>libvhdi</title>
     <description>Library to access the Virtual Hard Disk (VHD) image format</description>
-    <releaseNotes>Release of libvhdi 20201015</releaseNotes>
+    <releaseNotes>Release of libvhdi 20201017</releaseNotes>
     <copyright>Copyright (C) 2012-2020</copyright>
     <tags>native</tags>
   </metadata>

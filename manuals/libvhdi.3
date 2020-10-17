@@ -1,4 +1,4 @@
-.Dd October 10, 2020
+.Dd October 17, 2020
 .Dt libvhdi 3
 .Os libvhdi
 .Sh NAME
@@ -90,6 +90,8 @@ Meta data functions
 .Fn libvhdi_file_get_disk_type "libvhdi_file_t *file" "uint32_t *disk_type" "libvhdi_error_t **error"
 .Ft int
 .Fn libvhdi_file_get_media_size "libvhdi_file_t *file" "size64_t *media_size" "libvhdi_error_t **error"
+.Ft int
+.Fn libvhdi_file_get_bytes_per_sector "libvhdi_file_t *file" "uint32_t *bytes_per_sector" "libvhdi_error_t **error"
 .Ft int
 .Fn libvhdi_file_get_identifier "libvhdi_file_t *file" "uint8_t *guid_data" "size_t guid_data_size" "libvhdi_error_t **error"
 .Ft int

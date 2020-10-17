@@ -361,6 +361,15 @@ int libvhdi_file_get_media_size(
      size64_t *media_size,
      libvhdi_error_t **error );
 
+/* Retrieves the number of bytes per (logical) sector
+ * Returns 1 if successful or -1 on error
+ */
+LIBVHDI_EXTERN \
+int libvhdi_file_get_bytes_per_sector(
+     libvhdi_file_t *file,
+     uint32_t *bytes_per_sector,
+     libvhdi_error_t **error );
+
 /* Retrieves the identifier
  * The identifier is a big-endian GUID and is 16 bytes of size
  * For VHDX this value is obtained from the data write identifier

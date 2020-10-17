@@ -1,4 +1,6 @@
 environment:
+  nuget_token:
+    secure: I76uKAwZaYO+hJcLYhi5+CYCFfn+JSKGvtQ3/B2SZNw1M1ktYcA/2rtQfbxYSTQ5
   pypi_token:
     secure: VHuZiUWgTqTciKE2nsv/LsYcNyjwcFenqlqX5p+UACmt+0q8IEl8w0HuUwhAuUK3AEMmFu+OCU+F/6AKDN7pTlc6NPHVR23NYMrjd18VPvGwHbxuDokU+XhuBwgw0XhjwUAQWS51+2plL01jJDr63A//tByOyaYuCAWfWYVJivwClx4efB3Ii8xc0AaM1NfW0Tfkl8oNCNIv8ISHrhzrXOFzqx0iiTX9/6Hh8R29OzMFKG361CFXX+K7aNyKV38mouMt7Ao6Dgfaze8xoQYgOw==
   matrix:
@@ -249,18 +251,9 @@ artifacts:
 - path: \*.nupkg
 - path: dist\*.whl
 
-deploy:
-- provider: NuGet
-  skip_symbols: true
-  api_key:
-    secure: gCkz3PNGORdxJGl+aegOa7OJ4IQFHC/FqgCzbirMk7nyNFCuZzc1/ne2174eYxsw
-  artifact: /.*(\.|\.s)nupkg/
-  on:
-    branch: master
-    APPVEYOR_REPO_TAG: true
-    TARGET: vs2017
-
 deploy_script:
+- ps: If ($env:APPVEYOR_REPO_TAG -eq "true" -and $isWindows -and $env:TARGET -eq "vs2017") {
+    Invoke-Expression "nuget push *.nupkg -ApiKey ${env:NUGET_TOKEN} -NonInteractive -SkipDuplicate -Source https://api.nuget.org/v3/index.json" }
 - ps: If ($env:APPVEYOR_REPO_TAG -eq "true" -and $isWindows -and $env:BUILD_ENVIRONMENT -eq "python") {
     Invoke-Expression "${env:PYTHON} -m twine upload dist/*.whl --username __token__ --password ${env:PYPI_TOKEN} --skip-existing" }
 

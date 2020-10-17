@@ -134,13 +134,6 @@ PyMethodDef pyvhdi_file_object_methods[] = {
 	  "\n"
 	  "Sets the parent file." },
 
-	{ "get_media_size",
-	  (PyCFunction) pyvhdi_file_get_media_size,
-	  METH_NOARGS,
-	  "get_media_size() -> Integer or None\n"
-	  "\n"
-	  "Retrieves the media size." },
-
 	{ "get_format_version",
 	  (PyCFunction) pyvhdi_file_get_format_version,
 	  METH_NOARGS,
@@ -154,6 +147,20 @@ PyMethodDef pyvhdi_file_object_methods[] = {
 	  "get_disk_type() -> Integer or None\n"
 	  "\n"
 	  "Retrieves the disk type." },
+
+	{ "get_media_size",
+	  (PyCFunction) pyvhdi_file_get_media_size,
+	  METH_NOARGS,
+	  "get_media_size() -> Integer or None\n"
+	  "\n"
+	  "Retrieves the media size." },
+
+	{ "get_bytes_per_sector",
+	  (PyCFunction) pyvhdi_file_get_bytes_per_sector,
+	  METH_NOARGS,
+	  "get_bytes_per_sector() -> Integer or None\n"
+	  "\n"
+	  "Retrieves the number of bytes per sector." },
 
 	{ "get_identifier",
 	  (PyCFunction) pyvhdi_file_get_identifier,
@@ -182,12 +189,6 @@ PyMethodDef pyvhdi_file_object_methods[] = {
 
 PyGetSetDef pyvhdi_file_object_get_set_definitions[] = {
 
-	{ "media_size",
-	  (getter) pyvhdi_file_get_media_size,
-	  (setter) 0,
-	  "The media size.",
-	  NULL },
-
 	{ "format_version",
 	  (getter) pyvhdi_file_get_format_version,
 	  (setter) 0,
@@ -198,6 +199,18 @@ PyGetSetDef pyvhdi_file_object_get_set_definitions[] = {
 	  (getter) pyvhdi_file_get_disk_type,
 	  (setter) 0,
 	  "The disk type.",
+	  NULL },
+
+	{ "media_size",
+	  (getter) pyvhdi_file_get_media_size,
+	  (setter) 0,
+	  "The media size.",
+	  NULL },
+
+	{ "bytes_per_sector",
+	  (getter) pyvhdi_file_get_bytes_per_sector,
+	  (setter) 0,
+	  "The number of bytes per sector.",
 	  NULL },
 
 	{ "identifier",
@@ -1500,58 +1513,6 @@ PyObject *pyvhdi_file_set_parent(
 	return( Py_None );
 }
 
-/* Retrieves the media size
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyvhdi_file_get_media_size(
-           pyvhdi_file_t *pyvhdi_file,
-           PyObject *arguments PYVHDI_ATTRIBUTE_UNUSED )
-{
-	PyObject *integer_object = NULL;
-	libcerror_error_t *error = NULL;
-	static char *function    = "pyvhdi_file_get_media_size";
-	size64_t media_size      = 0;
-	int result               = 0;
-
-	PYVHDI_UNREFERENCED_PARAMETER( arguments )
-
-	if( pyvhdi_file == NULL )
-	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid file.",
-		 function );
-
-		return( NULL );
-	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libvhdi_file_get_media_size(
-	          pyvhdi_file->file,
-	          &media_size,
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
-	{
-		pyvhdi_error_raise(
-		 error,
-		 PyExc_IOError,
-		 "%s: failed to retrieve media size.",
-		 function );
-
-		libcerror_error_free(
-		 &error );
-
-		return( NULL );
-	}
-	integer_object = pyvhdi_integer_unsigned_new_from_64bit(
-	                  (uint64_t) media_size );
-
-	return( integer_object );
-}
-
 /* Retrieves the format version
  * Returns a Python object if successful or NULL on error
  */
@@ -1701,6 +1662,110 @@ PyObject *pyvhdi_file_get_disk_type(
 	}
 	integer_object = PyLong_FromUnsignedLong(
 	                  (unsigned long) value_32bit );
+
+	return( integer_object );
+}
+
+/* Retrieves the media size
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyvhdi_file_get_media_size(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments PYVHDI_ATTRIBUTE_UNUSED )
+{
+	PyObject *integer_object = NULL;
+	libcerror_error_t *error = NULL;
+	static char *function    = "pyvhdi_file_get_media_size";
+	size64_t media_size      = 0;
+	int result               = 0;
+
+	PYVHDI_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyvhdi_file == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libvhdi_file_get_media_size(
+	          pyvhdi_file->file,
+	          &media_size,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyvhdi_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: failed to retrieve media size.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyvhdi_integer_unsigned_new_from_64bit(
+	                  (uint64_t) media_size );
+
+	return( integer_object );
+}
+
+/* Retrieves the number of bytes per sector
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyvhdi_file_get_bytes_per_sector(
+           pyvhdi_file_t *pyvhdi_file,
+           PyObject *arguments )
+{
+	libcerror_error_t *error  = NULL;
+	PyObject *integer_object  = NULL;
+	static char *function     = "pyvhdi_file_get_bytes_per_sector";
+	uint32_t bytes_per_sector = 0;
+	int result                = 0;
+
+	PYVHDI_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyvhdi_file == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libvhdi_file_get_bytes_per_sector(
+	          pyvhdi_file->file,
+	          &bytes_per_sector,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyvhdi_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve bytes per sectors.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyvhdi_integer_unsigned_new_from_64bit(
+	                  (uint64_t) bytes_per_sector );
 
 	return( integer_object );
 }

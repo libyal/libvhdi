@@ -312,7 +312,7 @@ int info_handle_input_fprint(
 	static char *function                = "info_handle_input_fprint";
 	size64_t media_size                  = 0;
 	size_t value_string_size             = 0;
-	uint32_t disk_type                   = 0;
+	uint32_t value_32bit                 = 0;
 	uint16_t major_version               = 0;
 	uint16_t minor_version               = 0;
 	int file_type                        = 0;
@@ -415,7 +415,7 @@ int info_handle_input_fprint(
 
 	if( libvhdi_file_get_disk_type(
 	     info_handle->input,
-	     &disk_type,
+	     &value_32bit,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -427,7 +427,7 @@ int info_handle_input_fprint(
 
 		goto on_error;
 	}
-	switch( disk_type )
+	switch( value_32bit )
 	{
 		case LIBVHDI_DISK_TYPE_FIXED:
 			disk_type_string = "Fixed";
@@ -486,6 +486,25 @@ int info_handle_input_fprint(
 		 "\tMedia size\t\t: %" PRIu64 " bytes\n",
 		 media_size );
 	}
+	if( libvhdi_file_get_bytes_per_sector(
+	     info_handle->input,
+	     &value_32bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve bytes per sector.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tBytes per sector\t: %" PRIu32 " bytes\n",
+	 value_32bit );
+
 	if( libfguid_identifier_initialize(
 	     &guid,
 	     error ) != 1 )

@@ -1232,8 +1232,9 @@ int libvhdi_internal_file_open_read(
 
 			goto on_error;
 		}
-		internal_file->io_handle->disk_type  = internal_file->file_footer->disk_type;
-		internal_file->io_handle->media_size = internal_file->file_footer->media_size;
+		internal_file->io_handle->disk_type        = internal_file->file_footer->disk_type;
+		internal_file->io_handle->media_size       = internal_file->file_footer->media_size;
+		internal_file->io_handle->bytes_per_sector = 512;
 	}
 	if( ( internal_file->io_handle->file_type == LIBVHDI_FILE_TYPE_VHD )
 	 && ( internal_file->io_handle->disk_type != LIBVHDI_DISK_TYPE_FIXED ) )
@@ -1844,9 +1845,10 @@ int libvhdi_internal_file_open_read_metadata_values(
 
 		goto on_error;
 	}
-	internal_file->io_handle->disk_type  = internal_file->metadata_values->disk_type;
-	internal_file->io_handle->media_size = internal_file->metadata_values->virtual_disk_size;
-	internal_file->io_handle->block_size = internal_file->metadata_values->block_size;
+	internal_file->io_handle->disk_type        = internal_file->metadata_values->disk_type;
+	internal_file->io_handle->media_size       = internal_file->metadata_values->virtual_disk_size;
+	internal_file->io_handle->bytes_per_sector = internal_file->metadata_values->logical_sector_size;
+	internal_file->io_handle->block_size       = internal_file->metadata_values->block_size;
 
 	return( 1 );
 
@@ -1872,7 +1874,6 @@ int libvhdi_internal_file_open_read_block_allocation_table(
 	static char *function                            = "libvhdi_internal_file_open_read_block_allocation_table";
 	off64_t block_allocation_table_offset            = 0;
 	uint32_t number_of_entries                       = 0;
-	uint32_t sector_size                             = 0;
 	int segment_index                                = 0;
 
 	if( internal_file == NULL )
@@ -1950,7 +1951,6 @@ int libvhdi_internal_file_open_read_block_allocation_table(
 	{
 		block_allocation_table_offset = internal_file->dynamic_disk_header->block_table_offset;
 		number_of_entries             = internal_file->dynamic_disk_header->number_of_blocks;
-		sector_size                   = 512;
 	}
 	else
 	{
@@ -1999,18 +1999,6 @@ int libvhdi_internal_file_open_read_block_allocation_table(
 		{
 			number_of_entries++;
 		}
-		sector_size = internal_file->metadata_values->logical_sector_size;
-	}
-	if( sector_size == 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing sector size.",
-		 function );
-
-		goto on_error;
 	}
 	if( libvhdi_block_allocation_table_initialize(
 	     &( internal_file->block_allocation_table ),
@@ -2033,7 +2021,7 @@ int libvhdi_internal_file_open_read_block_allocation_table(
 	     internal_file->io_handle->disk_type,
 	     block_allocation_table_offset,
 	     internal_file->io_handle->block_size,
-	     sector_size,
+	     internal_file->io_handle->bytes_per_sector,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2136,7 +2124,6 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 	uint64_t block_number                                      = 0;
 	uint32_t block_data_offset                                 = 0;
 	uint32_t sector_range_flags                                = 0;
-	uint32_t sector_data_offset                                = 0;
 
 	if( internal_file == NULL )
 	{
@@ -2160,13 +2147,13 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 
 		return( -1 );
 	}
-	if( internal_file->io_handle->sector_size == 0 )
+	if( internal_file->io_handle->bytes_per_sector == 0 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - invalid IO handle - missing sector size.",
+		 "%s: invalid file - invalid IO handle - missing bytes per sector.",
 		 function );
 
 		return( -1 );
@@ -2312,12 +2299,11 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 
 				return( -1 );
 			}
-			sector_data_offset = (uint32_t) ( internal_file->current_offset % internal_file->io_handle->sector_size );
 			sector_file_offset = block_descriptor->file_offset;
 
 			if( sector_file_offset > -1 )
 			{
-				sector_file_offset += block_data_offset + sector_data_offset;
+				sector_file_offset += block_data_offset;
 			}
 			sector_range_flags = sector_range_descriptor->flags;
 
@@ -3041,87 +3027,6 @@ int libvhdi_file_set_parent_file(
 	return( result );
 }
 
-/* Retrieves the number of media size
- * Returns 1 if successful or -1 on error
- */
-int libvhdi_file_get_media_size(
-     libvhdi_file_t *file,
-     size64_t *media_size,
-     libcerror_error_t **error )
-{
-	libvhdi_internal_file_t *internal_file = NULL;
-	static char *function                  = "libvhdi_file_get_media_size";
-
-	if( file == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file.",
-		 function );
-
-		return( -1 );
-	}
-	internal_file = (libvhdi_internal_file_t *) file;
-
-	if( internal_file->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( media_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid media size.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_read(
-	     internal_file->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	*media_size = internal_file->io_handle->media_size;
-
-#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_read(
-	     internal_file->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	return( 1 );
-}
-
 /* Retrieves the file type
  * Returns 1 if successful or -1 on error
  */
@@ -3382,6 +3287,168 @@ int libvhdi_file_get_disk_type(
 	}
 #endif
 	return( result );
+}
+
+/* Retrieves the media size
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_file_get_media_size(
+     libvhdi_file_t *file,
+     size64_t *media_size,
+     libcerror_error_t **error )
+{
+	libvhdi_internal_file_t *internal_file = NULL;
+	static char *function                  = "libvhdi_file_get_media_size";
+
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libvhdi_internal_file_t *) file;
+
+	if( internal_file->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( media_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media size.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	*media_size = internal_file->io_handle->media_size;
+
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( 1 );
+}
+
+/* Retrieves the number of bytes per sector
+ * Returns 1 if successful or -1 on error
+ */
+int libvhdi_file_get_bytes_per_sector(
+     libvhdi_file_t *file,
+     uint32_t *bytes_per_sector,
+     libcerror_error_t **error )
+{
+	libvhdi_internal_file_t *internal_file = NULL;
+	static char *function                  = "libvhdi_file_get_bytes_per_sector";
+
+	if( file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file = (libvhdi_internal_file_t *) file;
+
+	if( internal_file->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( bytes_per_sector == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid bytes per sector.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	*bytes_per_sector = internal_file->io_handle->bytes_per_sector;
+
+#if defined( HAVE_LIBVHDI_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( 1 );
 }
 
 /* Retrieves the identifier

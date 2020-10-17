@@ -87,8 +87,8 @@ int libvhdi_io_handle_initialize(
 
 		goto on_error;
 	}
-	( *io_handle )->file_type   = LIBVHDI_FILE_TYPE_UNKNOWN;
-	( *io_handle )->sector_size = 512;
+	( *io_handle )->file_type        = LIBVHDI_FILE_TYPE_UNKNOWN;
+	( *io_handle )->bytes_per_sector = 512;
 
 	return( 1 );
 
@@ -167,8 +167,8 @@ int libvhdi_io_handle_clear(
 
 		return( -1 );
 	}
-	io_handle->file_type   = LIBVHDI_FILE_TYPE_UNKNOWN;
-	io_handle->sector_size = 512;
+	io_handle->file_type        = LIBVHDI_FILE_TYPE_UNKNOWN;
+	io_handle->bytes_per_sector = 512;
 
 	return( 1 );
 }
