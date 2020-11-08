@@ -190,6 +190,7 @@ All other bits are also reserved and should be set to 0.
 
 [cols="1,1,5",options="header"]
 |===
+| Value | Identifier | Description
 | "Mac\x20" | | Macintosh
 | "Wi2k" | | Windows
 |===
