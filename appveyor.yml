@@ -1,6 +1,6 @@
 environment:
   nuget_token:
-    secure: 8XL9sw3Z+NzRholyRHR1tfJO7DZYHH8fSNYkmv47WCm/kyuO1mVA0xLo26pPSD8m
+    secure: s3Sl1ZiRw+J7YD+2wr1elu0unq6koZek+JmOcYKfDPfwrz2NigSu5SD8WvlwdIcH
   pypi_token:
     secure: VHuZiUWgTqTciKE2nsv/LsYcNyjwcFenqlqX5p+UACmt+0q8IEl8w0HuUwhAuUK3AEMmFu+OCU+F/6AKDN7pTlc6NPHVR23NYMrjd18VPvGwHbxuDokU+XhuBwgw0XhjwUAQWS51+2plL01jJDr63A//tByOyaYuCAWfWYVJivwClx4efB3Ii8xc0AaM1NfW0Tfkl8oNCNIv8ISHrhzrXOFzqx0iiTX9/6Hh8R29OzMFKG361CFXX+K7aNyKV38mouMt7Ao6Dgfaze8xoQYgOw==
   matrix:
@@ -59,7 +59,7 @@ environment:
   - TARGET: python38-x64
     BUILD_ENVIRONMENT: python
     APPVEYOR_BUILD_WORKER_IMAGE: macos
-    PYTHON: "/usr/local/bin/python3.8"
+    PYTHON: "/usr/local/opt/python@3.8/bin/python3"
     HOMEBREW_NO_INSTALL_CLEANUP: 1
   - TARGET: cygwin-gcc
     BUILD_ENVIRONMENT: cygwin
@@ -253,7 +253,7 @@ artifacts:
 
 deploy_script:
 - ps: If ($env:APPVEYOR_REPO_TAG -eq "true" -and $isWindows -and $env:TARGET -eq "vs2017") {
-    Invoke-Expression "nuget push *.nupkg -ApiKey ${env:NUGET_TOKEN} -NonInteractive -Source https://api.nuget.org/v3/index.json" }
+    Invoke-Expression "nuget push *.nupkg -NonInteractive -NoSymbols -Source https://api.nuget.org/v3/index.json -ApiKey ${env:NUGET_TOKEN}" }
 - ps: If ($env:APPVEYOR_REPO_TAG -eq "true" -and $isWindows -and $env:BUILD_ENVIRONMENT -eq "python") {
     Invoke-Expression "${env:PYTHON} -m twine upload dist/*.whl --username __token__ --password ${env:PYPI_TOKEN} --skip-existing" }
 
