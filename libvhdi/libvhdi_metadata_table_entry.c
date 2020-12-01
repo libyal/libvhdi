@@ -264,6 +264,21 @@ int libvhdi_metadata_table_entry_read_data(
 		 function,
 		 value_64bit );
 
+		if( ( value_64bit & 0x00000001UL ) != 0 )
+		{
+			libcnotify_printf(
+			 "\t(IsUser)\n" );
+		}
+		if( ( value_64bit & 0x00000002UL ) != 0 )
+		{
+			libcnotify_printf(
+			 "\t(IsVirtualDisk)\n" );
+		}
+		if( ( value_64bit & 0x00000004UL ) != 0 )
+		{
+			libcnotify_printf(
+			 "\t(IsRequired)\n" );
+		}
 		libcnotify_printf(
 		 "\n" );
 	}

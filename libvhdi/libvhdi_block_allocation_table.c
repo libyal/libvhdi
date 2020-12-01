@@ -541,8 +541,39 @@ int libvhdi_block_allocation_table_read_element_data(
 
 		goto on_error;
 	}
-	table_entry_offset = block_allocation_table->file_offset + ( element_index * block_allocation_table->table_entry_size );
+	table_entry_offset = element_index;
 
+	if( ( block_allocation_table->file_type == LIBVHDI_FILE_TYPE_VHDX )
+	 && ( block_allocation_table->disk_type != LIBVHDI_DISK_TYPE_FIXED ) )
+	{
+		table_entry_offset /= block_allocation_table->entries_per_chunk;
+		table_entry_offset *= block_allocation_table->entries_per_chunk + 1;
+		table_entry_offset += element_index % block_allocation_table->entries_per_chunk;
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: table entry index\t: %" PRIi64 "\n",
+		 function,
+		 table_entry_offset );
+	}
+#endif
+	table_entry_offset *= block_allocation_table->table_entry_size;
+	table_entry_offset += block_allocation_table->file_offset;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: table entry offset\t: %" PRIi64 "\n",
+		 function,
+		 table_entry_offset );
+
+		libcnotify_printf(
+		 "\n" );
+	}
+#endif
 	if( libvhdi_block_descriptor_read_table_entry_file_io_handle(
 	     block_descriptor,
 	     file_io_handle,

@@ -47,7 +47,7 @@ struct libvhdi_io_handle
 	 */
 	size64_t media_size;
 
-	/* The number of bytes per sector
+	/* The (logical) number of bytes per sector
 	 */
 	uint32_t bytes_per_sector;
 

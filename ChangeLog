@@ -4,7 +4,7 @@ TODO
 * validated checksums
 * add VHDX log (journal) support
 * debug print timestamps
-* impreove test coverage
+* improve test coverage
 
 Tests:
 * Test concurrent read from diff image and parent
@@ -14,7 +14,7 @@ Tests:
   - print creator application
   - print creator host system
   - print disk geometry
-* what about geomerty and disk size calculation
+* what about geometry and disk size calculation
 * read backup file footer of dynamic disk
 
 20130922

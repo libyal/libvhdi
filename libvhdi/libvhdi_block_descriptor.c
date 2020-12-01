@@ -301,7 +301,7 @@ int libvhdi_block_descriptor_read_table_entry_data(
 			 function,
 			 ( table_entry >> 3 ) & 0x1ffff );
 		}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -735,7 +735,8 @@ int libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
 
 		return( -1 );
 	}
-	if( file_offset == -1 )
+	if( ( file_offset == -1 )
+	 || ( block_descriptor->block_state == 6 ) )
 	{
 		if( libvhdi_sector_range_descriptor_initialize(
 		     &sector_range_descriptor,
@@ -753,7 +754,8 @@ int libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
 		sector_range_descriptor->start_offset = 0;
 		sector_range_descriptor->end_offset   = block_size;
 
-		if( file_type == LIBVHDI_FILE_TYPE_VHD )
+		if( ( file_type == LIBVHDI_FILE_TYPE_VHD )
+		 || ( block_descriptor->block_state < 6 ) )
 		{
 			sector_range_descriptor->flags = LIBFDATA_SECTOR_RANGE_FLAG_IS_UNALLOCATED;
 		}

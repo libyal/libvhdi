@@ -2341,7 +2341,8 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 			libcnotify_printf(
 			 "\n" );
 		}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 		if( ( sector_range_flags & LIBFDATA_SECTOR_RANGE_FLAG_IS_UNALLOCATED ) == 0 )
 		{
 			if( libbfio_handle_seek_offset(

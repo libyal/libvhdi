@@ -45,6 +45,7 @@ in the section entitled "GNU Free Documentation License".
 |===
 | Version | Author | Date | Comments
 | 0.0.1 | J.B. Metz | October 2020 | Initial version
+| 0.0.2 | J.B. Metz | December 2020 | Additional information
 |===
 
 :numbered:
@@ -229,6 +230,14 @@ According to `[MS-VHDX]` this value must be greater than 64 KiB
 |===
 
 [yellow-background]*TODO: describe last 8 bytes*
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00000001 | IsUser |
+| 0x00000002 | IsVirtualDisk |
+| 0x00000004 | IsRequired |
+|===
 
 === Metadata items
 
