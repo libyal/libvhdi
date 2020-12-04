@@ -377,27 +377,11 @@ int libvhdi_block_descriptor_read_table_entry_file_io_handle(
 		 file_offset );
 	}
 #endif
-	if( libbfio_handle_seek_offset(
-	     file_io_handle,
-	     file_offset,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek block allocation table entry offset: %" PRIi64 " (0x%08" PRIx64 ").",
-		 function,
-		 file_offset,
-		 file_offset );
-
-		return( -1 );
-	}
-	read_count = libbfio_handle_read_buffer(
+	read_count = libbfio_handle_read_buffer_at_offset(
 	              file_io_handle,
 	              table_entry_data,
 	              table_entry_size,
+	              file_offset,
 	              error );
 
 	if( read_count != (ssize_t) table_entry_size )
@@ -406,8 +390,10 @@ int libvhdi_block_descriptor_read_table_entry_file_io_handle(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read block allocation table entry data.",
-		 function );
+		 "%s: unable to read block allocation table entry data at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 file_offset,
+		 file_offset );
 
 		return( -1 );
 	}
@@ -489,6 +475,18 @@ int libvhdi_block_descriptor_read_sector_bitmap_data(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( file_type != LIBVHDI_FILE_TYPE_VHD )
+	 && ( file_type != LIBVHDI_FILE_TYPE_VHDX ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported file type.",
 		 function );
 
 		return( -1 );
@@ -788,23 +786,6 @@ int libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
 			 file_offset );
 		}
 #endif
-		if( libbfio_handle_seek_offset(
-		     file_io_handle,
-		     file_offset,
-		     SEEK_SET,
-		     error ) == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek sector bitmap at offset: %" PRIi64 " (0x%08" PRIx64 ").",
-			 function,
-			 file_offset,
-			 file_offset );
-
-			goto on_error;
-		}
 		data = (uint8_t *) memory_allocate(
 		                    sizeof( uint8_t ) * sector_bitmap_size );
 
@@ -819,10 +800,11 @@ int libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
 
 			goto on_error;
 		}
-		read_count = libbfio_handle_read_buffer(
+		read_count = libbfio_handle_read_buffer_at_offset(
 		              file_io_handle,
 		              data,
 		              (size_t) sector_bitmap_size,
+		              file_offset,
 		              error );
 
 		if( read_count != (ssize_t) sector_bitmap_size )
@@ -831,8 +813,10 @@ int libvhdi_block_descriptor_read_sector_bitmap_file_io_handle(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read sector bitmap data.",
-			 function );
+			 "%s: unable to read sector bitmap data at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+			 function,
+			 file_offset,
+			 file_offset );
 
 			goto on_error;
 		}

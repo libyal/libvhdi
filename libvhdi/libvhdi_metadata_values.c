@@ -830,23 +830,6 @@ int libvhdi_metadata_values_read_item_file_io_handle(
 		 metadata_item_offset );
 	}
 #endif
-	if( libbfio_handle_seek_offset(
-	     file_io_handle,
-	     metadata_item_offset,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek metadata item offset: %" PRIi64 " (0x%08" PRIx64 ").",
-		 function,
-		 metadata_item_offset,
-		 metadata_item_offset );
-
-		goto on_error;
-	}
 	data = (uint8_t *) memory_allocate(
 	                    sizeof( uint8_t ) * metadata_table_entry->item_size );
 
@@ -861,10 +844,11 @@ int libvhdi_metadata_values_read_item_file_io_handle(
 
 		goto on_error;
 	}
-	read_count = libbfio_handle_read_buffer(
+	read_count = libbfio_handle_read_buffer_at_offset(
 	              file_io_handle,
 	              data,
 	              (size_t) metadata_table_entry->item_size,
+	              metadata_item_offset,
 	              error );
 
 	if( read_count != (ssize_t) (size_t) metadata_table_entry->item_size )
@@ -873,8 +857,10 @@ int libvhdi_metadata_values_read_item_file_io_handle(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read metadata item data.",
-		 function );
+		 "%s: unable to read metadata item data at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 metadata_item_offset,
+		 metadata_item_offset );
 
 		goto on_error;
 	}

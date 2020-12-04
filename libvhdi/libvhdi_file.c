@@ -2073,7 +2073,7 @@ int libvhdi_internal_file_open_read_block_allocation_table(
 	}
 	if( libfcache_cache_initialize(
 	     &( internal_file->block_descriptors_cache ),
-	     8,
+	     LIBVHDI_MAXIMUM_CACHE_ENTRIES_BLOCK_DESCRIPTORS,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2345,27 +2345,11 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 
 		if( ( sector_range_flags & LIBFDATA_SECTOR_RANGE_FLAG_IS_UNALLOCATED ) == 0 )
 		{
-			if( libbfio_handle_seek_offset(
-			     file_io_handle,
-			     sector_file_offset,
-			     SEEK_SET,
-			     error ) == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_SEEK_FAILED,
-				 "%s: unable to seek sector offset: %" PRIi64 " (0x%08" PRIx64 ").",
-				 function,
-				 sector_file_offset,
-				 sector_file_offset );
-
-				return( -1 );
-			}
-			read_count = libbfio_handle_read_buffer(
+			read_count = libbfio_handle_read_buffer_at_offset(
 			              file_io_handle,
 			              &( ( (uint8_t *) buffer )[ buffer_offset ] ),
 			              read_size,
+			              sector_file_offset,
 			              error );
 
 			if( read_count != (ssize_t) read_size )
@@ -2374,8 +2358,10 @@ ssize_t libvhdi_internal_file_read_buffer_from_file_io_handle(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read sector data.",
-				 function );
+				 "%s: unable to read sector data at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+				 function,
+				 sector_file_offset,
+				 sector_file_offset );
 
 				return( -1 );
 			}

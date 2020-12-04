@@ -291,27 +291,11 @@ int libvhdi_file_information_read_file_io_handle(
 		 file_offset );
 	}
 #endif
-	if( libbfio_handle_seek_offset(
-	     file_io_handle,
-	     file_offset,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek file information offset: %" PRIi64 " (0x%08" PRIx64 ").",
-		 function,
-		 file_offset,
-		 file_offset );
-
-		return( -1 );
-	}
-	read_count = libbfio_handle_read_buffer(
+	read_count = libbfio_handle_read_buffer_at_offset(
 	              file_io_handle,
 	              file_information_data,
 	              sizeof( vhdi_file_information_t ),
+	              file_offset,
 	              error );
 
 	if( read_count != (ssize_t) sizeof( vhdi_file_information_t ) )
@@ -320,8 +304,10 @@ int libvhdi_file_information_read_file_io_handle(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read file information data.",
-		 function );
+		 "%s: unable to read file information data at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 file_offset,
+		 file_offset );
 
 		return( -1 );
 	}

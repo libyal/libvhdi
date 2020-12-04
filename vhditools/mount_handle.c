@@ -259,7 +259,7 @@ int mount_handle_set_basename(
 
 		goto on_error;
 	}
-	if( basename_size > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
+	if( basename_size > (size_t) ( MEMORY_MAXIMUM_ALLOCATION_SIZE / sizeof( system_character_t ) ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -502,7 +502,7 @@ on_error:
 }
 
 /* Opens a parent file
- * Returns 1 if successful, 0 if no parent or -1 on error
+ * Returns 1 if successful, 0 if the file has no parent or -1 on error
  */
 int mount_handle_open_parent(
      mount_handle_t *mount_handle,
@@ -586,8 +586,7 @@ int mount_handle_open_parent(
 
 		goto on_error;
 	}
-	if( ( parent_filename_size > (size_t) SSIZE_MAX )
-	 || ( ( sizeof( system_character_t ) * parent_filename_size ) > (size_t) SSIZE_MAX ) )
+	if( parent_filename_size > (size_t) ( MEMORY_MAXIMUM_ALLOCATION_SIZE / sizeof( system_character_t ) ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -750,7 +749,7 @@ int mount_handle_open_parent(
 	}
 	if( mount_file_system_append_file(
 	     mount_handle->file_system,
-	     vhdi_file,
+	     parent_vhdi_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

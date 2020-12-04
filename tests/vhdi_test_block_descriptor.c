@@ -36,6 +36,24 @@
 
 #include "../libvhdi/libvhdi_block_descriptor.h"
 
+uint8_t vhdi_test_block_descriptor_data1[ 256 ] = {
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xbf, 0xff, 0x3f, 0xf0, 0xc7, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01, 0x80, 0x03, 0x00, 0xdf, 0xff,
+	0xe7, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x03, 0x00, 0xfd, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0f, 0x00, 0xf8,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+
 #if defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT )
 
 /* Tests the libvhdi_block_descriptor_initialize function
@@ -271,6 +289,212 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libvhdi_block_descriptor_read_sector_bitmap_data function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_block_descriptor_read_sector_bitmap_data(
+     void )
+{
+	libcerror_error_t *error                     = NULL;
+	libvhdi_block_descriptor_t *block_descriptor = NULL;
+	int result                                   = 0;
+
+	/* Initialize test
+	 */
+	result = libvhdi_block_descriptor_initialize(
+	          &block_descriptor,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "block_descriptor",
+	 block_descriptor );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libvhdi_block_descriptor_read_sector_bitmap_data(
+	          block_descriptor,
+	          vhdi_test_block_descriptor_data1,
+	          256,
+	          LIBVHDI_FILE_TYPE_VHD,
+	          512,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libvhdi_block_descriptor_read_sector_bitmap_data(
+	          NULL,
+	          vhdi_test_block_descriptor_data1,
+	          256,
+	          LIBVHDI_FILE_TYPE_VHD,
+	          512,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_block_descriptor_read_sector_bitmap_data(
+	          block_descriptor,
+	          NULL,
+	          256,
+	          LIBVHDI_FILE_TYPE_VHD,
+	          512,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_block_descriptor_read_sector_bitmap_data(
+	          block_descriptor,
+	          vhdi_test_block_descriptor_data1,
+	          (size_t) SSIZE_MAX + 1,
+	          LIBVHDI_FILE_TYPE_VHD,
+	          512,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_block_descriptor_read_sector_bitmap_data(
+	          block_descriptor,
+	          vhdi_test_block_descriptor_data1,
+	          0,
+	          LIBVHDI_FILE_TYPE_VHD,
+	          512,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_block_descriptor_read_sector_bitmap_data(
+	          block_descriptor,
+	          vhdi_test_block_descriptor_data1,
+	          256,
+	          -1,
+	          512,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libvhdi_block_descriptor_read_sector_bitmap_data(
+	          block_descriptor,
+	          vhdi_test_block_descriptor_data1,
+	          256,
+	          LIBVHDI_FILE_TYPE_VHD,
+	          0xffffffffUL,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libvhdi_block_descriptor_free(
+	          &block_descriptor,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "block_descriptor",
+	 block_descriptor );
+
+	VHDI_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( block_descriptor != NULL )
+	{
+		libvhdi_block_descriptor_free(
+		 &block_descriptor,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBVHDI_DLL_IMPORT ) */
 
 /* The main program
@@ -300,7 +524,9 @@ int main(
 
 	/* TODO add tests for libvhdi_block_descriptor_read_table_entry */
 
-	/* TODO add tests for libvhdi_block_descriptor_read_sector_bitmap_data */
+	VHDI_TEST_RUN(
+	 "libvhdi_block_descriptor_read_sector_bitmap_data",
+	 vhdi_test_block_descriptor_read_sector_bitmap_data );
 
 	/* TODO add tests for libvhdi_block_descriptor_read_sector_bitmap_file_io_handle */
 
