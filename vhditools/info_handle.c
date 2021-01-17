@@ -1,7 +1,7 @@
 /*
  * Info handle
  *
- * Copyright (C) 2012-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2021, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -464,6 +464,10 @@ int info_handle_input_fprint(
 
 		goto on_error;
 	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tMedia size\t\t:" );
+
 	result = byte_size_string_create(
 	          byte_size_string,
 	          16,
@@ -475,7 +479,7 @@ int info_handle_input_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tMedia size\t\t: %" PRIs_SYSTEM " (%" PRIu64 " bytes)\n",
+		 " %" PRIs_SYSTEM " (%" PRIu64 " bytes)",
 		 byte_size_string,
 		 media_size );
 	}
@@ -483,9 +487,13 @@ int info_handle_input_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tMedia size\t\t: %" PRIu64 " bytes\n",
+		 " %" PRIu64 " bytes",
 		 media_size );
 	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\n" );
+
 	if( libvhdi_file_get_bytes_per_sector(
 	     info_handle->input,
 	     &value_32bit,
@@ -683,8 +691,7 @@ int info_handle_input_fprint(
 	}
 	else if( result != 0 )
 	{
-		if( ( value_string_size > (size_t) SSIZE_MAX )
-		 || ( ( sizeof( system_character_t ) * value_string_size )  > (size_t) SSIZE_MAX ) )
+		if( value_string_size > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -744,6 +751,7 @@ int info_handle_input_fprint(
 		value_string = NULL;
 	}
 /* TODO add more info */
+
 	fprintf(
 	 info_handle->notify_stream,
 	 "\n" );

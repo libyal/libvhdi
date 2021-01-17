@@ -1,7 +1,7 @@
 /*
  * The file footer definition of a Virtual Hard Disk (VHD) file
  *
- * Copyright (C) 2012-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2021, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *

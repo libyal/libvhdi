@@ -1,7 +1,7 @@
 /*
  * Library file type test program
  *
- * Copyright (C) 2012-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2021, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -530,9 +530,9 @@ on_error:
 }
 
 /* Opens the parent input file
- * Returns 1 if successful, 0 if no parent or -1 on error
+ * Returns 1 if successful, 0 if no parent file or -1 on error
  */
-int vhdi_test_file_open_parent(
+int vhdi_test_file_open_parent_file(
      libvhdi_file_t **parent_file,
      const system_character_t *source,
      libvhdi_file_t *file,
@@ -544,12 +544,12 @@ int vhdi_test_file_open_parent(
 	system_character_t *parent_basename_end = NULL;
 	system_character_t *parent_filename     = NULL;
 	system_character_t *parent_path         = NULL;
-	static char *function                   = "vhdi_test_file_open_parent";
+	static char *function                   = "vhdi_test_file_open_parent_file";
 	size_t basename_length                  = 0;
-	size_t source_length                    = 0;
 	size_t parent_basename_length           = 0;
 	size_t parent_filename_size             = 0;
 	size_t parent_path_size                 = 0;
+	size_t source_length                    = 0;
 	int result                              = 0;
 
 	if( parent_file == NULL )
@@ -629,8 +629,7 @@ int vhdi_test_file_open_parent(
 
 		goto on_error;
 	}
-	if( ( parent_filename_size > (size_t) SSIZE_MAX )
-	 || ( ( sizeof( system_character_t ) * parent_filename_size ) > (size_t) SSIZE_MAX ) )
+	if( parent_filename_size > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -642,7 +641,7 @@ int vhdi_test_file_open_parent(
 		goto on_error;
 	}
 	parent_filename = system_string_allocate(
-			   parent_filename_size );
+	                   parent_filename_size );
 
 	if( parent_filename == NULL )
 	{
@@ -2848,7 +2847,7 @@ int main(
 	         "error",
 	         error );
 
-		result = vhdi_test_file_open_parent(
+		result = vhdi_test_file_open_parent_file(
 		          &parent_file,
 		          source,
 		          file,

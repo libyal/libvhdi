@@ -1,4 +1,4 @@
-.Dd October 17, 2020
+.Dd December 12, 2020
 .Dt libvhdi 3
 .Os libvhdi
 .Sh NAME
@@ -72,6 +72,8 @@ File functions
 .Fn libvhdi_file_seek_offset "libvhdi_file_t *file" "off64_t offset" "int whence" "libvhdi_error_t **error"
 .Ft int
 .Fn libvhdi_file_get_offset "libvhdi_file_t *file" "off64_t *offset" "libvhdi_error_t **error"
+.Ft int
+.Fn libvhdi_file_set_parent_file "libvhdi_file_t *file" "libvhdi_file_t *parent_file" "libvhdi_error_t **error"
 .Pp
 Available when compiled with wide character string support:
 .Ft int
@@ -133,7 +135,7 @@ Please report bugs of any kind on the project issue tracker: https://github.com/
 .Sh AUTHOR
 These man pages are generated from "libvhdi.h".
 .Sh COPYRIGHT
-Copyright (C) 2012-2020, Joachim Metz <joachim.metz@gmail.com>.
+Copyright (C) 2012-2021, Joachim Metz <joachim.metz@gmail.com>.
 .sp
 This is free software; see the source for copying conditions.
 There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

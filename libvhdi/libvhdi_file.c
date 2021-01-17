@@ -1,7 +1,7 @@
 /*
  * File functions
  *
- * Copyright (C) 2012-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2021, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -2922,6 +2922,17 @@ int libvhdi_file_set_parent_file(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: invalid file - not a differential disk type.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->parent_file != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - parent file already set.",
 		 function );
 
 		return( -1 );

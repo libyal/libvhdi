@@ -1,7 +1,7 @@
 /*
  * Library to access the Virtual Hard Disk (VHD) image format
  *
- * Copyright (C) 2012-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2021, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -315,6 +315,7 @@ int libvhdi_file_get_offset(
 /* Sets the parent file of a differential image
  * Returns 1 if successful or -1 on error
  */
+LIBVHDI_EXTERN \
 int libvhdi_file_set_parent_file(
      libvhdi_file_t *file,
      libvhdi_file_t *parent_file,
