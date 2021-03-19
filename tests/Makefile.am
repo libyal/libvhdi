@@ -67,6 +67,7 @@ check_PROGRAMS = \
 	vhdi_test_region_table_header \
 	vhdi_test_sector_range_descriptor \
 	vhdi_test_support \
+	vhdi_test_tools_info_handle \
 	vhdi_test_tools_output \
 	vhdi_test_tools_signal
 
@@ -410,6 +411,21 @@ vhdi_test_support_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
+	../libvhdi/libvhdi.la \
+	@LIBCERROR_LIBADD@
+
+vhdi_test_tools_info_handle_SOURCES = \
+	../vhditools/byte_size_string.c ../vhditools/byte_size_string.h \
+	../vhditools/info_handle.c ../vhditools/info_handle.h \
+	vhdi_test_libcerror.h \
+	vhdi_test_macros.h \
+	vhdi_test_memory.c vhdi_test_memory.h \
+	vhdi_test_tools_info_handle.c \
+	vhdi_test_unused.h
+
+vhdi_test_tools_info_handle_LDADD = \
+	@LIBFGUID_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
 	../libvhdi/libvhdi.la \
 	@LIBCERROR_LIBADD@
 

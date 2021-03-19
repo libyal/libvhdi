@@ -33,13 +33,55 @@
 
 #include "../vhditools/vhditools_signal.h"
 
-void vhdi_test_tools_signal_handler(
+void vhdi_test_tools_signal_handler_function(
       vhditools_signal_t signal VHDI_TEST_ATTRIBUTE_UNUSED )
 {
 	VHDI_TEST_UNREFERENCED_PARAMETER( signal )
 }
 
-/* Tests the vhditools_signal_attach and function
+#if defined( WINAPI )
+
+/* Tests the vhditools_signal_handler function
+ * Returns 1 if successful or 0 if not
+ */
+int vhdi_test_tools_signal_handler(
+     void )
+{
+	BOOL result = 0;
+
+	/* Test regular cases
+	 */
+	result = vhditools_signal_handler(
+	          CTRL_C_EVENT );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 (int) TRUE );
+
+	result = vhditools_signal_handler(
+	          CTRL_LOGOFF_EVENT );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 (int) FALSE );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#if defined( _MSC_VER )
+
+	/* TODO add tests for vhditools_signal_initialize_memory_debug */
+
+#endif /* defined( _MSC_VER ) */
+
+#endif /* defined( WINAPI ) */
+
+/* Tests the vhditools_signal_attach function
  * Returns 1 if successful or 0 if not
  */
 int vhdi_test_tools_signal_attach(
@@ -48,8 +90,10 @@ int vhdi_test_tools_signal_attach(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
+	/* Test regular cases
+	 */
 	result = vhditools_signal_attach(
-	          vhdi_test_tools_signal_handler,
+	          vhdi_test_tools_signal_handler_function,
 	          &error );
 
 	VHDI_TEST_ASSERT_EQUAL_INT(
@@ -60,6 +104,24 @@ int vhdi_test_tools_signal_attach(
 	VHDI_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	/* Test error cases
+	 */
+	result = vhditools_signal_attach(
+	          NULL,
+	          &error );
+
+	VHDI_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	VHDI_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
 
 	return( 1 );
 
@@ -72,7 +134,7 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the vhditools_signal_detach and function
+/* Tests the vhditools_signal_detach function
  * Returns 1 if successful or 0 if not
  */
 int vhdi_test_tools_signal_detach(
@@ -81,6 +143,8 @@ int vhdi_test_tools_signal_detach(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
+	/* Test regular cases
+	 */
 	result = vhditools_signal_detach(
 	          &error );
 
@@ -121,13 +185,17 @@ int main(
 
 #if defined( WINAPI )
 
-	/* TODO add tests for vhditools_signal_handler */
-#endif
+	VHDI_TEST_RUN(
+	 "vhditools_signal_handler",
+	 vhdi_test_tools_signal_handler )
 
-#if defined( WINAPI ) && defined( _MSC_VER )
+#if defined( _MSC_VER )
 
 	/* TODO add tests for vhditools_signal_initialize_memory_debug */
-#endif
+
+#endif /* defined( _MSC_VER ) */
+
+#endif /* defined( WINAPI ) */
 
 	VHDI_TEST_RUN(
 	 "vhditools_signal_attach",

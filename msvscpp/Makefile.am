@@ -37,6 +37,7 @@ MSVSCPP_FILES = \
 	vhdi_test_region_table_header/vhdi_test_region_table_header.vcproj \
 	vhdi_test_sector_range_descriptor/vhdi_test_sector_range_descriptor.vcproj \
 	vhdi_test_support/vhdi_test_support.vcproj \
+	vhdi_test_tools_info_handle/vhdi_test_tools_info_handle.vcproj \
 	vhdi_test_tools_output/vhdi_test_tools_output.vcproj \
 	vhdi_test_tools_signal/vhdi_test_tools_signal.vcproj \
 	vhdiinfo/vhdiinfo.vcproj \
