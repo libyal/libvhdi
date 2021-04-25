@@ -39,15 +39,16 @@ class FileTypeTests(unittest.TestCase):
 
   def test_open(self):
     """Tests the open function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
     vhdi_file = pyvhdi.file()
 
-    vhdi_file.open(unittest.source)
+    vhdi_file.open(test_source)
 
     with self.assertRaises(IOError):
-      vhdi_file.open(unittest.source)
+      vhdi_file.open(test_source)
 
     vhdi_file.close()
 
@@ -55,19 +56,20 @@ class FileTypeTests(unittest.TestCase):
       vhdi_file.open(None)
 
     with self.assertRaises(ValueError):
-      vhdi_file.open(unittest.source, mode="w")
+      vhdi_file.open(test_source, mode="w")
 
   def test_open_file_object(self):
     """Tests the open_file_object function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    if not os.path.isfile(unittest.source):
+    if not os.path.isfile(test_source):
       raise unittest.SkipTest("source not a regular file")
 
     vhdi_file = pyvhdi.file()
 
-    with open(unittest.source, "rb") as file_object:
+    with open(test_source, "rb") as file_object:
 
       vhdi_file.open_file_object(file_object)
 
@@ -84,7 +86,8 @@ class FileTypeTests(unittest.TestCase):
 
   def test_close(self):
     """Tests the close function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
     vhdi_file = pyvhdi.file()
@@ -94,21 +97,22 @@ class FileTypeTests(unittest.TestCase):
 
   def test_open_close(self):
     """Tests the open and close functions."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       return
 
     vhdi_file = pyvhdi.file()
 
     # Test open and close.
-    vhdi_file.open(unittest.source)
+    vhdi_file.open(test_source)
     vhdi_file.close()
 
     # Test open and close a second time to validate clean up on close.
-    vhdi_file.open(unittest.source)
+    vhdi_file.open(test_source)
     vhdi_file.close()
 
-    if os.path.isfile(unittest.source):
-      with open(unittest.source, "rb") as file_object:
+    if os.path.isfile(test_source):
+      with open(test_source, "rb") as file_object:
 
         # Test open_file_object and close.
         vhdi_file.open_file_object(file_object)
@@ -125,12 +129,13 @@ class FileTypeTests(unittest.TestCase):
 
   def test_read_buffer(self):
     """Tests the read_buffer function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
     vhdi_file = pyvhdi.file()
 
-    vhdi_file.open(unittest.source)
+    vhdi_file.open(test_source)
 
     vhdi_parent_file = None
     if vhdi_file.parent_identifier:
@@ -138,7 +143,7 @@ class FileTypeTests(unittest.TestCase):
 
       _, _, parent_filename = vhdi_file.parent_filename.rpartition('\\')
       parent_filename = os.path.join(
-        os.path.dirname(unittest.source), parent_filename)
+        os.path.dirname(test_source), parent_filename)
       vhdi_parent_file.open(parent_filename, "r")
 
       vhdi_file.set_parent(vhdi_parent_file)
@@ -217,13 +222,14 @@ class FileTypeTests(unittest.TestCase):
 
   def test_read_buffer_file_object(self):
     """Tests the read_buffer function on a file-like object."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    if not os.path.isfile(unittest.source):
+    if not os.path.isfile(test_source):
       raise unittest.SkipTest("source not a regular file")
 
-    with open(unittest.source, "rb") as file_object:
+    with open(test_source, "rb") as file_object:
       vhdi_file = pyvhdi.file()
 
       vhdi_file.open_file_object(file_object)
@@ -234,7 +240,7 @@ class FileTypeTests(unittest.TestCase):
 
         _, _, parent_filename = vhdi_file.parent_filename.rpartition('\\')
         parent_filename = os.path.join(
-          os.path.dirname(unittest.source), parent_filename)
+          os.path.dirname(test_source), parent_filename)
         vhdi_parent_file.open(parent_filename, "r")
 
         vhdi_file.set_parent(vhdi_parent_file)
@@ -254,12 +260,13 @@ class FileTypeTests(unittest.TestCase):
 
   def test_read_buffer_at_offset(self):
     """Tests the read_buffer_at_offset function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
     vhdi_file = pyvhdi.file()
 
-    vhdi_file.open(unittest.source)
+    vhdi_file.open(test_source)
 
     vhdi_parent_file = None
     if vhdi_file.parent_identifier:
@@ -267,7 +274,7 @@ class FileTypeTests(unittest.TestCase):
 
       _, _, parent_filename = vhdi_file.parent_filename.rpartition('\\')
       parent_filename = os.path.join(
-        os.path.dirname(unittest.source), parent_filename)
+        os.path.dirname(test_source), parent_filename)
       vhdi_parent_file.open(parent_filename, "r")
 
       vhdi_file.set_parent(vhdi_parent_file)
@@ -335,12 +342,13 @@ class FileTypeTests(unittest.TestCase):
 
   def test_seek_offset(self):
     """Tests the seek_offset function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
     vhdi_file = pyvhdi.file()
 
-    vhdi_file.open(unittest.source)
+    vhdi_file.open(test_source)
 
     vhdi_parent_file = None
     if vhdi_file.parent_identifier:
@@ -348,7 +356,7 @@ class FileTypeTests(unittest.TestCase):
 
       _, _, parent_filename = vhdi_file.parent_filename.rpartition('\\')
       parent_filename = os.path.join(
-        os.path.dirname(unittest.source), parent_filename)
+        os.path.dirname(test_source), parent_filename)
       vhdi_parent_file.open(parent_filename, "r")
 
       vhdi_file.set_parent(vhdi_parent_file)
@@ -408,12 +416,13 @@ class FileTypeTests(unittest.TestCase):
 
   def test_get_offset(self):
     """Tests the get_offset function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
     vhdi_file = pyvhdi.file()
 
-    vhdi_file.open(unittest.source)
+    vhdi_file.open(test_source)
 
     offset = vhdi_file.get_offset()
     self.assertIsNotNone(offset)
@@ -422,12 +431,13 @@ class FileTypeTests(unittest.TestCase):
 
   def test_get_media_size(self):
     """Tests the get_media_size function and media_size property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
     vhdi_file = pyvhdi.file()
 
-    vhdi_file.open(unittest.source)
+    vhdi_file.open(test_source)
 
     media_size = vhdi_file.get_media_size()
     self.assertIsNotNone(media_size)
@@ -438,12 +448,13 @@ class FileTypeTests(unittest.TestCase):
 
   def test_get_disk_type(self):
     """Tests the get_disk_type function and disk_type property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
     vhdi_file = pyvhdi.file()
 
-    vhdi_file.open(unittest.source)
+    vhdi_file.open(test_source)
 
     disk_type = vhdi_file.get_disk_type()
     self.assertIsNotNone(disk_type)
@@ -454,12 +465,13 @@ class FileTypeTests(unittest.TestCase):
 
   def test_get_parent_filename(self):
     """Tests the get_parent_filename function and parent_filename property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
     vhdi_file = pyvhdi.file()
 
-    vhdi_file.open(unittest.source)
+    vhdi_file.open(test_source)
 
     _ = vhdi_file.get_parent_filename()
 
