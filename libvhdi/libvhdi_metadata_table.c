@@ -368,6 +368,11 @@ on_error:
 		memory_free(
 		 data );
 	}
+	libcdata_array_empty(
+	 metadata_table->entries_array,
+	 (int (*)(intptr_t **, libcerror_error_t **)) &libvhdi_metadata_table_entry_free,
+	 NULL );
+
 	return( -1 );
 }
 

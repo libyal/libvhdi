@@ -409,6 +409,15 @@ void pyvhdi_file_free(
 
 		return;
 	}
+	if( pyvhdi_file->file_io_handle != NULL )
+	{
+		if( pyvhdi_file_close(
+		     pyvhdi_file,
+		     NULL ) == NULL )
+		{
+			return;
+		}
+	}
 	if( pyvhdi_file->file != NULL )
 	{
 		Py_BEGIN_ALLOW_THREADS
