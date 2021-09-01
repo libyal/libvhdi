@@ -513,7 +513,7 @@ int libvhdi_parent_locator_compare_key_with_utf8_string(
      size_t utf8_string_length,
      libcerror_error_t **error )
 {
-	static char *function = "libvhdi_parent_locator_entry_read_key_value_data";
+	static char *function = "libvhdi_parent_locator_compare_key_with_utf8_string";
 	int result            = 0;
 
 	if( parent_locator_entry == NULL )

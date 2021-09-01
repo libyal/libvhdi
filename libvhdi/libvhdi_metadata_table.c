@@ -357,6 +357,12 @@ int libvhdi_metadata_table_read_file_io_handle(
 	return( 1 );
 
 on_error:
+	if( metadata_table_entry != NULL )
+	{
+		libvhdi_metadata_table_entry_free(
+		 &metadata_table_entry,
+		 NULL );
+	}
 	if( metadata_table->header != NULL )
 	{
 		libvhdi_metadata_table_header_free(

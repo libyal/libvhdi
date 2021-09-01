@@ -690,7 +690,7 @@ int libvhdi_metadata_values_read_item_data(
 			 "%s: unable to copy virtual disk identifier.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )

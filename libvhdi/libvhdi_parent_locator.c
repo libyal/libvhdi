@@ -359,6 +359,12 @@ int libvhdi_parent_locator_read_data(
 	return( 1 );
 
 on_error:
+	if( parent_locator_entry != NULL )
+	{
+		libvhdi_parent_locator_entry_free(
+		 &parent_locator_entry,
+		 NULL );
+	}
 	if( parent_locator->header != NULL )
 	{
 		libvhdi_parent_locator_header_free(
