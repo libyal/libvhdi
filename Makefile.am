@@ -36,7 +36,6 @@ DPKG_FILES = \
 	dpkg/rules \
 	dpkg/libvhdi.install \
 	dpkg/libvhdi-dev.install \
-	dpkg/libvhdi-python.install \
 	dpkg/libvhdi-python3.install \
 	dpkg/libvhdi-tools.install \
 	dpkg/source/format

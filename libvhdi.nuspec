@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>libvhdi</id>
-    <version>20220417</version>
+    <version>20220429</version>
     <authors>Joachim Metz</authors>
     <owners>joachimmetz</owners>
     <license type="expression">LGPL-3.0-or-later</license>
@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <title>libvhdi</title>
     <description>Library to access the Virtual Hard Disk (VHD) image format</description>
-    <releaseNotes>Release of libvhdi 20220417</releaseNotes>
+    <releaseNotes>Release of libvhdi 20220429</releaseNotes>
     <copyright>Copyright (C) 2012-2022</copyright>
     <tags>native</tags>
   </metadata>
