@@ -440,6 +440,11 @@ void pyvhdi_file_free(
 			 &error );
 		}
 	}
+	if( pyvhdi_file->parent_file_object != NULL )
+	{
+		Py_DecRef(
+		 (PyObject *) pyvhdi_file->parent_file_object );
+	}
 	ob_type->tp_free(
 	 (PyObject*) pyvhdi_file );
 }
@@ -1516,6 +1521,11 @@ PyObject *pyvhdi_file_set_parent(
 
 		return( NULL );
 	}
+	pyvhdi_file->parent_file_object = parent_file;
+
+	Py_IncRef(
+	 pyvhdi_file->parent_file_object );
+
 	Py_IncRef(
 	 Py_None );
 
