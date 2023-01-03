@@ -1,7 +1,7 @@
 /*
  * Internationalization (i18n) functions
  *
- * Copyright (C) 2012-2022, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2023, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,7 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#if defined( HAVE_LIBINTL_H )
+#if defined( HAVE_LIBINTL_H ) && defined( ENABLE_NLS )
 #include <libintl.h>
 #endif
 

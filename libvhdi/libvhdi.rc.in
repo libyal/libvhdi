@@ -24,7 +24,7 @@ BEGIN
       VALUE "FileDescription",		"Library to access the Virtual Hard Disk (VHD) image format\0"
       VALUE "FileVersion",		"@VERSION@" "\0"
       VALUE "InternalName",		"libvhdi.dll\0"
-      VALUE "LegalCopyright",		"(C) 2012-2022, Joachim Metz <joachim.metz@gmail.com>\0"
+      VALUE "LegalCopyright",		"(C) 2012-2023, Joachim Metz <joachim.metz@gmail.com>\0"
       VALUE "OriginalFilename",		"libvhdi.dll\0"
       VALUE "ProductName",		"libvhdi\0"
       VALUE "ProductVersion",		"@VERSION@" "\0"
