@@ -96,7 +96,6 @@ PyObject *pyvhdi_get_version(
            PyObject *self PYVHDI_ATTRIBUTE_UNUSED,
            PyObject *arguments PYVHDI_ATTRIBUTE_UNUSED )
 {
-	const char *errors           = NULL;
 	const char *version_string   = NULL;
 	size_t version_string_length = 0;
 
@@ -119,7 +118,7 @@ PyObject *pyvhdi_get_version(
 	return( PyUnicode_DecodeUTF8(
 	         version_string,
 	         (Py_ssize_t) version_string_length,
-	         errors ) );
+	         NULL ) );
 }
 
 /* Checks if a file has a Virtual Hard Disk (VHD) image file signature
@@ -179,8 +178,14 @@ PyObject *pyvhdi_check_file_signature(
 		PyErr_Clear();
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+		filename_wide = (wchar_t *) PyUnicode_AsWideCharString(
+		                             string_object,
+		                             NULL );
+#else
 		filename_wide = (wchar_t *) PyUnicode_AsUnicode(
 		                             string_object );
+#endif
 		Py_BEGIN_ALLOW_THREADS
 
 		result = libvhdi_check_file_signature_wide(
@@ -188,6 +193,11 @@ PyObject *pyvhdi_check_file_signature(
 		          &error );
 
 		Py_END_ALLOW_THREADS
+
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+		PyMem_Free(
+		 filename_wide );
+#endif
 #else
 		utf8_string_object = PyUnicode_AsUTF8String(
 		                      string_object );
