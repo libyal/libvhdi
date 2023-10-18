@@ -49,9 +49,9 @@ struct pyvhdi_file
 	 */
 	libbfio_handle_t *file_io_handle;
 
-	/* The parent file object
+	/* The parent file
 	 */
-	PyObject *parent_file_object;
+	pyvhdi_file_t *parent_file;
 };
 
 extern PyMethodDef pyvhdi_file_object_methods[];

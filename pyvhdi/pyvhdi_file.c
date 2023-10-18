@@ -350,6 +350,7 @@ int pyvhdi_file_init(
 	}
 	pyvhdi_file->file           = NULL;
 	pyvhdi_file->file_io_handle = NULL;
+	pyvhdi_file->parent_file    = NULL;
 
 	if( libvhdi_file_initialize(
 	     &( pyvhdi_file->file ),
@@ -440,10 +441,10 @@ void pyvhdi_file_free(
 			 &error );
 		}
 	}
-	if( pyvhdi_file->parent_file_object != NULL )
+	if( pyvhdi_file->parent_file != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyvhdi_file->parent_file_object );
+		 (PyObject *) pyvhdi_file->parent_file );
 	}
 	ob_type->tp_free(
 	 (PyObject*) pyvhdi_file );
@@ -1532,10 +1533,10 @@ PyObject *pyvhdi_file_set_parent(
 
 		return( NULL );
 	}
-	pyvhdi_file->parent_file_object = parent_file;
+	pyvhdi_file->parent_file = parent_file;
 
 	Py_IncRef(
-	 pyvhdi_file->parent_file_object );
+	 pyvhdi_file->parent_file );
 
 	Py_IncRef(
 	 Py_None );
