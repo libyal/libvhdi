@@ -99,11 +99,13 @@ MAINTAINERCLEANFILES = \
 	Makefile.in
 
 distclean: clean
-	/bin/rm -f libvhdi_definitions.h
-	/bin/rm -f libvhdi.rc
-	/bin/rm -f Makefile
+	-rm -f libvhdi_definitions.h
+	-rm -f libvhdi.rc
+	-rm -f Makefile
 
-splint:
+sources-local: $(BUILT_SOURCES)
+
+splint-local:
 	@echo "Running splint on libvhdi ..."
 	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(libvhdi_la_SOURCES)
 

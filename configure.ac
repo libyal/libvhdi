@@ -2,13 +2,14 @@ AC_PREREQ([2.71])
 
 AC_INIT(
  [libvhdi],
- [20231016],
+ [20231106],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
  [include/libvhdi.h.in])
 
 AM_INIT_AUTOMAKE([gnu 1.6 tar-ustar])
+AM_EXTRA_RECURSIVE_TARGETS([sources splint])
 
 AC_CONFIG_MACRO_DIR([m4])
 

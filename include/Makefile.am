@@ -19,9 +19,9 @@ MAINTAINERCLEANFILES = \
 	Makefile.in
 
 distclean: clean
-	/bin/rm -f libvhdi.h
-	/bin/rm -f libvhdi/definitions.h
-	/bin/rm -f libvhdi/features.h
-	/bin/rm -f libvhdi/types.h
-	/bin/rm -f Makefile
+	-rm -f libvhdi.h
+	-rm -f libvhdi/definitions.h
+	-rm -f libvhdi/features.h
+	-rm -f libvhdi/types.h
+	-rm -f Makefile
 

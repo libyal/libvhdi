@@ -40,7 +40,7 @@ void (*vhditools_signal_signal_handler)( vhditools_signal_t ) = NULL;
 /* Signal handler for Ctrl+C or Ctrl+Break signals
  */
 BOOL WINAPI vhditools_signal_handler(
-             unsigned long signal )
+             vhditools_signal_t signal )
 {
 	static char *function = "vhditools_signal_handler";
 
@@ -112,7 +112,7 @@ int vhditools_signal_attach(
 	vhditools_signal_signal_handler = signal_handler;
 
 	if( SetConsoleCtrlHandler(
-	     vhditools_signal_handler,
+	     (PHANDLER_ROUTINE) vhditools_signal_handler,
 	     TRUE ) == 0 )
 	{
 		libcerror_error_set(
@@ -179,7 +179,7 @@ int vhditools_signal_detach(
 	static char *function = "vhditools_signal_detach";
 
 	if( SetConsoleCtrlHandler(
-	     vhditools_signal_handler,
+	     (PHANDLER_ROUTINE) vhditools_signal_handler,
 	     FALSE ) == 0 )
 	{
 		libcerror_error_set(
