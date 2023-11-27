@@ -19,8 +19,6 @@ SUBDIRS = \
 	libvhdi \
 	vhditools \
 	pyvhdi \
-	pyvhdi-python2 \
-	pyvhdi-python3 \
 	po \
 	manuals \
 	tests \
