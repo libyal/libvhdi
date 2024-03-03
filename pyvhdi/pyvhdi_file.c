@@ -1,7 +1,7 @@
 /*
  * Python object wrapper of libvhdi_file_t
  *
- * Copyright (C) 2012-2023, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2024, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -81,14 +81,14 @@ PyMethodDef pyvhdi_file_object_methods[] = {
 	{ "read_buffer",
 	  (PyCFunction) pyvhdi_file_read_buffer,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "read_buffer(size) -> Binary string or None\n"
+	  "read_buffer(size) -> Bytes or None\n"
 	  "\n"
 	  "Reads a buffer of data." },
 
 	{ "read_buffer_at_offset",
 	  (PyCFunction) pyvhdi_file_read_buffer_at_offset,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "read_buffer_at_offset(size, offset) -> Binary string or None\n"
+	  "read_buffer_at_offset(size, offset) -> Bytes or None\n"
 	  "\n"
 	  "Reads a buffer of data at a specific offset." },
 
@@ -1536,7 +1536,7 @@ PyObject *pyvhdi_file_set_parent(
 	pyvhdi_file->parent_file = parent_file;
 
 	Py_IncRef(
-	 pyvhdi_file->parent_file );
+	 (PyObject *) pyvhdi_file->parent_file );
 
 	Py_IncRef(
 	 Py_None );

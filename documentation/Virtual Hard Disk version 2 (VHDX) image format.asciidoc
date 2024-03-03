@@ -107,7 +107,7 @@ The image header is 4 KiB (4096 bytes) of size and consists of:
 | Offset | Size | Value | Description
 | 0 | 4 | "head" | Signature
 | 4 | 4 | | Checksum +
-Contains a CRC-32C, which uses the Castagnoli polynomial (0x1edc6f41) of the 4 KiB image header where the checksum value is set to 0
+Contains a CRC-32C (or CRC32-C), which uses the Castagnoli polynomial (0x1edc6f41) of the 4 KiB image header where the checksum value is set to 0
 | 8 | 8 | | Sequence number
 | 16 | 16 | | [yellow-background]*Unknown (file write identifier)* +
 Contains a GUID
@@ -144,7 +144,7 @@ The region table header is 16 bytes of size and consists of:
 | Offset | Size | Value | Description
 | 0 | 4 | "regi" | Signature
 | 4 | 4 | | Checksum +
-Contains a CRC-32C, which uses the Castagnoli polynomial (0x1edc6f41) of the 64 KiB region table where the checksum value is set to 0
+Contains a CRC-32C (or CRC32-C), which uses the Castagnoli polynomial (0x1edc6f41) of the 64 KiB region table where the checksum value is set to 0
 | 8 | 4 | | Number of table entries +
 According to `[MS-VHDX]` this value must be less than or equal to 2047
 | 12 | 4 | 0 | [yellow-background]*Unknown (reserved)* +
