@@ -133,6 +133,7 @@ stamp-h[1-9]
 /vhditools/vhdimount
 /tests/*.exe
 /tests/input
+/tests/notify_stream.log
 /tests/tmp*
 /tests/vhdi_test_block_allocation_table
 /tests/vhdi_test_block_descriptor

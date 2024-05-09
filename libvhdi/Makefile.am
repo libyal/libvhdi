@@ -1,7 +1,7 @@
 AM_CPPFLAGS = \
 	-DLOCALEDIR=\"$(datadir)/locale\" \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/common \
+	-I../include -I$(top_srcdir)/include \
+	-I../common -I$(top_srcdir)/common \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCTHREADS_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
@@ -95,13 +95,11 @@ EXTRA_DIST = \
 	libvhdi.rc \
 	libvhdi.rc.in
 
-MAINTAINERCLEANFILES = \
+DISTCLEANFILES = \
+	libvhdi_definitions.h \
+	libvhdi.rc \
+	Makefile \
 	Makefile.in
-
-distclean: clean
-	-rm -f libvhdi_definitions.h
-	-rm -f libvhdi.rc
-	-rm -f Makefile
 
 sources-local: $(BUILT_SOURCES)
 

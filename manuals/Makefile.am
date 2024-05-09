@@ -6,9 +6,7 @@ EXTRA_DIST = \
 	vhdiinfo.1 \
 	libvhdi.3
 
-MAINTAINERCLEANFILES = \
+DISTCLEANFILES = \
+	Makefile \
 	Makefile.in
-
-distclean: clean
-	-rm -f Makefile
 

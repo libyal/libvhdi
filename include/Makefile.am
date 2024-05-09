@@ -15,13 +15,11 @@ EXTRA_DIST = \
 	libvhdi/features.h.in \
 	libvhdi/types.h.in
 
-MAINTAINERCLEANFILES = \
+DISTCLEANFILES = \
+	libvhdi.h \
+	libvhdi/definitions.h \
+	libvhdi/features.h \
+	libvhdi/types.h \
+	Makefile \
 	Makefile.in
-
-distclean: clean
-	-rm -f libvhdi.h
-	-rm -f libvhdi/definitions.h
-	-rm -f libvhdi/features.h
-	-rm -f libvhdi/types.h
-	-rm -f Makefile
 
