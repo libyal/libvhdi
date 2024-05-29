@@ -1,5 +1,5 @@
 /*
- * Shows information obtained from a Virtual Hard Disk (VHD) image file
+ * Shows information obtained from a Virtual Hard Disk (VHD) image file.
  *
  * Copyright (C) 2012-2024, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -79,7 +79,7 @@ void vhdiinfo_signal_handler(
       vhditools_signal_t signal VHDITOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
-	static char *function   = "vhdiinfo_signal_handler";
+	static char *function    = "vhdiinfo_signal_handler";
 
 	VHDITOOLS_UNREFERENCED_PARAMETER( signal )
 
@@ -138,7 +138,7 @@ int main( int argc, char * const argv[] )
 	 1 );
 
 	if( libclocale_initialize(
-             "vhditools",
+	     "vhditools",
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -147,9 +147,9 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-        if( vhditools_output_initialize(
-             _IONBF,
-             &error ) != 1 )
+	if( vhditools_output_initialize(
+	     _IONBF,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,

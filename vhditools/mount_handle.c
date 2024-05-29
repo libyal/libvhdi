@@ -502,7 +502,7 @@ on_error:
 }
 
 /* Opens a parent file
- * Returns 1 if successful, 0 if the file has no parent or -1 on error
+ * Returns 1 if successful, 0 if no parent or -1 on error
  */
 int mount_handle_open_parent(
      mount_handle_t *mount_handle,
@@ -811,6 +811,7 @@ int mount_handle_close(
 	static char *function     = "mount_handle_close";
 	int file_index            = 0;
 	int number_of_files       = 0;
+	int result                = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -835,7 +836,7 @@ int mount_handle_close(
 		 "%s: unable to retrieve number of files.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
 	for( file_index = number_of_files - 1;
 	     file_index > 0;
@@ -855,7 +856,7 @@ int mount_handle_close(
 			 function,
 			 file_index );
 
-			goto on_error;
+			result = -1;
 		}
 /* TODO remove vhdi_file from file system */
 
@@ -871,7 +872,7 @@ int mount_handle_close(
 			 function,
 			 file_index );
 
-			goto on_error;
+			result = -1;
 		}
 		if( libvhdi_file_free(
 		     &vhdi_file,
@@ -885,19 +886,10 @@ int mount_handle_close(
 			 function,
 			 file_index );
 
-			goto on_error;
+			result = -1;
 		}
 	}
-	return( 0 );
-
-on_error:
-	if( vhdi_file != NULL )
-	{
-		libvhdi_file_free(
-		 &vhdi_file,
-		 NULL );
-	}
-	return( -1 );
+	return( result );
 }
 
 /* Retrieves a file entry for a specific path
