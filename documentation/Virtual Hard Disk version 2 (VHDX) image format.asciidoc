@@ -30,7 +30,7 @@ for the libvhdi project.
 == License
 
 ....
-Copyright (C) 2020, Joachim Metz <joachim.metz@gmail.com>.
+Copyright (C) 2020-2024, Joachim Metz <joachim.metz@gmail.com>.
 Permission is granted to copy, distribute and/or modify this document under the
 terms of the GNU Free Documentation License, Version 1.3 or any later version
 published by the Free Software Foundation; with no Invariant Sections, no
@@ -46,6 +46,7 @@ in the section entitled "GNU Free Documentation License".
 | Version | Author | Date | Comments
 | 0.0.1 | J.B. Metz | October 2020 | Initial version
 | 0.0.2 | J.B. Metz | December 2020 | Additional information
+| 0.0.3 | J.B. Metz | November 2024 | Textual changes.
 |===
 
 :numbered:
@@ -74,7 +75,7 @@ The elements are stored in 64 KiB (65536 bytes) aligned blocks
 [cols="1,5",options="header"]
 |===
 | Characteristics | Description
-| Byte order | big-endian
+| Byte order | little-endian
 | Character strings | Unicode strings are stored in UTF-16 litte-endian without the byte order mark (BOM).
 |===
 
@@ -87,7 +88,7 @@ used for the information in this document:
 
 == File (type) identifier
 
-The file (type) identifier is 64 KiB (65536 bytes) of size and consists of:
+The file (type) identifier is 64 KiB (65536 bytes) in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -100,7 +101,7 @@ UTF-16 little-endian string with end-of-string character
 
 == Image header
 
-The image header is 4 KiB (4096 bytes) of size and consists of:
+The image header is 4 KiB (4096 bytes) in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -137,7 +138,7 @@ The region table is stored in a block of 64 KiB (65536 bytes) and consists of:
 
 === Region table header
 
-The region table header is 16 bytes of size and consists of:
+The region table header is 16 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -153,7 +154,7 @@ According to `[MS-VHDX]` this value must be set to 0
 
 === Region table entry
 
-The region table entry is 32 bytes of size and consists of:
+The region table entry is 32 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -198,7 +199,7 @@ The metadata table is stored in a block of 64 KiB (65536 bytes) and consists of:
 
 ==== Metadata table header
 
-The metadata table header is 32 bytes of size and consists of:
+The metadata table header is 32 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -214,7 +215,7 @@ According to `[MS-VHDX]` this value must be set to 0
 
 ==== Metadata table entry
 
-The metdata table entry is 32 bytes of size and consists of:
+The metdata table entry is 32 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -256,7 +257,7 @@ According to `[MS-VHDX]` this value must be greater than 64 KiB
 
 ==== File parameters metadata item
 
-The file parameters metadata item is 8 bytes of size and consists of:
+The file parameters metadata item is 8 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -273,7 +274,7 @@ According to `[MS-VHDX]` this value must be set to 0
 
 ==== Logical sector size metadata item
 
-The logical sector size metadata item is 4 bytes of size and consists of:
+The logical sector size metadata item is 4 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -284,7 +285,7 @@ According to `[MS-VHDX]` this value must be either 512 or 4096
 
 ==== Parent locator metadata item
 
-The parent locator metadata item is variable of size and consits of:
+The parent locator metadata item is of variable size and consits of:
 
 * parent locator header
 * 0 or more parent locator entry
@@ -294,7 +295,7 @@ The parent locator metadata item is variable of size and consits of:
 
 ===== Parent locator header
 
-The parent locator header is 20 bytes of size and consists of:
+The parent locator header is 20 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -308,7 +309,7 @@ According to `[MS-VHDX]` this value must be set to 0
 
 ===== Parent locator entry
 
-The parent locator entry is 12 bytes of size and consists of:
+The parent locator entry is 12 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -341,7 +342,7 @@ This GUID should correspond to the data write identifier of the parent file
 
 ==== Physical sector size metadata item
 
-The physical sector size metadata item is 4 bytes of size and consists of:
+The physical sector size metadata item is 4 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -352,7 +353,7 @@ According to `[MS-VHDX]` this value must be either 512 or 4096
 
 ==== Virtual disk identifier metadata item
 
-The virtual disk identifier metadata item is 16 bytes of size and consists of:
+The virtual disk identifier metadata item is 16 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -368,7 +369,7 @@ to be used instead.
 
 ==== Virtual disk size metadata item
 
-The virtual disk size metadata item is 8 bytes of size and consists of:
+The virtual disk size metadata item is 8 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -408,7 +409,7 @@ The block allocation table (BAT) of:
 
 === Block allocation table (BAT) entry
 
-The block allocation table (BAT) entry is 64 bits of size and consists of:
+The block allocation table (BAT) entry is 64 bits in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -460,7 +461,7 @@ in the bitmap.
 
 [yellow-background]*TODO: complete this section*
 
-The log serves as metadata journal and consist of a variable-sized contiguous
+The log serves as metadata journal is of variable size and consist of contiguous
 circular (ring) buffer that contains log entries.
 
 === Log entry

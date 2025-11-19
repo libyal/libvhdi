@@ -1,7 +1,7 @@
 /*
  * Block allocation table functions
  *
- * Copyright (C) 2012-2024, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2025, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -354,7 +354,7 @@ int libvhdi_block_allocation_table_read_file_io_handle(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to block allocation table at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+			 "%s: unable to seek block allocation table at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 			 function,
 			 file_offset,
 			 file_offset );

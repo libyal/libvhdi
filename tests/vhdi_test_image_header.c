@@ -1,7 +1,7 @@
 /*
  * Library image_header type test program
  *
- * Copyright (C) 2012-2024, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2025, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -801,8 +801,6 @@ int vhdi_test_image_header_read_file_io_handle(
 	          file_io_handle,
 	          0,
 	          &error );
-
-VHDI_TEST_FPRINT_ERROR( error );
 
 	VHDI_TEST_ASSERT_EQUAL_INT(
 	 "result",
