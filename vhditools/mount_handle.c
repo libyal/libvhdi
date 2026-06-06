@@ -511,15 +511,16 @@ int mount_handle_open_parent(
 {
 	uint8_t guid[ 16 ];
 
-	libvhdi_file_t *parent_vhdi_file        = NULL;
-	system_character_t *parent_basename_end = NULL;
-	system_character_t *parent_filename     = NULL;
-	system_character_t *parent_path         = NULL;
-	static char *function                   = "mount_handle_open_parent";
-	size_t parent_basename_length           = 0;
-	size_t parent_filename_size             = 0;
-	size_t parent_path_size                 = 0;
-	int result                              = 0;
+	libvhdi_file_t *parent_vhdi_file              = NULL;
+	const system_character_t *parent_basename_end = NULL;
+	system_character_t *parent_filename           = NULL;
+	system_character_t *parent_path               = NULL;
+	system_character_t *vhdi_parent_path          = NULL;
+	static char *function                         = "mount_handle_open_parent";
+	size_t parent_basename_length                 = 0;
+	size_t parent_filename_size                   = 0;
+	size_t parent_path_size                       = 0;
+	int result                                    = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -646,8 +647,7 @@ int mount_handle_open_parent(
 	}
 	if( mount_handle->basename == NULL )
 	{
-		parent_path      = &( parent_filename[ parent_basename_length ] );
-		parent_path_size = parent_filename_size - ( parent_basename_length + 1 );
+		vhdi_parent_path = &( parent_filename[ parent_basename_length ] );
 	}
 	else
 	{
@@ -680,6 +680,7 @@ int mount_handle_open_parent(
 
 			goto on_error;
 		}
+		vhdi_parent_path = parent_path;
 	}
 	if( libvhdi_file_initialize(
 	     &parent_vhdi_file,
@@ -697,13 +698,13 @@ int mount_handle_open_parent(
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libvhdi_file_open_wide(
 	     parent_vhdi_file,
-	     parent_path,
+	     vhdi_parent_path,
 	     LIBVHDI_OPEN_READ,
 	     error ) != 1 )
 #else
 	if( libvhdi_file_open(
 	     parent_vhdi_file,
-	     parent_path,
+	     vhdi_parent_path,
 	     LIBVHDI_OPEN_READ,
 	     error ) != 1 )
 #endif
@@ -714,7 +715,7 @@ int mount_handle_open_parent(
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open parent file: %" PRIs_SYSTEM ".",
 		 function,
-		 parent_path );
+		 vhdi_parent_path );
 
 		goto on_error;
 	}
@@ -729,9 +730,9 @@ int mount_handle_open_parent(
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open parent file: %" PRIs_SYSTEM ".",
 		 function,
-		 parent_path );
+		 vhdi_parent_path );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libvhdi_file_set_parent_file(
 	     vhdi_file,
@@ -763,11 +764,9 @@ int mount_handle_open_parent(
 	}
 	if( parent_path != NULL )
 	{
-		if( mount_handle->basename != NULL )
-		{
-			memory_free(
-			 parent_path );
-		}
+		memory_free(
+		 parent_path );
+
 		parent_path = NULL;
 	}
 	if( parent_filename != NULL )
@@ -786,8 +785,7 @@ on_error:
 		 &parent_vhdi_file,
 		 NULL );
 	}
-	if( ( parent_path != NULL )
-	 && ( mount_handle->basename != NULL ) )
+	if( parent_path != NULL )
 	{
 		memory_free(
 		 parent_path );

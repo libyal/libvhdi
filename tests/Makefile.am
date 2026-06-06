@@ -19,6 +19,10 @@ AM_CPPFLAGS = \
 	@PTHREAD_CPPFLAGS@ \
 	@LIBVHDI_DLL_IMPORT@
 
+AM_TESTS_ENVIRONMENT = \
+	export PYTHON="@PYTHON@"; \
+	export TESTS_USE_WINAPI="@TESTS_USE_WINAPI@";
+
 if HAVE_PYTHON_TESTS
 TESTS_PYVHDI = \
 	test_python_module.sh
@@ -438,7 +442,8 @@ vhdi_test_tools_output_SOURCES = \
 
 vhdi_test_tools_output_LDADD = \
 	../libvhdi/libvhdi.la \
-	@LIBCERROR_LIBADD@
+	@LIBCERROR_LIBADD@ \
+	@LIBINTL@
 
 vhdi_test_tools_signal_SOURCES = \
 	../vhditools/vhditools_signal.c ../vhditools/vhditools_signal.h \

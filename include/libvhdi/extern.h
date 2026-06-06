@@ -31,14 +31,17 @@
  */
 #if defined( LIBVHDI_DLL_EXPORT )
 #define LIBVHDI_EXTERN __declspec(dllexport)
+#define LIBVHDI_EXTERN_VARIABLE extern __declspec(dllexport)
 
 #elif defined( LIBVHDI_DLL_IMPORT )
-#define LIBVHDI_EXTERN extern __declspec(dllimport)
+#define LIBVHDI_EXTERN __declspec(dllimport)
+#define LIBVHDI_EXTERN_VARIABLE extern __declspec(dllimport)
 
 #else
 #define LIBVHDI_EXTERN extern
+#define LIBVHDI_EXTERN_VARIABLE extern
 
-#endif
+#endif /* defined( LIBVHDI_DLL_EXPORT ) */
 
 #endif /* !defined( _LIBVHDI_EXTERN_H ) */
 

@@ -24,21 +24,28 @@
 
 #include <common.h>
 
+#if !defined( __CYGWIN__ ) && !defined( _WIN32 ) && defined( __has_attribute )
+#if __has_attribute( visibility )
+#define LIBVHDI_INTERNAL	__attribute__((visibility("hidden"))) extern
+
+#else
+#define LIBVHDI_INTERNAL	extern
+
+#endif /* __has_attribute( visibility ) */
+#else
+#define LIBVHDI_INTERNAL	extern
+
+#endif /* !defined( __CYGWIN__ ) && !defined( _WIN32 ) && defined( __has_attribute ) */
+
 /* Define HAVE_LOCAL_LIBVHDI for local use of libvhdi
  */
 #if !defined( HAVE_LOCAL_LIBVHDI )
 
 #include <libvhdi/extern.h>
 
-#if defined( __CYGWIN__ ) || defined( __MINGW32__ )
-#define LIBVHDI_EXTERN_VARIABLE	extern
-#else
-#define LIBVHDI_EXTERN_VARIABLE	LIBVHDI_EXTERN
-#endif
-
 #else
 #define LIBVHDI_EXTERN		/* extern */
-#define LIBVHDI_EXTERN_VARIABLE	extern
+#define LIBVHDI_EXTERN_VARIABLE	LIBVHDI_INTERNAL
 
 #endif /* !defined( HAVE_LOCAL_LIBVHDI ) */
 
