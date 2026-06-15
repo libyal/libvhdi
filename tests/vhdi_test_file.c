@@ -540,17 +540,17 @@ int vhdi_test_file_open_parent_file(
 {
 	uint8_t guid[ 16 ];
 
-	system_character_t *basename_end        = NULL;
-	system_character_t *parent_basename_end = NULL;
-	system_character_t *parent_filename     = NULL;
-	system_character_t *parent_path         = NULL;
-	static char *function                   = "vhdi_test_file_open_parent_file";
-	size_t basename_length                  = 0;
-	size_t parent_basename_length           = 0;
-	size_t parent_filename_size             = 0;
-	size_t parent_path_size                 = 0;
-	size_t source_length                    = 0;
-	int result                              = 0;
+	const system_character_t *basename_end        = NULL;
+	const system_character_t *parent_basename_end = NULL;
+	system_character_t *parent_filename           = NULL;
+	system_character_t *parent_path               = NULL;
+	static char *function                         = "vhdi_test_file_open_parent_file";
+	size_t basename_length                        = 0;
+	size_t parent_basename_length                 = 0;
+	size_t parent_filename_size                   = 0;
+	size_t parent_path_size                       = 0;
+	size_t source_length                          = 0;
+	int result                                    = 0;
 
 	if( parent_file == NULL )
 	{

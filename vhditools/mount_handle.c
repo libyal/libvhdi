@@ -365,12 +365,12 @@ int mount_handle_open(
      const system_character_t *filename,
      libcerror_error_t **error )
 {
-	libvhdi_file_t *vhdi_file        = NULL;
-	system_character_t *basename_end = NULL;
-	static char *function            = "mount_handle_open";
-	size_t basename_length           = 0;
-	size_t filename_length           = 0;
-	int result                       = 0;
+	libvhdi_file_t *vhdi_file              = NULL;
+	const system_character_t *basename_end = NULL;
+	static char *function                  = "mount_handle_open";
+	size_t basename_length                 = 0;
+	size_t filename_length                 = 0;
+	int result                             = 0;
 
 	if( mount_handle == NULL )
 	{
