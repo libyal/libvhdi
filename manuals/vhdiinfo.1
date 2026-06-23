@@ -1,6 +1,6 @@
-.Dd March  9, 2019
-.Dt vhdiinfo
-.Os libvhdi
+.Dd June 23, 2026
+.Dt VHDIINFO 1
+.Os
 .Sh NAME
 .Nm vhdiinfo
 .Nd determines information about a Virtual Hard Disk (VHD) image file
@@ -20,7 +20,7 @@ package.
 is a library to access the Virtual Hard Disk (VHD) image format
 .Pp
 .Ar source
-is the source file.
+is the source image.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
@@ -39,7 +39,7 @@ None
 .Bd -literal
 # vhdiinfo differential.vhd
 vhdiinfo 20130512
-
+.sp
 Virtual Hard Disk (VHD) image information:
 	Format:			1.0
 	Disk type:		Differential
@@ -47,16 +47,20 @@ Virtual Hard Disk (VHD) image information:
 	Identifier:		5577d188-a753-4a80-800a-c627f764c304
 	Parent identifier:	44421587-1b53-4972-9ceb-9a31e1618e5b
 	Parent filename: 	dynamic.vhd
-
+.sp
 .Ed
 .Sh DIAGNOSTICS
-Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled.
+Errors, verbose and debug output are printed to stderr when verbose output \
+\-v is enabled.
 Verbose and debug output are only printed when enabled at compilation.
+.Sh AUTHORS
+.An Joachim Metz <joachim.metz@gmail.com>
 .Sh BUGS
-Please report bugs of any kind to <joachim.metz@gmail.com> or on the project website:
-https://github.com/libyal/libvhdi/
-.Sh AUTHOR
-These man pages were written by Joachim Metz.
+Please report bugs of any kind on the project issue tracker: \
+https://github.com/libyal/libvhdi/issues
 .Sh COPYRIGHT
 Copyright (C) 2012-2026, Joachim Metz <joachim.metz@gmail.com>.
-.Sh SEE ALSO
+.sp
+This is free software; see the source for copying conditions.
+There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A \
+PARTICULAR PURPOSE.

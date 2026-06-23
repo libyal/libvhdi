@@ -354,7 +354,7 @@ int libvhdi_file_get_disk_type(
      libvhdi_error_t **error );
 
 /* Retrieves the media size
- * Returns the 1 if succesful or -1 on error
+ * Returns the 1 if successful or -1 on error
  */
 LIBVHDI_EXTERN \
 int libvhdi_file_get_media_size(

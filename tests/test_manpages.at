@@ -67,4 +67,4 @@ m4_define([AT_SETUP],
     ])
   )
 
-LINT_MANPAGES([libvhdi.3])
+LINT_MANPAGES([libvhdi.3 vhdiinfo.1])
