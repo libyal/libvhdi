@@ -68,7 +68,7 @@ int info_handle_close(
      info_handle_t *info_handle,
      libcerror_error_t **error );
 
-int info_handle_input_fprint(
+int info_handle_image_fprint(
      info_handle_t *info_handle,
      libcerror_error_t **error );
 

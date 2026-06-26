@@ -309,10 +309,10 @@ int info_handle_close(
 	return( 0 );
 }
 
-/* Prints the input information to a stream
+/* Prints the image information to a stream
  * Returns 1 if successful or -1 on error
  */
-int info_handle_input_fprint(
+int info_handle_image_fprint(
      info_handle_t *info_handle,
      libcerror_error_t **error )
 {
@@ -323,7 +323,7 @@ int info_handle_input_fprint(
 	libfguid_identifier_t *guid          = NULL;
 	system_character_t *disk_type_string = NULL;
 	system_character_t *value_string     = NULL;
-	static char *function                = "info_handle_input_fprint";
+	static char *function                = "info_handle_image_fprint";
 	size64_t media_size                  = 0;
 	size_t value_string_size             = 0;
 	uint32_t value_32bit                 = 0;

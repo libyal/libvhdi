@@ -1,18 +1,20 @@
 .Dd June 26, 2026
-.Dt VHDIINFO 1
+.Dt VHDIMOUNT 1
 .Os
 .Sh NAME
-.Nm vhdiinfo
-.Nd determines information about a Virtual Hard Disk (VHD) image file
+.Nm vhdimount
+.Nd mounts a Virtual Hard Disk (VHD) image file
 .Sh SYNOPSIS
-.Nm vhdiinfo
+.Nm vhdimount
+.Op Fl X Ar extended_options
 .Op Fl hvV
 .Ar source
+.Ar mount_point
 .Sh DESCRIPTION
-.Nm vhdiinfo
-is a utility to determine information about a Virtual Hard Disk (VHD) image file
+.Nm vhdimount
+is a utility to mount a Virtual Hard Disk (VHD) image file
 .Pp
-.Nm vhdiinfo
+.Nm vhdimount
 is part of the
 .Nm libvhdi
 package.
@@ -20,16 +22,20 @@ package.
 is a library to access the Virtual Hard Disk (VHD) image format
 .Pp
 .Ar source
-is the source image.
+a Virtual Hard Disk (VHD) image file
+.Ar mount_point
+the directory to serve as mount point
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
 .It Fl h
 shows this help
 .It Fl v
-verbose output to stderr
+verbose output to stderr, while vhdimount will remain running in the foreground
 .It Fl V
 print version
+.It Fl X Ar extended_options
+extended options to pass to sub system
 .El
 .Sh ENVIRONMENT
 None
@@ -37,16 +43,8 @@ None
 None
 .Sh EXAMPLES
 .Bd -literal
-# vhdiinfo differential.vhd
-vhdiinfo 20130512
-.sp
-Virtual Hard Disk (VHD) image information:
-	Format:			1.0
-	Disk type:		Differential
-	Media size:		536870912 bytes
-	Identifier:		5577d188-a753-4a80-800a-c627f764c304
-	Parent identifier:	44421587-1b53-4972-9ceb-9a31e1618e5b
-	Parent filename: 	dynamic.vhd
+# vhdimount image.vhd
+vhdimount 20260626
 .sp
 .Ed
 .Sh DIAGNOSTICS
@@ -54,7 +52,7 @@ Errors, verbose and debug output are printed to stderr when verbose output \
 \-v is enabled.
 Verbose and debug output are only printed when enabled at compilation.
 .Sh SEE ALSO
-.Xr vhdimount 1
+.Xr vhdiinfo 1
 .Sh AUTHORS
 .An Joachim Metz <joachim.metz@gmail.com>
 .Sh BUGS
