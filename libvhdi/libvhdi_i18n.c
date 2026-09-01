@@ -22,7 +22,7 @@
 #include <common.h>
 #include <types.h>
 
-#if defined( HAVE_LIBINTL_H ) && defined( ENABLE_NLS )
+#if defined( HAVE_LIBINTL_H )
 #include <libintl.h>
 #endif
 
@@ -40,6 +40,7 @@ int libvhdi_i18n_initialize(
 
 	if( libvhdi_i18n_initialized == 0 )
 	{
+#if defined( ENABLE_NLS ) && !defined( WINAPI )
 #if defined( HAVE_BINDTEXTDOMAIN ) && defined( LOCALEDIR )
 		if( bindtextdomain(
 		     "libvhdi",
@@ -55,6 +56,7 @@ int libvhdi_i18n_initialize(
 			return( -1 );
 		}
 #endif /* defined( HAVE_BINDTEXTDOMAIN ) && defined( LOCALEDIR ) */
+#endif /* defined( ENABLE_NLS ) && !defined( WINAPI ) */
 
 		libvhdi_i18n_initialized = 1;
 	}

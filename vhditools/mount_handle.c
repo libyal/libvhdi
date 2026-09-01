@@ -837,7 +837,7 @@ int mount_handle_close(
 		result = -1;
 	}
 	for( file_index = number_of_files - 1;
-	     file_index > 0;
+	     file_index >= 0;
 	     file_index-- )
 	{
 		if( mount_file_system_get_file_by_index(

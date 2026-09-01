@@ -309,7 +309,7 @@ int mount_file_system_signal_abort(
 		return( -1 );
 	}
 	for( file_index = number_of_files - 1;
-	     file_index > 0;
+	     file_index >= 0;
 	     file_index-- )
 	{
 		if( libcdata_array_get_entry_by_index(
