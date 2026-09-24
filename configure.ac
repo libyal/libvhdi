@@ -2,7 +2,7 @@ AC_PREREQ([2.71])
 
 AC_INIT(
   [libvhdi],
-  [20260917],
+  [20260924],
   [https://github.com/libyal/libvhdi/issues])
 
 AC_CONFIG_SRCDIR(

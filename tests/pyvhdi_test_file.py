@@ -29,467 +29,476 @@ import pyvhdi
 
 
 class FileTypeTests(unittest.TestCase):
-  """Tests the file type."""
+    """Tests the file type."""
 
-  def test_signal_abort(self):
-    """Tests the signal_abort function."""
-    vhdi_file = pyvhdi.file()
+    def test_signal_abort(self):
+        """Tests the signal_abort function."""
+        vhdi_file = pyvhdi.file()
 
-    vhdi_file.signal_abort()
+        vhdi_file.signal_abort()
 
-  def test_open(self):
-    """Tests the open function."""
-    test_source = getattr(unittest, "source", None)
-    if not test_source:
-      raise unittest.SkipTest("missing source")
+    def test_open(self):
+        """Tests the open function."""
+        test_source = getattr(unittest, "source", None)
+        if not test_source:
+            raise unittest.SkipTest("missing source")
 
-    vhdi_file = pyvhdi.file()
+        vhdi_file = pyvhdi.file()
 
-    vhdi_file.open(test_source)
+        vhdi_file.open(test_source)
 
-    with self.assertRaises(IOError):
-      vhdi_file.open(test_source)
+        with self.assertRaises(IOError):
+            vhdi_file.open(test_source)
 
-    vhdi_file.close()
-
-    with self.assertRaises(TypeError):
-      vhdi_file.open(None)
-
-    with self.assertRaises(ValueError):
-      vhdi_file.open(test_source, mode="w")
-
-  def test_open_file_object(self):
-    """Tests the open_file_object function."""
-    test_source = getattr(unittest, "source", None)
-    if not test_source:
-      raise unittest.SkipTest("missing source")
-
-    if not os.path.isfile(test_source):
-      raise unittest.SkipTest("source not a regular file")
-
-    vhdi_file = pyvhdi.file()
-
-    with open(test_source, "rb") as file_object:
-
-      vhdi_file.open_file_object(file_object)
-
-      with self.assertRaises(IOError):
-        vhdi_file.open_file_object(file_object)
-
-      vhdi_file.close()
-
-      with self.assertRaises(TypeError):
-        vhdi_file.open_file_object(None)
-
-      with self.assertRaises(ValueError):
-        vhdi_file.open_file_object(file_object, mode="w")
-
-  def test_close(self):
-    """Tests the close function."""
-    test_source = getattr(unittest, "source", None)
-    if not test_source:
-      raise unittest.SkipTest("missing source")
-
-    vhdi_file = pyvhdi.file()
-
-    with self.assertRaises(IOError):
-      vhdi_file.close()
-
-  def test_open_close(self):
-    """Tests the open and close functions."""
-    test_source = getattr(unittest, "source", None)
-    if not test_source:
-      return
-
-    vhdi_file = pyvhdi.file()
-
-    # Test open and close.
-    vhdi_file.open(test_source)
-    vhdi_file.close()
-
-    # Test open and close a second time to validate clean up on close.
-    vhdi_file.open(test_source)
-    vhdi_file.close()
-
-    if os.path.isfile(test_source):
-      with open(test_source, "rb") as file_object:
-
-        # Test open_file_object and close.
-        vhdi_file.open_file_object(file_object)
         vhdi_file.close()
 
-        # Test open_file_object and close a second time to validate clean up on close.
-        vhdi_file.open_file_object(file_object)
+        with self.assertRaises(TypeError):
+            vhdi_file.open(None)
+
+        with self.assertRaises(ValueError):
+            vhdi_file.open(test_source, mode="w")
+
+    def test_open_file_object(self):
+        """Tests the open_file_object function."""
+        test_source = getattr(unittest, "source", None)
+        if not test_source:
+            raise unittest.SkipTest("missing source")
+
+        if not os.path.isfile(test_source):
+            raise unittest.SkipTest("source not a regular file")
+
+        vhdi_file = pyvhdi.file()
+
+        with open(test_source, "rb") as file_object:
+
+            vhdi_file.open_file_object(file_object)
+
+            with self.assertRaises(IOError):
+                vhdi_file.open_file_object(file_object)
+
+            vhdi_file.close()
+
+            with self.assertRaises(TypeError):
+                vhdi_file.open_file_object(None)
+
+            with self.assertRaises(ValueError):
+                vhdi_file.open_file_object(file_object, mode="w")
+
+    def test_close(self):
+        """Tests the close function."""
+        test_source = getattr(unittest, "source", None)
+        if not test_source:
+            raise unittest.SkipTest("missing source")
+
+        vhdi_file = pyvhdi.file()
+
+        with self.assertRaises(IOError):
+            vhdi_file.close()
+
+    def test_open_close(self):
+        """Tests the open and close functions."""
+        test_source = getattr(unittest, "source", None)
+        if not test_source:
+            return
+
+        vhdi_file = pyvhdi.file()
+
+        # Test open and close.
+        vhdi_file.open(test_source)
         vhdi_file.close()
 
-        # Test open_file_object and close and dereferencing file_object.
-        vhdi_file.open_file_object(file_object)
-        del file_object
+        # Test open and close a second time to validate clean up on close.
+        vhdi_file.open(test_source)
         vhdi_file.close()
 
-  def test_read_buffer(self):
-    """Tests the read_buffer function."""
-    test_source = getattr(unittest, "source", None)
-    if not test_source:
-      raise unittest.SkipTest("missing source")
+        if os.path.isfile(test_source):
+            with open(test_source, "rb") as file_object:
 
-    vhdi_file = pyvhdi.file()
+                # Test open_file_object and close.
+                vhdi_file.open_file_object(file_object)
+                vhdi_file.close()
 
-    vhdi_file.open(test_source)
+                # Test open_file_object and close a second time to validate clean up on close.
+                vhdi_file.open_file_object(file_object)
+                vhdi_file.close()
 
-    vhdi_parent_file = None
-    if vhdi_file.parent_identifier:
-      vhdi_parent_file = pyvhdi.file()
+                # Test open_file_object and close and dereferencing file_object.
+                vhdi_file.open_file_object(file_object)
+                del file_object
+                vhdi_file.close()
 
-      _, _, parent_filename = vhdi_file.parent_filename.rpartition('\\')
-      parent_filename = os.path.join(
-        os.path.dirname(test_source), parent_filename)
-      vhdi_parent_file.open(parent_filename, "r")
+    def test_read_buffer(self):
+        """Tests the read_buffer function."""
+        test_source = getattr(unittest, "source", None)
+        if not test_source:
+            raise unittest.SkipTest("missing source")
 
-      vhdi_file.set_parent(vhdi_parent_file)
+        vhdi_file = pyvhdi.file()
 
-    media_size = vhdi_file.get_media_size()
+        vhdi_file.open(test_source)
 
-    if media_size < 4096:
-      # Test read without maximum size.
-      vhdi_file.seek_offset(0, os.SEEK_SET)
+        vhdi_parent_file = None
+        if vhdi_file.parent_identifier:
+            vhdi_parent_file = pyvhdi.file()
 
-      data = vhdi_file.read_buffer()
+            _, _, parent_filename = vhdi_file.parent_filename.rpartition("\\")
+            parent_filename = os.path.join(
+                os.path.dirname(test_source), parent_filename
+            )
+            vhdi_parent_file.open(parent_filename, "r")
 
-      self.assertIsNotNone(data)
-      self.assertEqual(len(data), media_size)
+            vhdi_file.set_parent(vhdi_parent_file)
 
-    # Test read with maximum size.
-    vhdi_file.seek_offset(0, os.SEEK_SET)
+        media_size = vhdi_file.get_media_size()
 
-    data = vhdi_file.read_buffer(size=4096)
+        if media_size < 4096:
+            # Test read without maximum size.
+            vhdi_file.seek_offset(0, os.SEEK_SET)
 
-    self.assertIsNotNone(data)
-    self.assertEqual(len(data), min(media_size, 4096))
+            data = vhdi_file.read_buffer()
 
-    if media_size > 8:
-      vhdi_file.seek_offset(-8, os.SEEK_END)
+            self.assertIsNotNone(data)
+            self.assertEqual(len(data), media_size)
 
-      # Read buffer on media_size boundary.
-      data = vhdi_file.read_buffer(size=4096)
+        # Test read with maximum size.
+        vhdi_file.seek_offset(0, os.SEEK_SET)
 
-      self.assertIsNotNone(data)
-      self.assertEqual(len(data), 8)
+        data = vhdi_file.read_buffer(size=4096)
 
-      # Read buffer beyond media_size boundary.
-      data = vhdi_file.read_buffer(size=4096)
+        self.assertIsNotNone(data)
+        self.assertEqual(len(data), min(media_size, 4096))
 
-      self.assertIsNotNone(data)
-      self.assertEqual(len(data), 0)
+        if media_size > 8:
+            vhdi_file.seek_offset(-8, os.SEEK_END)
 
-    # Stress test read buffer.
-    vhdi_file.seek_offset(0, os.SEEK_SET)
+            # Read buffer on media_size boundary.
+            data = vhdi_file.read_buffer(size=4096)
 
-    remaining_media_size = media_size
+            self.assertIsNotNone(data)
+            self.assertEqual(len(data), 8)
 
-    for _ in range(1024):
-      read_size = int(random.random() * 4096)
+            # Read buffer beyond media_size boundary.
+            data = vhdi_file.read_buffer(size=4096)
 
-      data = vhdi_file.read_buffer(size=read_size)
+            self.assertIsNotNone(data)
+            self.assertEqual(len(data), 0)
 
-      self.assertIsNotNone(data)
-
-      data_size = len(data)
-
-      if read_size > remaining_media_size:
-        read_size = remaining_media_size
-
-      self.assertEqual(data_size, read_size)
-
-      remaining_media_size -= data_size
-
-      if not remaining_media_size:
+        # Stress test read buffer.
         vhdi_file.seek_offset(0, os.SEEK_SET)
 
         remaining_media_size = media_size
 
-    with self.assertRaises(ValueError):
-      vhdi_file.read_buffer(size=-1)
+        for _ in range(1024):
+            read_size = int(random.random() * 4096)
 
-    vhdi_file.close()
+            data = vhdi_file.read_buffer(size=read_size)
 
-    if vhdi_parent_file:
-      vhdi_parent_file.close()
+            self.assertIsNotNone(data)
 
-    # Test the read without open.
-    with self.assertRaises(IOError):
-      vhdi_file.read_buffer(size=4096)
+            data_size = len(data)
 
-  def test_read_buffer_file_object(self):
-    """Tests the read_buffer function on a file-like object."""
-    test_source = getattr(unittest, "source", None)
-    if not test_source:
-      raise unittest.SkipTest("missing source")
+            if read_size > remaining_media_size:
+                read_size = remaining_media_size
 
-    if not os.path.isfile(test_source):
-      raise unittest.SkipTest("source not a regular file")
+            self.assertEqual(data_size, read_size)
 
-    with open(test_source, "rb") as file_object:
-      vhdi_file = pyvhdi.file()
+            remaining_media_size -= data_size
 
-      vhdi_file.open_file_object(file_object)
+            if not remaining_media_size:
+                vhdi_file.seek_offset(0, os.SEEK_SET)
 
-      vhdi_parent_file = None
-      if vhdi_file.parent_identifier:
-        vhdi_parent_file = pyvhdi.file()
+                remaining_media_size = media_size
 
-        _, _, parent_filename = vhdi_file.parent_filename.rpartition('\\')
-        parent_filename = os.path.join(
-          os.path.dirname(test_source), parent_filename)
-        vhdi_parent_file.open(parent_filename, "r")
+        with self.assertRaises(ValueError):
+            vhdi_file.read_buffer(size=-1)
 
-        vhdi_file.set_parent(vhdi_parent_file)
+        vhdi_file.close()
 
-      media_size = vhdi_file.get_media_size()
+        if vhdi_parent_file:
+            vhdi_parent_file.close()
 
-      # Test normal read.
-      data = vhdi_file.read_buffer(size=4096)
+        # Test the read without open.
+        with self.assertRaises(IOError):
+            vhdi_file.read_buffer(size=4096)
 
-      self.assertIsNotNone(data)
-      self.assertEqual(len(data), min(media_size, 4096))
+    def test_read_buffer_file_object(self):
+        """Tests the read_buffer function on a file-like object."""
+        test_source = getattr(unittest, "source", None)
+        if not test_source:
+            raise unittest.SkipTest("missing source")
 
-      vhdi_file.close()
+        if not os.path.isfile(test_source):
+            raise unittest.SkipTest("source not a regular file")
 
-      if vhdi_parent_file:
-        vhdi_parent_file.close()
+        with open(test_source, "rb") as file_object:
+            vhdi_file = pyvhdi.file()
 
-  def test_read_buffer_at_offset(self):
-    """Tests the read_buffer_at_offset function."""
-    test_source = getattr(unittest, "source", None)
-    if not test_source:
-      raise unittest.SkipTest("missing source")
+            vhdi_file.open_file_object(file_object)
 
-    vhdi_file = pyvhdi.file()
+            vhdi_parent_file = None
+            if vhdi_file.parent_identifier:
+                vhdi_parent_file = pyvhdi.file()
 
-    vhdi_file.open(test_source)
+                _, _, parent_filename = vhdi_file.parent_filename.rpartition("\\")
+                parent_filename = os.path.join(
+                    os.path.dirname(test_source), parent_filename
+                )
+                vhdi_parent_file.open(parent_filename, "r")
 
-    vhdi_parent_file = None
-    if vhdi_file.parent_identifier:
-      vhdi_parent_file = pyvhdi.file()
+                vhdi_file.set_parent(vhdi_parent_file)
 
-      _, _, parent_filename = vhdi_file.parent_filename.rpartition('\\')
-      parent_filename = os.path.join(
-        os.path.dirname(test_source), parent_filename)
-      vhdi_parent_file.open(parent_filename, "r")
+            media_size = vhdi_file.get_media_size()
 
-      vhdi_file.set_parent(vhdi_parent_file)
+            # Test normal read.
+            data = vhdi_file.read_buffer(size=4096)
 
-    media_size = vhdi_file.get_media_size()
+            self.assertIsNotNone(data)
+            self.assertEqual(len(data), min(media_size, 4096))
 
-    # Test normal read.
-    data = vhdi_file.read_buffer_at_offset(4096, 0)
+            vhdi_file.close()
 
-    self.assertIsNotNone(data)
-    self.assertEqual(len(data), min(media_size, 4096))
+            if vhdi_parent_file:
+                vhdi_parent_file.close()
 
-    if media_size > 8:
-      # Read buffer on media_size boundary.
-      data = vhdi_file.read_buffer_at_offset(4096, media_size - 8)
+    def test_read_buffer_at_offset(self):
+        """Tests the read_buffer_at_offset function."""
+        test_source = getattr(unittest, "source", None)
+        if not test_source:
+            raise unittest.SkipTest("missing source")
 
-      self.assertIsNotNone(data)
-      self.assertEqual(len(data), 8)
+        vhdi_file = pyvhdi.file()
 
-      # Read buffer beyond media_size boundary.
-      data = vhdi_file.read_buffer_at_offset(4096, media_size + 8)
+        vhdi_file.open(test_source)
 
-      self.assertIsNotNone(data)
-      self.assertEqual(len(data), 0)
+        vhdi_parent_file = None
+        if vhdi_file.parent_identifier:
+            vhdi_parent_file = pyvhdi.file()
 
-    # Stress test read buffer.
-    for _ in range(1024):
-      random_number = random.random()
+            _, _, parent_filename = vhdi_file.parent_filename.rpartition("\\")
+            parent_filename = os.path.join(
+                os.path.dirname(test_source), parent_filename
+            )
+            vhdi_parent_file.open(parent_filename, "r")
 
-      media_offset = int(random_number * media_size)
-      read_size = int(random_number * 4096)
+            vhdi_file.set_parent(vhdi_parent_file)
 
-      data = vhdi_file.read_buffer_at_offset(read_size, media_offset)
+        media_size = vhdi_file.get_media_size()
 
-      self.assertIsNotNone(data)
+        # Test normal read.
+        data = vhdi_file.read_buffer_at_offset(4096, 0)
 
-      remaining_media_size = media_size - media_offset
+        self.assertIsNotNone(data)
+        self.assertEqual(len(data), min(media_size, 4096))
 
-      data_size = len(data)
+        if media_size > 8:
+            # Read buffer on media_size boundary.
+            data = vhdi_file.read_buffer_at_offset(4096, media_size - 8)
 
-      if read_size > remaining_media_size:
-        read_size = remaining_media_size
+            self.assertIsNotNone(data)
+            self.assertEqual(len(data), 8)
 
-      self.assertEqual(data_size, read_size)
+            # Read buffer beyond media_size boundary.
+            data = vhdi_file.read_buffer_at_offset(4096, media_size + 8)
 
-      remaining_media_size -= data_size
+            self.assertIsNotNone(data)
+            self.assertEqual(len(data), 0)
 
-      if not remaining_media_size:
-        vhdi_file.seek_offset(0, os.SEEK_SET)
+        # Stress test read buffer.
+        for _ in range(1024):
+            random_number = random.random()
 
-    with self.assertRaises(ValueError):
-      vhdi_file.read_buffer_at_offset(-1, 0)
+            media_offset = int(random_number * media_size)
+            read_size = int(random_number * 4096)
 
-    with self.assertRaises(ValueError):
-      vhdi_file.read_buffer_at_offset(4096, -1)
+            data = vhdi_file.read_buffer_at_offset(read_size, media_offset)
 
-    vhdi_file.close()
+            self.assertIsNotNone(data)
 
-    if vhdi_parent_file:
-      vhdi_parent_file.close()
+            remaining_media_size = media_size - media_offset
 
-    # Test the read without open.
-    with self.assertRaises(IOError):
-      vhdi_file.read_buffer_at_offset(4096, 0)
+            data_size = len(data)
 
-  def test_seek_offset(self):
-    """Tests the seek_offset function."""
-    test_source = getattr(unittest, "source", None)
-    if not test_source:
-      raise unittest.SkipTest("missing source")
+            if read_size > remaining_media_size:
+                read_size = remaining_media_size
 
-    vhdi_file = pyvhdi.file()
+            self.assertEqual(data_size, read_size)
 
-    vhdi_file.open(test_source)
+            remaining_media_size -= data_size
 
-    vhdi_parent_file = None
-    if vhdi_file.parent_identifier:
-      vhdi_parent_file = pyvhdi.file()
+            if not remaining_media_size:
+                vhdi_file.seek_offset(0, os.SEEK_SET)
 
-      _, _, parent_filename = vhdi_file.parent_filename.rpartition('\\')
-      parent_filename = os.path.join(
-        os.path.dirname(test_source), parent_filename)
-      vhdi_parent_file.open(parent_filename, "r")
+        with self.assertRaises(ValueError):
+            vhdi_file.read_buffer_at_offset(-1, 0)
 
-      vhdi_file.set_parent(vhdi_parent_file)
+        with self.assertRaises(ValueError):
+            vhdi_file.read_buffer_at_offset(4096, -1)
 
-    media_size = vhdi_file.get_media_size()
+        vhdi_file.close()
 
-    vhdi_file.seek_offset(16, os.SEEK_SET)
+        if vhdi_parent_file:
+            vhdi_parent_file.close()
 
-    offset = vhdi_file.get_offset()
-    self.assertEqual(offset, 16)
+        # Test the read without open.
+        with self.assertRaises(IOError):
+            vhdi_file.read_buffer_at_offset(4096, 0)
 
-    vhdi_file.seek_offset(16, os.SEEK_CUR)
+    def test_seek_offset(self):
+        """Tests the seek_offset function."""
+        test_source = getattr(unittest, "source", None)
+        if not test_source:
+            raise unittest.SkipTest("missing source")
 
-    offset = vhdi_file.get_offset()
-    self.assertEqual(offset, 32)
+        vhdi_file = pyvhdi.file()
 
-    vhdi_file.seek_offset(-16, os.SEEK_CUR)
+        vhdi_file.open(test_source)
 
-    offset = vhdi_file.get_offset()
-    self.assertEqual(offset, 16)
+        vhdi_parent_file = None
+        if vhdi_file.parent_identifier:
+            vhdi_parent_file = pyvhdi.file()
 
-    if media_size > 16:
-      vhdi_file.seek_offset(-16, os.SEEK_END)
+            _, _, parent_filename = vhdi_file.parent_filename.rpartition("\\")
+            parent_filename = os.path.join(
+                os.path.dirname(test_source), parent_filename
+            )
+            vhdi_parent_file.open(parent_filename, "r")
 
-      offset = vhdi_file.get_offset()
-      self.assertEqual(offset, media_size - 16)
+            vhdi_file.set_parent(vhdi_parent_file)
 
-    vhdi_file.seek_offset(16, os.SEEK_END)
+        media_size = vhdi_file.get_media_size()
 
-    offset = vhdi_file.get_offset()
-    self.assertEqual(offset, media_size + 16)
+        vhdi_file.seek_offset(16, os.SEEK_SET)
 
-    # TODO: change IOError into ValueError
-    with self.assertRaises(IOError):
-      vhdi_file.seek_offset(-1, os.SEEK_SET)
+        offset = vhdi_file.get_offset()
+        self.assertEqual(offset, 16)
 
-    # TODO: change IOError into ValueError
-    with self.assertRaises(IOError):
-      vhdi_file.seek_offset(-32 - media_size, os.SEEK_CUR)
+        vhdi_file.seek_offset(16, os.SEEK_CUR)
 
-    # TODO: change IOError into ValueError
-    with self.assertRaises(IOError):
-      vhdi_file.seek_offset(-32 - media_size, os.SEEK_END)
+        offset = vhdi_file.get_offset()
+        self.assertEqual(offset, 32)
 
-    # TODO: change IOError into ValueError
-    with self.assertRaises(IOError):
-      vhdi_file.seek_offset(0, -1)
+        vhdi_file.seek_offset(-16, os.SEEK_CUR)
 
-    vhdi_file.close()
+        offset = vhdi_file.get_offset()
+        self.assertEqual(offset, 16)
 
-    if vhdi_parent_file:
-      vhdi_parent_file.close()
+        if media_size > 16:
+            vhdi_file.seek_offset(-16, os.SEEK_END)
 
-    # Test the seek without open.
-    with self.assertRaises(IOError):
-      vhdi_file.seek_offset(16, os.SEEK_SET)
+            offset = vhdi_file.get_offset()
+            self.assertEqual(offset, media_size - 16)
 
-  def test_get_offset(self):
-    """Tests the get_offset function."""
-    test_source = getattr(unittest, "source", None)
-    if not test_source:
-      raise unittest.SkipTest("missing source")
+        vhdi_file.seek_offset(16, os.SEEK_END)
 
-    vhdi_file = pyvhdi.file()
+        offset = vhdi_file.get_offset()
+        self.assertEqual(offset, media_size + 16)
 
-    vhdi_file.open(test_source)
+        # TODO: change IOError into ValueError
+        with self.assertRaises(IOError):
+            vhdi_file.seek_offset(-1, os.SEEK_SET)
 
-    offset = vhdi_file.get_offset()
-    self.assertIsNotNone(offset)
+        # TODO: change IOError into ValueError
+        with self.assertRaises(IOError):
+            vhdi_file.seek_offset(-32 - media_size, os.SEEK_CUR)
 
-    vhdi_file.close()
+        # TODO: change IOError into ValueError
+        with self.assertRaises(IOError):
+            vhdi_file.seek_offset(-32 - media_size, os.SEEK_END)
 
-  def test_get_media_size(self):
-    """Tests the get_media_size function and media_size property."""
-    test_source = getattr(unittest, "source", None)
-    if not test_source:
-      raise unittest.SkipTest("missing source")
+        # TODO: change IOError into ValueError
+        with self.assertRaises(IOError):
+            vhdi_file.seek_offset(0, -1)
 
-    vhdi_file = pyvhdi.file()
+        vhdi_file.close()
 
-    vhdi_file.open(test_source)
+        if vhdi_parent_file:
+            vhdi_parent_file.close()
 
-    media_size = vhdi_file.get_media_size()
-    self.assertIsNotNone(media_size)
+        # Test the seek without open.
+        with self.assertRaises(IOError):
+            vhdi_file.seek_offset(16, os.SEEK_SET)
 
-    self.assertIsNotNone(vhdi_file.media_size)
+    def test_get_offset(self):
+        """Tests the get_offset function."""
+        test_source = getattr(unittest, "source", None)
+        if not test_source:
+            raise unittest.SkipTest("missing source")
 
-    vhdi_file.close()
+        vhdi_file = pyvhdi.file()
 
-  def test_get_disk_type(self):
-    """Tests the get_disk_type function and disk_type property."""
-    test_source = getattr(unittest, "source", None)
-    if not test_source:
-      raise unittest.SkipTest("missing source")
+        vhdi_file.open(test_source)
 
-    vhdi_file = pyvhdi.file()
+        offset = vhdi_file.get_offset()
+        self.assertIsNotNone(offset)
 
-    vhdi_file.open(test_source)
+        vhdi_file.close()
 
-    disk_type = vhdi_file.get_disk_type()
-    self.assertIsNotNone(disk_type)
+    def test_get_media_size(self):
+        """Tests the get_media_size function and media_size property."""
+        test_source = getattr(unittest, "source", None)
+        if not test_source:
+            raise unittest.SkipTest("missing source")
 
-    self.assertIsNotNone(vhdi_file.disk_type)
+        vhdi_file = pyvhdi.file()
 
-    vhdi_file.close()
+        vhdi_file.open(test_source)
 
-  def test_get_parent_filename(self):
-    """Tests the get_parent_filename function and parent_filename property."""
-    test_source = getattr(unittest, "source", None)
-    if not test_source:
-      raise unittest.SkipTest("missing source")
+        media_size = vhdi_file.get_media_size()
+        self.assertIsNotNone(media_size)
 
-    vhdi_file = pyvhdi.file()
+        self.assertIsNotNone(vhdi_file.media_size)
 
-    vhdi_file.open(test_source)
+        vhdi_file.close()
 
-    _ = vhdi_file.get_parent_filename()
+    def test_get_disk_type(self):
+        """Tests the get_disk_type function and disk_type property."""
+        test_source = getattr(unittest, "source", None)
+        if not test_source:
+            raise unittest.SkipTest("missing source")
 
-    _ = vhdi_file.parent_filename
+        vhdi_file = pyvhdi.file()
 
-    vhdi_file.close()
+        vhdi_file.open(test_source)
+
+        disk_type = vhdi_file.get_disk_type()
+        self.assertIsNotNone(disk_type)
+
+        self.assertIsNotNone(vhdi_file.disk_type)
+
+        vhdi_file.close()
+
+    def test_get_parent_filename(self):
+        """Tests the get_parent_filename function and parent_filename property."""
+        test_source = getattr(unittest, "source", None)
+        if not test_source:
+            raise unittest.SkipTest("missing source")
+
+        vhdi_file = pyvhdi.file()
+
+        vhdi_file.open(test_source)
+
+        _ = vhdi_file.get_parent_filename()
+
+        _ = vhdi_file.parent_filename
+
+        vhdi_file.close()
 
 
 if __name__ == "__main__":
-  argument_parser = argparse.ArgumentParser()
+    argument_parser = argparse.ArgumentParser()
 
-  argument_parser.add_argument(
-      "source", nargs="?", action="store", metavar="PATH",
-      default=None, help="path of the source file.")
+    argument_parser.add_argument(
+        "source",
+        nargs="?",
+        action="store",
+        metavar="PATH",
+        default=None,
+        help="path of the source file.",
+    )
 
-  options, unknown_options = argument_parser.parse_known_args()
-  unknown_options.insert(0, sys.argv[0])
+    options, unknown_options = argument_parser.parse_known_args()
+    unknown_options.insert(0, sys.argv[0])
 
-  setattr(unittest, "source", options.source)
+    setattr(unittest, "source", options.source)
 
-  unittest.main(argv=unknown_options, verbosity=2)
+    unittest.main(argv=unknown_options, verbosity=2)
