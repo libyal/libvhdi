@@ -314,8 +314,7 @@ int libvhdi_block_allocation_table_read_file_io_handle(
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		if( ( file_type == LIBVHDI_FILE_TYPE_VHDX )
-		 && ( disk_type != LIBVHDI_DISK_TYPE_FIXED ) )
+		if( file_type == LIBVHDI_FILE_TYPE_VHDX )
 		{
 			table_entries_size = block_allocation_table->number_of_entries / entries_per_chunk;
 
@@ -543,8 +542,7 @@ int libvhdi_block_allocation_table_read_element_data(
 	}
 	table_entry_offset = element_index;
 
-	if( ( block_allocation_table->file_type == LIBVHDI_FILE_TYPE_VHDX )
-	 && ( block_allocation_table->disk_type != LIBVHDI_DISK_TYPE_FIXED ) )
+	if( block_allocation_table->file_type == LIBVHDI_FILE_TYPE_VHDX )
 	{
 		table_entry_offset /= block_allocation_table->entries_per_chunk;
 		table_entry_offset *= block_allocation_table->entries_per_chunk + 1;
