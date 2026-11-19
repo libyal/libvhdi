@@ -31,37 +31,42 @@ extern "C" {
 
 #if !defined( LIBVHDI_HAVE_BFIO )
 
+/* Determines if a file contains a VHD file signature using a Basic File IO (bfio) handle
+ * Returns 1 if true, 0 if not or -1 on error
+ */
+LIBVHDI_EXTERN \
+int libvhdi_check_file_signature_file_io_handle(
+      libbfio_handle_t *file_io_handle,
+      libvhdi_error_t **error );
+
 /* Opens a file using a Basic File IO (bfio) handle
  * Returns 1 if successful or -1 on error
  */
 LIBVHDI_EXTERN \
 int libvhdi_file_open_file_io_handle(
-     libvhdi_file_t *file,
-     libbfio_handle_t *file_io_handle,
-     int access_flags,
-     libvhdi_error_t **error );
+      libvhdi_file_t *file,
+      libbfio_handle_t *file_io_handle,
+      int access_flags,
+      libvhdi_error_t **error );
 
 #endif /* !defined( LIBVHDI_HAVE_BFIO ) */
 
 int LLVMFuzzerTestOneInput(
-     const uint8_t *data,
-     size_t size )
+      const uint8_t *data,
+      size_t size )
 {
-	uint8_t buffer[ 512 ];
 	uint8_t guid[ 16 ];
 	uint8_t utf8_string[ 64 ];
 	uint16_t utf16_string[ 64 ];
 
 	libbfio_handle_t *file_io_handle = NULL;
 	libvhdi_file_t *file             = NULL;
-	off64_t media_offset             = 0;
 	size64_t media_size              = 0;
 	size_t string_size               = 0;
 	uint32_t value_32bit             = 0;
 	uint16_t major_version           = 0;
 	uint16_t minor_version           = 0;
 	int file_type                    = 0;
-	int read_iterator                = 0;
 
 	if( libbfio_memory_range_initialize(
 	     &file_io_handle,
@@ -74,6 +79,12 @@ int LLVMFuzzerTestOneInput(
 	     (uint8_t *) data,
 	     size,
 	     NULL ) != 1 )
+	{
+		goto on_error_libbfio;
+	}
+	if( libvhdi_check_file_signature_file_io_handle(
+	     file_io_handle,
+	     NULL ) == -1 )
 	{
 		goto on_error_libbfio;
 	}
@@ -113,13 +124,6 @@ int LLVMFuzzerTestOneInput(
 	{
 		goto on_error_libvhdi;
 	}
-	if( libvhdi_file_get_bytes_per_sector(
-	     file,
-	     &value_32bit,
-	     NULL ) != 1 )
-	{
-		goto on_error_libvhdi;
-	}
 	if( libvhdi_file_get_identifier(
 	     file,
 	     guid,
@@ -133,6 +137,13 @@ int LLVMFuzzerTestOneInput(
 	     guid,
 	     16,
 	     NULL ) == -1 )
+	{
+		goto on_error_libvhdi;
+	}
+	if( libvhdi_file_get_bytes_per_sector(
+	     file,
+	     &value_32bit,
+	     NULL ) != 1 )
 	{
 		goto on_error_libvhdi;
 	}
@@ -173,25 +184,6 @@ int LLVMFuzzerTestOneInput(
 	{
 		goto on_error_libvhdi;
 	}
-	for( read_iterator = 0;
-	     read_iterator < 128;
-	     read_iterator++ )
-	{
-		if( media_offset >= media_size )
-		{
-			break;
-		}
-		if( libvhdi_file_read_buffer_at_offset(
-		     file,
-		     buffer,
-		     497,
-		     media_offset,
-		     NULL ) == -1 )
-		{
-			goto on_error_libvhdi;
-		}
-		media_offset += 497;
-	}
 	libvhdi_file_close(
 	 file,
 	 NULL );
@@ -210,4 +202,3 @@ on_error_libbfio:
 }
 
 } /* extern "C" */
-

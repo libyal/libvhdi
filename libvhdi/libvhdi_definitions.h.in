@@ -96,5 +96,9 @@ enum LIBFDATA_SECTOR_RANGE_FLAGS
 
 #define LIBVHDI_MAXIMUM_CACHE_ENTRIES_BLOCK_DESCRIPTORS		8
 
+/* The maximum number of sector ranges allowed in the sector bitmap of a block
+ */
+#define LIBVHDI_MAXIMUM_NUMBER_OF_SECTOR_RANGES			16384
+
 #endif /* !defined( _LIBVHDI_INTERNAL_DEFINITIONS_H ) */
 

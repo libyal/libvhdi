@@ -517,7 +517,7 @@ int libvhdi_block_descriptor_read_sector_bitmap_data(
 #endif
 	if( file_type == LIBVHDI_FILE_TYPE_VHD )
 	{
-		first_element_value = data[ data_offset ] >> 7;
+		first_element_value = ( data[ data_offset ] >> 7 ) & 0x01;
 	}
 	else if( file_type == LIBVHDI_FILE_TYPE_VHDX )
 	{
@@ -535,7 +535,7 @@ int libvhdi_block_descriptor_read_sector_bitmap_data(
 		{
 			if( file_type == LIBVHDI_FILE_TYPE_VHD )
 			{
-				element_value = byte_value >> ( 7 - bit_index );
+				element_value = ( byte_value >> ( 7 - bit_index ) ) & 0x01;
 			}
 			else if( file_type == LIBVHDI_FILE_TYPE_VHDX )
 			{
@@ -568,6 +568,19 @@ int libvhdi_block_descriptor_read_sector_bitmap_data(
 				}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
+				if( entry_index >= LIBVHDI_MAXIMUM_NUMBER_OF_SECTOR_RANGES )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+					 "%s: invalid sector bitmap - number of sector ranges: %d value exceeds maximum: %d.",
+					 function,
+					 entry_index,
+					 LIBVHDI_MAXIMUM_NUMBER_OF_SECTOR_RANGES );
+
+					goto on_error;
+				}
 				if( libvhdi_sector_range_descriptor_initialize(
 				     &sector_range_descriptor,
 				     error ) != 1 )
@@ -635,6 +648,19 @@ int libvhdi_block_descriptor_read_sector_bitmap_data(
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
+	if( entry_index >= LIBVHDI_MAXIMUM_NUMBER_OF_SECTOR_RANGES )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid sector bitmap - number of sector ranges: %d value exceeds maximum: %d.",
+		 function,
+		 entry_index,
+		 LIBVHDI_MAXIMUM_NUMBER_OF_SECTOR_RANGES );
+
+		goto on_error;
+	}
 	if( libvhdi_sector_range_descriptor_initialize(
 	     &sector_range_descriptor,
 	     error ) != 1 )
